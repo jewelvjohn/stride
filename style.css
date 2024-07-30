@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap');
+
+body {
+    overflow: hidden;
+    font-family: "Merriweather", serif;
+    font-weight: 400;
+
+    /* disable touch function */
+    -webkit-touch-callout: none; /* Safari */
+            -webkit-user-select: none; /* Chrome */     
+               -moz-user-select: none; /* Firefox */
+                -ms-user-select: none; /* Internet Explorer/Edge */
+                    user-select: none; 
+}
+
+canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.touch-inputs {
+    position: fixed;
+    display: flex;
+    left: 0;
+    bottom: 5vh;
+    width: 100vw;
+    justify-content: right;
+    z-index: 10;
+}
+
+.button-container {
+    display: flex;
+    margin: 16px;
+    margin-right: 32px;
+    padding: 16px;
+    gap: 2vmin;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.button-flex {
+    height: fit-content;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.control-button {
+    width: 16vmin;
+    max-width: 60px;
+    height: 16vmin;
+    max-height: 60px;
+    display: flex;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    outline: none;
+
+    background: black;
+    color: white;
+    border: none;
+    transition: all ease-in-out 0.2s;
+}
+
+.control-button img {
+    width: 50%;
+    height: 50%;
+    pointer-events: none;
+    -webkit-touch-callout: none;
+}
+
+.control-toggle {
+    width: 16vmin;
+    max-width: 60px;
+    height: 16vmin;
+    max-height: 60px;
+    display: flex;
+    border-radius: 25%;
+    justify-content: center;
+    align-items: center;
+    outline: none;
+
+    background-image: url(resources/sprites/run.svg);
+    background-size: cover;
+    color: white;
+    border: none;
+    transition: all ease-in-out 0.2s;
+    overflow: hidden;
+}
+
+.talk-bubble {
+    position: relative;
+    max-width: 300px;
+    background: white;
+    padding: 8px;
+    border-radius: 8px;
+    transform: translateY(calc(-50% + 20px));
+    opacity: 0;
+}
+
+.talk-bubble #textCone {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    bottom: -20px;
+    left: calc(50% - 12px);
+}
+
+.talk-bubble #textCone img {
+    width: 24px;
+    height: 24px;
+}
+
+.talk-bubble p {
+    margin: 4px;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.hidden {
+    display: none;
+}
