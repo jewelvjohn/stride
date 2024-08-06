@@ -7,7 +7,7 @@ import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
 /* 
 Current Bugs :-
-    3. Movement glitch when a keyboard input is used while the mouse pointer leave the same control button
+    -null-
 Solved Bugs  :-
     1. Player rotates opposite direction to reach idle rotation when tab refocuses
     2. Input system freezes when tab is unfocused while giving input
@@ -190,12 +190,12 @@ class InputSystem {
 }
 
 let scene, camera, renderer, effect, stats;
+let dirLight, hemiLight
 let inputSystem, character;
 let interfaceRenderer;
 let textBubble, textContainer;
 let texts = {};
 let runToggle;
-let lights = [];
 
 const runSpeed = 6.6;
 const walkSpeed = 2.6;
@@ -203,15 +203,15 @@ const positionLerp = 20;
 const rotationLerp = 16;
 
 const cameraLerp = 0.1;
-const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
+const cameraLookAtOffset = new THREE.Vector3(0, 100, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
-const walkLimit = new THREE.Vector2(-875, 875);
-const interactionPoints = [-800, -400, 400, 800];
-const interactionRange = 250;
+const walkLimit = new THREE.Vector2(-800, 800);
+const interactionPoints = [-500, -200, 200, 500];
+const interactionRange = 200;
 
-var runToggleOn = true;
-var runningMode = true;
+var runToggleOn = false;
+var runningMode = false;
 var isPaused = false;
 var atWalkLimitX = false;
 var atWalkLimitY = false;
@@ -362,50 +362,27 @@ function toggleRunButton() {
     }
 }
 
-function loadEnvironment() {
-    const manager = new THREE.LoadingManager();
-    const loader = new GLTFLoader(manager);
-    loader.load('resources/models/hall.glb', initializeEnvironment);
-}
-
-function initializeEnvironment(gltf) {
-    const model = gltf.scene;
-
-    model.traverse(function(child) {
-        if(child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-        }
-    });
-
-    model.scale.set(50, 50, 50);
-    model.position.set(20, 0, 0);
-    model.rotation.y = -90 * (Math.PI/180);
-    scene.add(model);
-    // colliderDebug();
-}
-
-function colliderDebug() {
-    const geometry = new THREE.BoxGeometry(100, 100, interactionRange);
-    const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.25 });
+function initializeEnvironment() {
+    const geometry = new THREE.BoxGeometry(200, 100, 200);
+    const redMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
     const redBox = new THREE.Mesh(geometry, redMaterial);
     scene.add(redBox);
-    redBox.position.set(0, 50, interactionPoints[0]);
+    redBox.position.set(0, 50, -200);
 
-    const greenMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.25 });
+    const greenMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
     const greenBox = new THREE.Mesh(geometry, greenMaterial);
     scene.add(greenBox);
-    greenBox.position.set(0, 50, interactionPoints[1]);
+    greenBox.position.set(0, 50, -500);
 
-    const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, transparent: true, opacity: 0.25 });
+    const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, transparent: true, opacity: 0.5 });
     const blueBox = new THREE.Mesh(geometry, blueMaterial);
     scene.add(blueBox);
-    blueBox.position.set(0, 50, interactionPoints[2]);
+    blueBox.position.set(0, 50, 200);
 
-    const yellowMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.25 });
+    const yellowMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.5 });
     const yellowBox = new THREE.Mesh(geometry, yellowMaterial);
     scene.add(yellowBox);
-    yellowBox.position.set(0, 50, interactionPoints[3]);
+    yellowBox.position.set(0, 50, 500);
 }
 
 //loads the player model file
@@ -533,56 +510,14 @@ function textBubbleUpdate() {
     textContainer.position.set(talkBubblePosition.x, talkBubblePosition.y, talkBubblePosition.z);
 }
 
-function setupLighting(highTier) {
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
-    hemiLight.position.set(0, 200, 0);
-    scene.add(hemiLight);
-    
-    const color = 0xfffae6;
-    const distance = 600;
-    const angle = 45 * Math.PI/180;
-    const intensity = 50;
-    const penubra = 0.5;
-    const decay = 0.5;
-    const bias = -0.00005;
-    const lightPosition = -200;
-    const lightTarget = 100;
-
-    if(highTier) {
-        const centerLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-        centerLight.position.set(lightPosition, 300, 0);
-        centerLight.target.position.set(lightTarget, 0, 0);
-        centerLight.castShadow = true;
-        centerLight.shadow.bias = bias;
-        
-        scene.add(centerLight);
-        scene.add(centerLight.target);
-        lights[0] = centerLight
-        
-        for(let i=0; i<interactionPoints.length; i++) {
-            const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-            spotLight.position.set(lightPosition, 300, interactionPoints[i]);
-            spotLight.target.position.set(lightTarget, 0, interactionPoints[i]);
-            spotLight.castShadow = true;
-            spotLight.shadow.bias = bias;
-            scene.add(spotLight);
-            scene.add(spotLight.target);
-            lights[i+1] = spotLight;
-        }
-    } else {
-        const dirLight = new THREE.DirectionalLight(color, 5);
-        dirLight.position.set(0, 200, 100);
-        scene.add(dirLight);
-    }
-}
-
 //initializes the whole scene
 function init() {
     const container = document.createElement('div');
     document.body.appendChild(container);
     
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+    scene = new THREE.Scene();    
+    scene.background = new THREE.Color( 0xa0a0a0 );
+    scene.fog = new THREE.Fog( 0xa0a0a0, 400, 2000 );
     
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
     camera.position.set(-500, 250, 250);
@@ -593,28 +528,50 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.render(scene, camera);
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.shadowMap.enabled = true;
-    
+
     stats = new Stats();
+
+    hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444, 5 );
+    hemiLight.position.set( 0, 200, 0 );
+    
+    dirLight = new THREE.DirectionalLight( 0xffffff, 5 );
+    dirLight.position.set( 0, 200, 100 );
+    dirLight.castShadow = true;
+    dirLight.shadow.camera.top = 180;
+    dirLight.shadow.camera.bottom = - 100;
+    dirLight.shadow.camera.left = - 120;
+    dirLight.shadow.camera.right = 120;
+
+    //post processing effects
+    effect = new OutlineEffect(renderer, {
+        defaultThickness: 0.002,
+        defaultColor: [0, 0, 0]
+    });
+
+    const ground = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+    ground.rotation.x = - Math.PI / 2;
+    ground.receiveShadow = true;
+    
+    const grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+    grid.material.opacity = 0.2;
+    grid.material.transparent = true;
+    
+    scene.add(hemiLight);
+    scene.add(dirLight);
+    scene.add(ground);
+    scene.add(grid);
+
     window.addEventListener('resize', onWindowResize);
     
     loadCharacter('character');
     inputSystem = new InputSystem();
     container.appendChild(renderer.domElement);
     container.appendChild(stats.dom);
-    
+
     window.addEventListener('blur',() => { isPaused = true; });
     window.addEventListener('focus',() => { isPaused = false; });
-    
-    //post processing effects
-    effect = new OutlineEffect(renderer, {
-        defaultThickness: 0.002,
-        defaultColor: [0, 0, 0]
-    });
-    
-    loadEnvironment();
-    setupLighting(true);
+
+    initializeEnvironment();
     initializeGUI();
 }
 
@@ -642,8 +599,6 @@ function animate() {
         textBubbleUpdate();
         cameraMovement();
     }
-
-    // console.log(renderer.info.render.triangles);
 }
 
 init();

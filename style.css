@@ -85,6 +85,8 @@ canvas {
 
     background-image: url(resources/sprites/run.svg);
     background-size: cover;
+    filter: invert(1);
+    transform: scale(1.1);
     color: white;
     border: none;
     transition: all ease-in-out 0.2s;
