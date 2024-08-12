@@ -12,16 +12,21 @@ export class CharacterController {
         this.actions = {};
         this.activeAction = null;
         this.previousActions = null;
-        this.walkAnimation = false;
         this.runAnimation = false;
+        this.walkAnimation = false;
 
         this.runningMode = true;
-        this.PositionRef = 0;
-        this.walkSpeed = 2.6;
-        this.runSpeed = 6.6;
+        this.interactionMode = true;
         this.moveInput = 0;
-        this.rotationLerp = 0.15;
-        this.positionLerp = 0.2;
+        this.positionRef = 0;
+
+        //constants
+        this.walkSpeed = 190;
+        this.runSpeed = 470;
+        this.rotationLerp = 20;
+        this.positionLerp = 20;
+        this.minBound = -925;
+        this.maxBound = 925;
     
         window.addEventListener('blur',() => { this.pause = true; });
         window.addEventListener('focus',() => { this.pause = false; });
@@ -86,7 +91,7 @@ export class CharacterController {
 
     //change character animation according to input
     characterAnimation() {
-        if(Math.abs(this.moveInput) > 0){
+        if(Math.abs(this.moveInput) > 0 && this.positionRef > this.minBound && this.positionRef < this.maxBound){
             if(!this.walkAnimation && !this.runningMode) {
                 this.walkAnimation = true;
                 this.runAnimation = false;
@@ -107,34 +112,22 @@ export class CharacterController {
     }
     
     //handles player translation and rotation
-    characterMovement() {
+    characterMovement(delta) {
         if(!this.pause) {
-            //check if the character position is inside any interaction section
-            // isInteracting = false;
-            // for(let i=0; i<interactionPoints.length; i++) {
-            //     if(this.model.position.z < (interactionPoints[i]+(interactionRange/2)) && this.model.position.z > (interactionPoints[i]-(interactionRange/2))) {
-            //         interactionId = i;
-            //         isInteracting = true;
-            //         break;
-            //     }
-            // }
-
-            //when to walk
-            if(this.runningMode) {
-                this.PositionRef += (this.runSpeed * this.moveInput);
-            } else {
-                this.PositionRef += (this.walkSpeed * this.moveInput);
-            }
-
-            //assign position and rotation according to the input
-            this.model.position.z = THREE.MathUtils.lerp(this.model.position.z, this.PositionRef, this.positionLerp);
-            this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, ((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp);
+            if(this.runningMode) this.positionRef += (this.runSpeed * this.moveInput * delta);
+            else this.positionRef += (this.walkSpeed * this.moveInput * delta);
+            this.positionRef = THREE.MathUtils.clamp(this.positionRef, this.minBound, this.maxBound);
+            this.model.position.z = THREE.MathUtils.lerp(this.model.position.z, this.positionRef, this.positionLerp * delta);
+            if(this.interactionMode) this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, ((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
+            else if(this.moveInput != 0)this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, ((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
         }
     }
 
-    update(input) {
-        this.moveInput = input;
-        this.characterMovement();
+    update(input, delta) {
+        this.mixer.update(delta);
+        this.moveInput = input.axes.horizontal;
+        this.runningMode = input.isRunToggle;
+        this.characterMovement(delta);
         this.characterAnimation();
     }
 }

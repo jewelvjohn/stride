@@ -9,20 +9,20 @@ import {InputSystem} from './resources/system/input.js';
 import {CharacterController} from './resources/system/character.js';
 
 /* 
-Current Bugs :-
-    3. Movement glitch when a keyboard input is used while the mouse pointer leave the same control button
-    4. The movement speed changes with the frame rate
-Solved Bugs  :-
+    Current Bugs :-
+    --null--
+    Solved Bugs  :-
     1. Player rotates opposite direction to reach idle rotation when tab refocuses
     2. Input system freezes when tab is unfocused while giving input
+    3. Movement glitch when a keyboard input is used while the mouse pointer leave the same control button
+    4. The movement speed changes with the frame rate
  */
 
 let scene, camera, renderer, effect, stats;
-let inputSystem, characterController;
+let inputSystem, player;
 let interfaceRenderer;
 let textBubble, textContainer;
 let texts = {};
-let runToggle;
 let lights = [];
 
 const cameraLerp = 0.1;
@@ -30,17 +30,14 @@ const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
 const interactionPoints = [-800, -400, 400, 800];
-const interactionRange = 250;
+const interactionRange = 200;
 
-var runToggleOn = true;
 var isTextBubbleVisible = false;
 var isInteracting = false; 
 var interactionId = -1;
 var currentInteractionId = -1;
-
 var cameraPosition = new THREE.Vector3(-500, 250, 250);
 var cameraLookAt = new THREE.Vector3(0, 100, 0);
-
 const clock = new THREE.Clock();
 
 function LerpVector3(start, end, t) {
@@ -91,14 +88,12 @@ function initializeGUI() {
 
     //assigning the left and right html buttons to the input system
     document.addEventListener("contextmenu", function (e) {e.preventDefault();}, false);
+    const docRunToggle = document.getElementById("runToggle");
     const docLeftButton = document.getElementById("leftButton");
     const docRightButton = document.getElementById("rightButton");
+    inputSystem.addTouchRunToggle(docRunToggle);
     inputSystem.addTouchLeftButton(docLeftButton); 
     inputSystem.addTouchRightButton(docRightButton);
-
-    //creating an event for the run toggle button
-    runToggle = document.getElementById("runToggle");
-    runToggle.onclick = toggleRunButton;
 }
 
 function textBubbleFadeIn() {
@@ -133,82 +128,20 @@ function textBubbleFadeOut() {
     })
 }
 
-function toggleButtonOn(toggle) {
-    toggle.animate([
-        {
-            transform: "scale(1.0)",
-            filter: "invert(0)",
-        },
-        {
-            transform: "scale(1.1)",
-            filter: "invert(1)",
-        }
-    ], {
-        duration: 100,
-        fill: "forwards",
-    })
-}
-
-function toggleButtonOff(toggle) {
-    toggle.animate([
-        {
-            transform: "scale(1.1)",
-            filter: "invert(1)",
-        },
-        {
-            transform: "scale(1.0)",
-            filter: "invert(0)",
-        }
-    ], {
-        duration: 100,
-        fill: "forwards",
-    })
-}
-
-function toggleRunButton() {
-    if(runToggleOn) {
-        toggleButtonOff(runToggle);
-        runningMode = false;
-        runToggleOn = false;
-    } else {
-        toggleButtonOn(runToggle);
-        runningMode = true;
-        runToggleOn = true;
-    }
-}
-
-function loadEnvironment() {
-    const manager = new THREE.LoadingManager();
-    const loader = new GLTFLoader(manager);
-    loader.load('resources/models/hall.glb', initializeEnvironment);
-}
-
-function initializeEnvironment(gltf) {
-    const model = gltf.scene;
-
-    model.traverse(function(child) {
-        if(child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-        }
-    });
-
-    model.scale.set(50, 50, 50);
-    model.position.set(20, 0, 0);
-    model.rotation.y = -90 * (Math.PI/180);
-    scene.add(model);
-}
-
-//move camera with player
-function cameraMovement() {
-    cameraLookAt = LerpVector3(cameraLookAt, characterController.model.position.clone().add(cameraLookAtOffset), cameraLerp);
-    camera.lookAt(cameraLookAt);
-    cameraPosition = LerpVector3(cameraPosition, characterController.model.position.clone().add(cameraPositionOffset), cameraLerp);
-    camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-}
-
 //move the html talk bubble with the player
 function textBubbleUpdate() {
+    //check if the character position is inside any interaction section
+    isInteracting = false;
+    player.interactionMode = false;
+    for(let i=0; i<interactionPoints.length; i++) {
+        if(player.model.position.z < (interactionPoints[i]+(interactionRange/2)) && player.model.position.z > (interactionPoints[i]-(interactionRange/2))) {
+            interactionId = i;
+            isInteracting = true;
+            player.interactionMode = true;
+            break;
+        }
+    }
+
     if(isInteracting && (interactionId !== currentInteractionId)) {
         currentInteractionId = interactionId;
 
@@ -231,11 +164,31 @@ function textBubbleUpdate() {
         isTextBubbleVisible = false;
     }
 
-    const talkBubblePosition = characterController.model.position.clone().add(talkBubbleOffset);
+    const talkBubblePosition = player.model.position.clone().add(talkBubbleOffset);
     textContainer.position.set(talkBubblePosition.x, talkBubblePosition.y, talkBubblePosition.z);
 }
 
-function setupLighting(highTier) {
+function loadEnvironment() {
+    const manager = new THREE.LoadingManager();
+    const loader = new GLTFLoader(manager);
+    loader.load('resources/models/hall.glb', initializeEnvironment);
+}
+
+function initializeEnvironment(gltf) {
+    const model = gltf.scene;
+    model.traverse(function(child) {
+        if(child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+        }
+    });
+
+    model.scale.set(50, 50, 50);
+    model.position.set(20, 0, 0);
+    model.rotation.y = -90 * (Math.PI/180);
+    scene.add(model);
+    
+    //lighting
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
     hemiLight.position.set(0, 200, 0);
     scene.add(hemiLight);
@@ -250,34 +203,41 @@ function setupLighting(highTier) {
     const lightPositionX = -150;
     const lightPositionY = 280;
     const lightTarget = 100;
+    
+    //simple lighting
+    // const dirLight = new THREE.DirectionalLight(color, 5);
+    // dirLight.position.set(0, 200, 100);
+    // scene.add(dirLight);
 
-    if(highTier) {
-        const centerLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-        centerLight.position.set(lightPositionX, lightPositionY, 0);
-        centerLight.target.position.set(lightTarget, 0, 0);
-        centerLight.castShadow = true;
-        centerLight.shadow.bias = bias;
+    const centerLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
+    centerLight.position.set(lightPositionX, lightPositionY, 0);
+    centerLight.target.position.set(lightTarget, 0, 0);
+    centerLight.castShadow = true;
+    centerLight.shadow.bias = bias;
+    
+    scene.add(centerLight);
+    scene.add(centerLight.target);
+    lights[0] = centerLight;
+    
+    for(let i=0; i<interactionPoints.length; i++) {
+        const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
+        spotLight.position.set(lightPositionX, lightPositionY, interactionPoints[i]);
+        spotLight.target.position.set(lightTarget, 0, interactionPoints[i]);
+        spotLight.castShadow = true;
+        spotLight.shadow.bias = bias;
         
-        scene.add(centerLight);
-        scene.add(centerLight.target);
-        lights[0] = centerLight;
-        
-        for(let i=0; i<interactionPoints.length; i++) {
-            const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-            spotLight.position.set(lightPositionX, lightPositionY, interactionPoints[i]);
-            spotLight.target.position.set(lightTarget, 0, interactionPoints[i]);
-            spotLight.castShadow = true;
-            spotLight.shadow.bias = bias;
-            
-            scene.add(spotLight);
-            scene.add(spotLight.target);
-            lights[i+1] = spotLight;
-        }
-    } else {
-        const dirLight = new THREE.DirectionalLight(color, 5);
-        dirLight.position.set(0, 200, 100);
-        scene.add(dirLight);
+        scene.add(spotLight);
+        scene.add(spotLight.target);
+        lights[i+1] = spotLight;
     }
+}
+
+//move camera with player
+function cameraMovement() {
+    cameraLookAt = LerpVector3(cameraLookAt, player.model.position.clone().add(cameraLookAtOffset), cameraLerp);
+    camera.lookAt(cameraLookAt);
+    cameraPosition = LerpVector3(cameraPosition, player.model.position.clone().add(cameraPositionOffset), cameraLerp);
+    camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 }
 
 //initializes the whole scene
@@ -303,7 +263,7 @@ function init() {
     stats = new Stats();
     window.addEventListener('resize', onWindowResize);
     
-    characterController = new CharacterController(scene);
+    player = new CharacterController(scene);
     inputSystem = new InputSystem();
     container.appendChild(renderer.domElement);
     container.appendChild(stats.dom);
@@ -315,7 +275,6 @@ function init() {
     });
     
     loadEnvironment();
-    setupLighting(true);
     initializeGUI();
 }
 
@@ -329,19 +288,18 @@ function onWindowResize() {
 
 //game loop
 function animate() {
-    requestAnimationFrame(animate);
+    stats.update();
     renderer.render(scene, camera);
     effect.render(scene, camera);
     interfaceRenderer.render(scene, camera);
-    const delta = clock.getDelta();
-    stats.update();
     
-    if(characterController.model) {
-        characterController.mixer.update(delta);
-        characterController.update(inputSystem.inputX);
+    const delta = clock.getDelta();
+    if(player.model) {
+        player.update(inputSystem, delta);
         textBubbleUpdate();
         cameraMovement();
     }
+    requestAnimationFrame(animate);
 }
 
 init();
