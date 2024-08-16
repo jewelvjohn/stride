@@ -16,9 +16,11 @@ import {CharacterController} from './resources/system/character.js';
     2. Input system freezes when tab is unfocused while giving input
     3. Movement glitch when a keyboard input is used while the mouse pointer leave the same control button
     4. The movement speed changes with the frame rate
+    5. Input system freezes when modifier keys are held
  */
 
 let scene, camera, renderer, effect, stats;
+let phone, computer;
 let inputSystem, player;
 let interfaceRenderer;
 let textBubble, textContainer;
@@ -30,7 +32,7 @@ const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
 const interactionPoints = [-800, -400, 400, 800];
-const interactionRange = 200;
+const interactionRange = 120;
 
 var isTextBubbleVisible = false;
 var isInteracting = false; 
@@ -40,12 +42,16 @@ var cameraPosition = new THREE.Vector3(-500, 250, 250);
 var cameraLookAt = new THREE.Vector3(0, 100, 0);
 const clock = new THREE.Clock();
 
-function LerpVector3(start, end, t) {
+function lerpVector3(start, end, t) {
     return new THREE.Vector3(
         THREE.MathUtils.lerp(start.x, end.x, t),
         THREE.MathUtils.lerp(start.y, end.y, t),
         THREE.MathUtils.lerp(start.z, end.z, t)
     );
+}
+
+function toRadian(angle) {
+    return angle * Math.PI / 180;
 }
 
 //function used for creating CSS renderer for rendering html elements in the 3D scene
@@ -88,12 +94,6 @@ function initializeGUI() {
 
     //assigning the left and right html buttons to the input system
     document.addEventListener("contextmenu", function (e) {e.preventDefault();}, false);
-    const docRunToggle = document.getElementById("runToggle");
-    const docLeftButton = document.getElementById("leftButton");
-    const docRightButton = document.getElementById("rightButton");
-    inputSystem.addTouchRunToggle(docRunToggle);
-    inputSystem.addTouchLeftButton(docLeftButton); 
-    inputSystem.addTouchRightButton(docRightButton);
 }
 
 function textBubbleFadeIn() {
@@ -107,7 +107,7 @@ function textBubbleFadeIn() {
             opacity: 1,
         }
     ], {
-        duration: 250,
+        duration: 150,
         fill: "forwards",
     })
 }
@@ -123,7 +123,7 @@ function textBubbleFadeOut() {
             opacity: 0,
         }
     ], {
-        duration: 250,
+        duration: 150,
         fill: "forwards",
     })
 }
@@ -172,10 +172,25 @@ function loadEnvironment() {
     const manager = new THREE.LoadingManager();
     const loader = new GLTFLoader(manager);
     loader.load('resources/models/hall.glb', initializeEnvironment);
+    loader.load('resources/models/phone.glb', (gltf) => {
+        phone = gltf.scene;
+        phone.scale.set(50, 50, 50);
+        phone.position.set(150, 80, interactionPoints[2]);
+        phone.rotation.set(0, toRadian(-90), 0);
+        scene.add(phone);
+    });
+    loader.load('resources/models/computer.glb', (gltf) => {
+        computer = gltf.scene;
+        computer.scale.set(50, 50, 50);
+        computer.position.set(150, 80, interactionPoints[3]);
+        computer.rotation.set(0, toRadian(-90), 0);
+        scene.add(computer);
+    });
 }
 
 function initializeEnvironment(gltf) {
     const model = gltf.scene;
+    
     model.traverse(function(child) {
         if(child.isMesh) {
             child.castShadow = true;
@@ -185,7 +200,7 @@ function initializeEnvironment(gltf) {
 
     model.scale.set(50, 50, 50);
     model.position.set(20, 0, 0);
-    model.rotation.y = -90 * (Math.PI/180);
+    model.rotation.y = toRadian(-90);
     scene.add(model);
     
     //lighting
@@ -234,9 +249,9 @@ function initializeEnvironment(gltf) {
 
 //move camera with player
 function cameraMovement() {
-    cameraLookAt = LerpVector3(cameraLookAt, player.model.position.clone().add(cameraLookAtOffset), cameraLerp);
+    cameraLookAt = lerpVector3(cameraLookAt, player.model.position.clone().add(cameraLookAtOffset), cameraLerp);
     camera.lookAt(cameraLookAt);
-    cameraPosition = LerpVector3(cameraPosition, player.model.position.clone().add(cameraPositionOffset), cameraLerp);
+    cameraPosition = lerpVector3(cameraPosition, player.model.position.clone().add(cameraPositionOffset), cameraLerp);
     camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 }
 
@@ -286,6 +301,11 @@ function onWindowResize() {
     interfaceRenderer.setSize(this.window.innerWidth, this.window.innerHeight);
 }
 
+function levitationAnimation(model, delta, frequency, amplitude, offset) {
+    model.userData.time = (model.userData.time || 0) + delta * frequency;
+    model.position.y = offset + (Math.sin(model.userData.time) * amplitude);
+}
+
 //game loop
 function animate() {
     stats.update();
@@ -294,12 +314,16 @@ function animate() {
     interfaceRenderer.render(scene, camera);
     
     const delta = clock.getDelta();
+
+    if(phone) levitationAnimation(phone, delta, 2, 5, 80);
+    if(computer) levitationAnimation(computer, delta, 2, 5, 80);
     if(player.model) {
         player.update(inputSystem, delta);
         textBubbleUpdate();
         cameraMovement();
     }
     requestAnimationFrame(animate);
+    // console.log(renderer.info.render.triangles);
 }
 
 init();
