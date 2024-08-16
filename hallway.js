@@ -7,6 +7,7 @@ import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
 import {InputSystem} from './resources/system/input.js';
 import {CharacterController} from './resources/system/character.js';
+import {InteractionContainer} from './resources/system/interaction.js';
 
 /* 
     Current Bugs :-
@@ -22,20 +23,15 @@ import {CharacterController} from './resources/system/character.js';
 let scene, camera, renderer, effect, stats;
 let hallway, painting;
 let hallwayMixer, hallwayActions = {};
-let inputSystem, player;
+let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
-let texts = {};
-let lights = [];
 
 const cameraLerp = 0.1;
 const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
-// const interactionPoints = [-1000, -600];
-const interactionPoints = [-1000];
-const interactionRange = 120;
-const highEndGraphics = true;
+const highEndGraphics = false;
 
 var isDoorOpen = true;
 var isTextBubbleVisible = false;
@@ -81,22 +77,29 @@ function initializeGUI() {
     coneImg.src = 'resources/sprites/cone.svg';
     coneDiv.appendChild(coneImg);
 
-    texts[0] = document.createElement('p');
-    texts[0].textContent = 'Hello world!';
-    texts[1] = document.createElement('p');
-    texts[1].textContent = 'How you doin!';
-    texts[2] = document.createElement('p');
-    texts[2].textContent = 'Sup dude!';
-    texts[3] = document.createElement('p');
-    texts[3].textContent = 'You smell!';
+    interactionContainer = new InteractionContainer();
+    interactionContainer.addInteractionPoint({
+        message: 'Beautiful painting!',
+        position: -950,
+        light: true,
+        focus: true,
+        range: 150 
+    });
+    interactionContainer.addInteractionPoint({
+        message: 'Should I go ahead',
+        position: -1150,
+        light: false,
+        focus: false,
+        range: 100 
+    });
 
     textBubble = document.createElement('div');
     textBubble.className = 'talk-bubble';
     textBubble.appendChild(coneDiv);
-    textBubble.appendChild(texts[0]);
-    textBubble.appendChild(texts[1]);
-    textBubble.appendChild(texts[2]);
-    textBubble.appendChild(texts[3]);
+
+    interactionContainer.points.forEach(point => {
+        textBubble.appendChild(point.text);
+    });
 
     const containerDiv = document.createElement('div');
     containerDiv.appendChild(textBubble);
@@ -145,11 +148,11 @@ function textBubbleUpdate() {
     //check if the character position is inside any interaction section
     isInteracting = false;
     player.interactionMode = false;
-    for(let i=0; i<interactionPoints.length; i++) {
-        if(player.model.position.z < (interactionPoints[i]+(interactionRange/2)) && player.model.position.z > (interactionPoints[i]-(interactionRange/2))) {
+    for(let i=0; i<interactionContainer.points.length; i++) {
+        if(player.model.position.z < interactionContainer.points[i].upperBound() && player.model.position.z > interactionContainer.points[i].lowerBound()) {
             interactionId = i;
             isInteracting = true;
-            player.interactionMode = true;
+            if(interactionContainer.points[i].focus) player.interactionMode = true;
             break;
         }
     }
@@ -157,12 +160,9 @@ function textBubbleUpdate() {
     if(isInteracting && (interactionId !== currentInteractionId)) {
         currentInteractionId = interactionId;
 
-        for(let i=0; i<Object.keys(texts).length; i++) {
-            if(i === currentInteractionId) {
-                texts[i].style.display = 'block';
-            } else {
-                texts[i].style.display = 'none';
-            }
+        for(let i=0; i<interactionContainer.points.length; i++) {
+            if(i === currentInteractionId) interactionContainer.points[i].text.style.display = 'block';
+            else interactionContainer.points[i].text.style.display = 'none';
         }
     }
 
@@ -210,18 +210,18 @@ function loadEnvironment() {
     const manager = new THREE.LoadingManager();
     const loader = new GLTFLoader(manager);
     loader.load('resources/models/hallway.glb', initializeEnvironment);
-    loader.load('resources/models/phone.glb', (gltf) => {
+    loader.load('resources/models/painting.glb', (gltf) => {
         painting = gltf.scene;
         painting.traverse(function(child) {
             if(child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
+                child.castShadow = false;
+                child.receiveShadow = false;
                 child.material.side = THREE.FrontSide;
             }
         });
         painting.scale.set(50, 50, 50);
-        painting.position.set(150, 80, interactionPoints[0]);
-        painting.rotation.set(0, toRadian(-90), 0);
+        painting.position.set(218, 120, interactionContainer.points[0].position);
+        painting.rotation.set(toRadian(10), toRadian(-90), 0);
         scene.add(painting);
     });
 }
@@ -236,7 +236,7 @@ function initializeEnvironment(gltf) {
     
     hallway.traverse(function(child) {
         if(child.isMesh) {
-            child.castShadow = true;
+            child.castShadow = false;
             child.receiveShadow = true;
             child.material.side = THREE.FrontSide;
         }
@@ -256,7 +256,7 @@ function initializeEnvironment(gltf) {
     scene.add(hallway);
     
     //lighting
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 1);
     hemiLight.position.set(0, 200, 0);
     scene.add(hemiLight);
     
@@ -282,24 +282,31 @@ function initializeEnvironment(gltf) {
         
         scene.add(centerLight);
         scene.add(centerLight.target);
-        lights[0] = centerLight;
         
-        for(let i=0; i<interactionPoints.length; i++) {
-            const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-            spotLight.position.set(lightPositionX, lightPositionY, interactionPoints[i]);
-            spotLight.target.position.set(lightTarget, 0, interactionPoints[i]);
-            spotLight.castShadow = true;
-            spotLight.shadow.bias = bias;
-            
-            scene.add(spotLight);
-            scene.add(spotLight.target);
-            lights[i+1] = spotLight;
+        for(let i=0; i<interactionContainer.points.length; i++) {
+            if(interactionContainer.points[i].light) {
+                const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
+                spotLight.position.set(lightPositionX, lightPositionY, interactionContainer.points[i].position);
+                spotLight.target.position.set(lightTarget, 0, interactionContainer.points[i].position);
+                spotLight.castShadow = true;
+                spotLight.shadow.bias = bias;
+                
+                scene.add(spotLight);
+                scene.add(spotLight.target);
+            }
         }
+        renderer.shadowMap.type = THREE.PCFShadowMap;
+        renderer.shadowMap.enabled = true;
     } else {
         //simple lighting
-        const dirLight = new THREE.DirectionalLight(color, 5);
-        dirLight.position.set(0, 200, 100);
+        const dirLight = new THREE.DirectionalLight(color, 3);
+        dirLight.position.set(-200, 200, -100);
+        dirLight.target.position.set(0, 0, 0);
         scene.add(dirLight);
+        scene.add(dirLight.target);
+
+        renderer.shadowMap.type = THREE.BasicShadowMap;
+        renderer.shadowMap.enabled = false;
     }
 }
 
@@ -332,14 +339,12 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.render(scene, camera);
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.shadowMap.enabled = true;
     
     stats = new Stats();
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController(scene, true, -1150, 150);
+    player = new CharacterController(scene, -1150, 150);
     inputSystem = new InputSystem();
     
     //post processing effects
@@ -350,8 +355,8 @@ function init() {
         });
     }
 
-    loadEnvironment();
     initializeGUI();
+    loadEnvironment();
     onWindowResize();
 }
 
@@ -372,7 +377,7 @@ function onWindowResize() {
 // }
 
 //game loop
-function animate() {
+function update() {
     stats.update();
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);
@@ -393,9 +398,9 @@ function animate() {
         if(player.model.position.z > -1100 && isDoorOpen) closeDoor();
     }
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(update);
     // console.log(renderer.info.render.triangles);
 }
 
 init();
-animate();
+update();
