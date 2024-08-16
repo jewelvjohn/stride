@@ -20,7 +20,8 @@ import {CharacterController} from './resources/system/character.js';
  */
 
 let scene, camera, renderer, effect, stats;
-let phone, computer;
+let hallway, painting;
+let hallwayMixer, hallwayActions = {};
 let inputSystem, player;
 let interfaceRenderer;
 let textBubble, textContainer;
@@ -31,9 +32,11 @@ const cameraLerp = 0.1;
 const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
-const interactionPoints = [-800, -400, 400, 800];
+// const interactionPoints = [-1000, -600];
+const interactionPoints = [-1000];
 const interactionRange = 120;
 
+var isDoorOpen = true;
 var isTextBubbleVisible = false;
 var isInteracting = false; 
 var interactionId = -1;
@@ -168,43 +171,75 @@ function textBubbleUpdate() {
     textContainer.position.set(talkBubblePosition.x, talkBubblePosition.y, talkBubblePosition.z);
 }
 
+function closeDoor() {
+    if(isDoorOpen) {
+        hallwayActions[1].fadeOut(0.3);
+        hallwayActions[0]
+            .reset()
+            .setEffectiveTimeScale(1)
+            .setEffectiveWeight(1)
+            .fadeIn(0.3)
+            .play();
+        isDoorOpen = false;
+    }
+}
+
+function openDoor() {
+    if(!isDoorOpen) {
+        hallwayActions[0].fadeOut(0.3);
+        hallwayActions[1]
+            .reset()
+            .setEffectiveTimeScale(1)
+            .setEffectiveWeight(1)
+            .fadeIn(0.3)
+            .play();
+        isDoorOpen = true;
+    }
+} 
+
 function loadEnvironment() {
     const manager = new THREE.LoadingManager();
     const loader = new GLTFLoader(manager);
-    loader.load('resources/models/hall.glb', initializeEnvironment);
+    loader.load('resources/models/hallway.glb', initializeEnvironment);
     loader.load('resources/models/phone.glb', (gltf) => {
-        phone = gltf.scene;
-        phone.scale.set(50, 50, 50);
-        phone.position.set(150, 80, interactionPoints[2]);
-        phone.rotation.set(0, toRadian(-90), 0);
-        scene.add(phone);
-    });
-    loader.load('resources/models/computer.glb', (gltf) => {
-        computer = gltf.scene;
-        computer.scale.set(50, 50, 50);
-        computer.position.set(150, 80, interactionPoints[3]);
-        computer.rotation.set(0, toRadian(-90), 0);
-        scene.add(computer);
+        painting = gltf.scene;
+        painting.scale.set(50, 50, 50);
+        painting.position.set(150, 80, interactionPoints[0]);
+        painting.rotation.set(0, toRadian(-90), 0);
+        scene.add(painting);
     });
 }
 
 function initializeEnvironment(gltf) {
-    const model = gltf.scene;
+    hallway = gltf.scene;
+    const animations = gltf.animations;
+
+    // animations.forEach((clip, index) => {
+    //     console.log(`Animation ${index}: ${clip.name}`);
+    // });
     
-    model.traverse(function(child) {
+    hallway.traverse(function(child) {
         if(child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
         }
     });
 
-    model.scale.set(50, 50, 50);
-    model.position.set(20, 0, 0);
-    model.rotation.y = toRadian(-90);
-    scene.add(model);
+    hallway.scale.set(50, 50, 50);
+    hallway.position.set(20, 0, 0);
+    hallway.rotation.y = toRadian(-90);
+
+    hallwayMixer = new THREE.AnimationMixer(hallway);
+    hallwayActions[0] = hallwayMixer.clipAction(animations[0]);
+    hallwayActions[1] = hallwayMixer.clipAction(animations[1]);
+    hallwayActions[0].clampWhenFinished = true;
+    hallwayActions[1].clampWhenFinished = true;
+
+    closeDoor();
+    scene.add(hallway);
     
     //lighting
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 2);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
     hemiLight.position.set(0, 200, 0);
     scene.add(hemiLight);
     
@@ -263,7 +298,7 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 2000);
     camera.position.set(-500, 250, 250);
     camera.rotation.set(0, 0, 0)
     camera.lookAt(0, 100, 0);
@@ -278,7 +313,7 @@ function init() {
     stats = new Stats();
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController(scene);
+    player = new CharacterController(scene, true, -1150, 150);
     inputSystem = new InputSystem();
     container.appendChild(renderer.domElement);
     container.appendChild(stats.dom);
@@ -295,16 +330,20 @@ function init() {
 
 //resize event used for resizing camera and renderer when window is resized
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    camera.aspect = aspectRatio;
+    camera.fov = THREE.MathUtils.clamp((-24 * aspectRatio)+70 , 35, 60);
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
     interfaceRenderer.setSize(this.window.innerWidth, this.window.innerHeight);
+
+    console.log(aspectRatio);
 }
 
-function levitationAnimation(model, delta, frequency, amplitude, offset) {
-    model.userData.time = (model.userData.time || 0) + delta * frequency;
-    model.position.y = offset + (Math.sin(model.userData.time) * amplitude);
-}
+// function levitationAnimation(model, delta, frequency, amplitude, offset) {
+//     model.userData.time = (model.userData.time || 0) + delta * frequency;
+//     model.position.y = offset + (Math.sin(model.userData.time) * amplitude);
+// }
 
 //game loop
 function animate() {
@@ -315,13 +354,21 @@ function animate() {
     
     const delta = clock.getDelta();
 
-    if(phone) levitationAnimation(phone, delta, 2, 5, 80);
-    if(computer) levitationAnimation(computer, delta, 2, 5, 80);
+    if(hallway) {
+        hallwayMixer.update(delta);
+    }
+
     if(player.model) {
         player.update(inputSystem, delta);
         textBubbleUpdate();
         cameraMovement();
     }
+
+    if(player.model && hallway) {
+        if(player.model.position.z < -1100 && !isDoorOpen) openDoor();
+        if(player.model.position.z > -1100 && isDoorOpen) closeDoor();
+    }
+
     requestAnimationFrame(animate);
     // console.log(renderer.info.render.triangles);
 }

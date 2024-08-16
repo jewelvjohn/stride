@@ -3,7 +3,7 @@ import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
 //class for storing character data like animations
 export class CharacterController {
-    constructor(scene) {
+    constructor(scene, interactionMode, minBound, maxBound) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
@@ -14,7 +14,7 @@ export class CharacterController {
         this.previousActions = null;
         this.runAnimation = false;
 
-        this.interactionMode = true;
+        this.interactionMode = interactionMode;
         this.moveInput = 0;
         this.positionRef = 0;
 
@@ -22,8 +22,8 @@ export class CharacterController {
         this.runSpeed = 470;
         this.rotationLerp = 20;
         this.positionLerp = 20;
-        this.minBound = -950;
-        this.maxBound = 950;
+        this.minBound = minBound;
+        this.maxBound = maxBound;
     
         window.addEventListener('blur',() => { this.pause = true; });
         window.addEventListener('focus',() => { this.pause = false; });
