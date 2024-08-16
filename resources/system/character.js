@@ -50,6 +50,7 @@ export class CharacterController {
                 child.material = new THREE.MeshToonMaterial({color: 0xFFFFFF, map: child.material.map, gradientMap: gradientMap});
                 child.castShadow = true;
                 child.receiveShadow = false;
+                child.material.side = THREE.FrontSide;
             }
         });
         model.scale.set(50, 50, 50);
@@ -84,10 +85,11 @@ export class CharacterController {
             .setEffectiveWeight(1)
             .fadeIn(duration)
             .play();
-    }
-
-    //change character animation according to input
-    characterAnimation() {
+        }
+        
+        //change character animation according to input
+    characterAnimation(delta) {
+        this.mixer.update(delta);
         const insideBound = (this.positionRef > this.minBound) && (this.positionRef < this.maxBound);
         if((Math.abs(this.moveInput) > 0) && insideBound) {
             if(!this.runAnimation) {
@@ -114,9 +116,8 @@ export class CharacterController {
     }
 
     update(input, delta) {
-        this.mixer.update(delta);
-        this.moveInput = input.axes.horizontal;
+        this.moveInput = input;
         this.characterMovement(delta);
-        this.characterAnimation();
+        this.characterAnimation(delta);
     }
 }

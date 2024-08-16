@@ -35,7 +35,7 @@ const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
 // const interactionPoints = [-1000, -600];
 const interactionPoints = [-1000];
 const interactionRange = 120;
-const highEndGraphics = false;
+const highEndGraphics = true;
 
 var isDoorOpen = true;
 var isTextBubbleVisible = false;
@@ -45,6 +45,14 @@ var currentInteractionId = -1;
 var cameraPosition = new THREE.Vector3(-500, 250, 250);
 var cameraLookAt = new THREE.Vector3(0, 100, 0);
 const clock = new THREE.Clock();
+
+function isMobile() {
+    return (/Android|iphone/i.test(navigator.userAgent));
+}
+
+function isTouch() {
+    return (navigator.maxTouchPoints > 0);
+}
 
 function lerpVector3(start, end, t) {
     return new THREE.Vector3(
@@ -204,6 +212,13 @@ function loadEnvironment() {
     loader.load('resources/models/hallway.glb', initializeEnvironment);
     loader.load('resources/models/phone.glb', (gltf) => {
         painting = gltf.scene;
+        painting.traverse(function(child) {
+            if(child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                child.material.side = THREE.FrontSide;
+            }
+        });
         painting.scale.set(50, 50, 50);
         painting.position.set(150, 80, interactionPoints[0]);
         painting.rotation.set(0, toRadian(-90), 0);
@@ -223,6 +238,7 @@ function initializeEnvironment(gltf) {
         if(child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
+            child.material.side = THREE.FrontSide;
         }
     });
 
@@ -369,7 +385,7 @@ function animate() {
     if(hallway) {
         hallwayMixer.update(delta);
     } if(player.model) {
-        player.update(inputSystem, delta);
+        player.update(inputSystem.axes.horizontal, delta);
         textBubbleUpdate();
         cameraMovement();
     } if(player.model && hallway) {
