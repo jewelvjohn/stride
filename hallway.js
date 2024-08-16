@@ -35,6 +35,7 @@ const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
 // const interactionPoints = [-1000, -600];
 const interactionPoints = [-1000];
 const interactionRange = 120;
+const highEndGraphics = false;
 
 var isDoorOpen = true;
 var isTextBubbleVisible = false;
@@ -254,31 +255,35 @@ function initializeEnvironment(gltf) {
     const lightPositionY = 280;
     const lightTarget = 100;
     
-    //simple lighting
-    // const dirLight = new THREE.DirectionalLight(color, 5);
-    // dirLight.position.set(0, 200, 100);
-    // scene.add(dirLight);
-
-    const centerLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-    centerLight.position.set(lightPositionX, lightPositionY, 0);
-    centerLight.target.position.set(lightTarget, 0, 0);
-    centerLight.castShadow = true;
-    centerLight.shadow.bias = bias;
     
-    scene.add(centerLight);
-    scene.add(centerLight.target);
-    lights[0] = centerLight;
-    
-    for(let i=0; i<interactionPoints.length; i++) {
-        const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-        spotLight.position.set(lightPositionX, lightPositionY, interactionPoints[i]);
-        spotLight.target.position.set(lightTarget, 0, interactionPoints[i]);
-        spotLight.castShadow = true;
-        spotLight.shadow.bias = bias;
+    if(highEndGraphics) {
+        //high end lighting
+        const centerLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
+        centerLight.position.set(lightPositionX, lightPositionY, 0);
+        centerLight.target.position.set(lightTarget, 0, 0);
+        centerLight.castShadow = true;
+        centerLight.shadow.bias = bias;
         
-        scene.add(spotLight);
-        scene.add(spotLight.target);
-        lights[i+1] = spotLight;
+        scene.add(centerLight);
+        scene.add(centerLight.target);
+        lights[0] = centerLight;
+        
+        for(let i=0; i<interactionPoints.length; i++) {
+            const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
+            spotLight.position.set(lightPositionX, lightPositionY, interactionPoints[i]);
+            spotLight.target.position.set(lightTarget, 0, interactionPoints[i]);
+            spotLight.castShadow = true;
+            spotLight.shadow.bias = bias;
+            
+            scene.add(spotLight);
+            scene.add(spotLight.target);
+            lights[i+1] = spotLight;
+        }
+    } else {
+        //simple lighting
+        const dirLight = new THREE.DirectionalLight(color, 5);
+        dirLight.position.set(0, 200, 100);
+        scene.add(dirLight);
     }
 }
 
@@ -292,8 +297,7 @@ function cameraMovement() {
 
 //initializes the whole scene
 function init() {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
+    const canvas = document.querySelector('canvas.webgl');
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
@@ -303,7 +307,12 @@ function init() {
     camera.rotation.set(0, 0, 0)
     camera.lookAt(0, 100, 0);
     
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ 
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance",
+        canvas: canvas
+    });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.render(scene, camera);
@@ -311,21 +320,23 @@ function init() {
     renderer.shadowMap.enabled = true;
     
     stats = new Stats();
+    document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
     player = new CharacterController(scene, true, -1150, 150);
     inputSystem = new InputSystem();
-    container.appendChild(renderer.domElement);
-    container.appendChild(stats.dom);
     
     //post processing effects
-    effect = new OutlineEffect(renderer, {
-        defaultThickness: 0.002,
-        defaultColor: [0, 0, 0]
-    });
-    
+    if(highEndGraphics) {
+        effect = new OutlineEffect(renderer, {
+            defaultThickness: 0.002,
+            defaultColor: [0, 0, 0]
+        });
+    }
+
     loadEnvironment();
     initializeGUI();
+    onWindowResize();
 }
 
 //resize event used for resizing camera and renderer when window is resized
@@ -335,9 +346,8 @@ function onWindowResize() {
     camera.fov = THREE.MathUtils.clamp((-24 * aspectRatio)+70 , 35, 60);
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
-    interfaceRenderer.setSize(this.window.innerWidth, this.window.innerHeight);
-
-    console.log(aspectRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    interfaceRenderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 // function levitationAnimation(model, delta, frequency, amplitude, offset) {
@@ -349,22 +359,20 @@ function onWindowResize() {
 function animate() {
     stats.update();
     renderer.render(scene, camera);
-    effect.render(scene, camera);
     interfaceRenderer.render(scene, camera);
     
+    if(highEndGraphics) {
+        effect.render(scene, camera);
+    }
+    
     const delta = clock.getDelta();
-
     if(hallway) {
         hallwayMixer.update(delta);
-    }
-
-    if(player.model) {
+    } if(player.model) {
         player.update(inputSystem, delta);
         textBubbleUpdate();
         cameraMovement();
-    }
-
-    if(player.model && hallway) {
+    } if(player.model && hallway) {
         if(player.model.position.z < -1100 && !isDoorOpen) openDoor();
         if(player.model.position.z > -1100 && isDoorOpen) closeDoor();
     }
