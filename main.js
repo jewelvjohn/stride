@@ -11,7 +11,7 @@ import {InteractionContainer} from './src/lib/interaction.js';
 
 /* 
     Current Bugs :-
-    6. Mobile button buzz when held pressed
+    7. Sub-pages have problem accessing js files after deployment
     --null--
     Solved Bugs  :-
     1. Player rotates opposite direction to reach idle rotation when tab refocuses
@@ -19,6 +19,7 @@ import {InteractionContainer} from './src/lib/interaction.js';
     3. Movement glitch when a keyboard input is used while the mouse pointer leave the same control button
     4. The movement speed changes with the frame rate
     5. Input system freezes when modifier keys are held
+    6. Mobile button buzz when held pressed
  */
 
 let scene, camera, renderer, effect, stats, canvas;
@@ -29,7 +30,7 @@ let interfaceRenderer;
 let textBubble, textContainer;
 
 const cameraLerp = 0.1;
-const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
+const cameraLookAtOffset = new THREE.Vector3(0, 170, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
 const sizes = {
@@ -44,7 +45,7 @@ var isInteracting = false;
 var interactionId = -1;
 var currentInteractionId = -1;
 var cameraPosition = new THREE.Vector3(-500, 250, 250);
-var cameraLookAt = new THREE.Vector3(0, 100, 0);
+var cameraLookAt = new THREE.Vector3(0, 170, 0);
 
 const loadingManager = new THREE.LoadingManager();
 const clock = new THREE.Clock();
@@ -75,7 +76,7 @@ function initializeGUI() {
     interfaceRenderer.setSize(sizes.width, sizes.height);
     interfaceRenderer.domElement.style.position = 'fixed';
     interfaceRenderer.domElement.style.top = '0px';
-    interfaceRenderer.domElement.style.pointerEvents = 'none';
+    // interfaceRenderer.domElement.style.pointerEvents = 'none';
     document.body.appendChild(interfaceRenderer.domElement);
 
     const coneDiv = document.createElement('div');
@@ -86,14 +87,14 @@ function initializeGUI() {
 
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
-        message: 'Beautiful painting!',
+        message: '<p>Beautiful painting!</p>',
         position: -950,
         light: true,
         focus: true,
         range: 150 
     });
     interactionContainer.addInteractionPoint({
-        message: 'Should I go ahead',
+        message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="living-room.html"><i>Go Ahead</i></a>',
         position: -1150,
         light: false,
         focus: false,
@@ -101,7 +102,7 @@ function initializeGUI() {
     });
 
     textBubble = document.createElement('div');
-    textBubble.className = 'talk-bubble';
+    textBubble.className = 'talkbubble';
     textBubble.appendChild(coneDiv);
 
     interactionContainer.points.forEach(point => {
@@ -168,7 +169,7 @@ function textBubbleUpdate() {
         currentInteractionId = interactionId;
 
         for(let i=0; i<interactionContainer.points.length; i++) {
-            if(i === currentInteractionId) interactionContainer.points[i].text.style.display = 'block';
+            if(i === currentInteractionId) interactionContainer.points[i].text.style.display = 'flex';
             else interactionContainer.points[i].text.style.display = 'none';
         }
     }

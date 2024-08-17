@@ -105,7 +105,7 @@ body {
     overflow: hidden;
 }
 
-.talk-bubble {
+.talkbubble {
     position: relative;
     max-width: 300px;
     background: white;
@@ -115,7 +115,7 @@ body {
     opacity: 0;
 }
 
-.talk-bubble #textCone {
+.talkbubble #textCone {
     position: absolute;
     width: 24px;
     height: 24px;
@@ -123,15 +123,41 @@ body {
     left: calc(50% - 12px);
 }
 
-.talk-bubble #textCone img {
+.talkbubble #textCone img {
     width: 24px;
     height: 24px;
 }
 
-.talk-bubble p {
+.talkbubble-message {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.talkbubble-message p {
     margin: 4px;
     font-size: 14px;
     font-style: italic;
+}
+
+.talkbubble-link {
+    display: flex;
+    margin: 4px;
+    width: 100%;
+    height: 30px;
+    border-radius: 6px;
+    background: #be63f9;
+    border-bottom: 4px solid #8142ab;
+    color: aliceblue;
+    text-decoration: none;
+    justify-content: center;
+    align-items: center;
+    transition: 0.3s all ease-in-out;
+}
+
+.talkbubble-link:hover {
+    transform: translateY(4px);
+    border-bottom: 2px solid #8142ab;
 }
 
 .hidden {
