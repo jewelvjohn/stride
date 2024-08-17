@@ -11,8 +11,7 @@
 }
 
 body {
-    overflow: hidden;
-
+    background: black;
     /* disable touch function */
           -webkit-touch-callout: none; /* Safari */
             -webkit-user-select: none; /* Chrome */     

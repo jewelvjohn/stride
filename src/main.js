@@ -20,7 +20,7 @@ import {InteractionContainer} from './lib/interaction.js';
     5. Input system freezes when modifier keys are held
  */
 
-let scene, camera, renderer, effect, stats;
+let scene, camera, renderer, effect, stats, canvas;
 let hallway, painting;
 let hallwayMixer, hallwayActions = {};
 let player, inputSystem, interactionContainer;
@@ -31,7 +31,11 @@ const cameraLerp = 0.1;
 const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
-const highEndGraphics = true;
+const highEndGraphics = false;
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
 
 var isDoorOpen = true;
 var isTextBubbleVisible = false;
@@ -65,8 +69,8 @@ function toRadian(angle) {
 //function used for creating CSS renderer for rendering html elements in the 3D scene
 function initializeGUI() {
     interfaceRenderer = new CSS2DRenderer();
-    interfaceRenderer.setSize(window.innerWidth, window.innerHeight);
-    interfaceRenderer.domElement.style.position = 'absolute';
+    interfaceRenderer.setSize(sizes.width, sizes.height);
+    interfaceRenderer.domElement.style.position = 'fixed';
     interfaceRenderer.domElement.style.top = '0px';
     interfaceRenderer.domElement.style.pointerEvents = 'none';
     document.body.appendChild(interfaceRenderer.domElement);
@@ -316,12 +320,12 @@ function cameraMovement() {
 
 //initializes the whole scene
 function init() {
-    const canvas = document.querySelector('canvas.webgl');
+    canvas = document.querySelector('canvas.webgl');
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     
-    camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 2000);
+    camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 1, 2000);
     camera.position.set(-500, 250, 250);
     camera.rotation.set(0, 0, 0)
     camera.lookAt(0, 100, 0);
@@ -332,8 +336,8 @@ function init() {
         powerPreference: "high-performance",
         canvas: canvas
     });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(sizes.width, sizes.height);
     renderer.render(scene, camera);
     
     stats = new Stats();
@@ -344,12 +348,12 @@ function init() {
     inputSystem = new InputSystem();
     
     //post processing effects
-    if(highEndGraphics) {
+    // if(highEndGraphics) {
         effect = new OutlineEffect(renderer, {
             defaultThickness: 0.002,
             defaultColor: [0, 0, 0]
         });
-    }
+    // }
 
     initializeGUI();
     loadEnvironment();
@@ -358,13 +362,18 @@ function init() {
 
 //resize event used for resizing camera and renderer when window is resized
 function onWindowResize() {
-    const aspectRatio = window.innerWidth / window.innerHeight;
-    camera.aspect = aspectRatio;
-    camera.fov = THREE.MathUtils.clamp((-24 * aspectRatio)+70 , 35, 60);
+    sizes.width = window.innerWidth;
+    sizes.height = window.innerHeight;
+    
+    camera.aspect = sizes.width / sizes.height;
+    camera.fov = THREE.MathUtils.clamp((-24 * camera.aspect)+70 , 35, 60);
     camera.updateProjectionMatrix();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    
+    renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    interfaceRenderer.setSize(window.innerWidth, window.innerHeight);
+    interfaceRenderer.setSize(sizes.width, sizes.height);
+
+    if(canvas) console.log(sizes.width, sizes.height);
 }
 
 //game loop
@@ -373,9 +382,9 @@ function update() {
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);
     
-    if(highEndGraphics) {
+    // if(highEndGraphics) {
         effect.render(scene, camera);
-    }
+    // }
     
     const delta = clock.getDelta();
     if(hallway) {
