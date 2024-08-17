@@ -3,7 +3,7 @@ import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
 //class for storing character data like animations
 export class CharacterController {
-    constructor(scene, minBound, maxBound) {
+    constructor(scene, manager, minBound, maxBound) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
@@ -28,12 +28,11 @@ export class CharacterController {
         window.addEventListener('blur',() => { this.pause = true; });
         window.addEventListener('focus',() => { this.pause = false; });
 
-        this.loadCharacter();
+        this.loadCharacter(manager);
     }
 
     //loads the player model file
-    loadCharacter() {
-        const manager = new THREE.LoadingManager();
+    loadCharacter(manager) {
         const loader = new GLTFLoader(manager);
         loader.load('./resources/3d/high-end/character.glb', this.initializeCharacter.bind(this));
     }

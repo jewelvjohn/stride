@@ -69,17 +69,19 @@ body {
     align-items: center;
     outline: none;
 
-    background: black;
     color: white;
     border: none;
     transition: all ease-in-out 0.2s;
 }
 
-.control-button img {
-    width: 50%;
-    height: 50%;
-    pointer-events: none;
-    -webkit-touch-callout: none;
+#leftButton {
+    background-image: url(/resources/images/left.png);
+    background-size: cover;
+}
+
+#rightButton {
+    background-image: url(/resources/images/right.png);
+    background-size: cover;
 }
 
 .control-toggle {

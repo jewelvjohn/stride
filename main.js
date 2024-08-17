@@ -11,6 +11,7 @@ import {InteractionContainer} from './src/lib/interaction.js';
 
 /* 
     Current Bugs :-
+    6. Mobile button buzz when held pressed
     --null--
     Solved Bugs  :-
     1. Player rotates opposite direction to reach idle rotation when tab refocuses
@@ -31,12 +32,12 @@ const cameraLerp = 0.1;
 const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
-const highEndGraphics = false;
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
 
+var highEndGraphics = false;
 var isDoorOpen = true;
 var isTextBubbleVisible = false;
 var isInteracting = false; 
@@ -44,6 +45,8 @@ var interactionId = -1;
 var currentInteractionId = -1;
 var cameraPosition = new THREE.Vector3(-500, 250, 250);
 var cameraLookAt = new THREE.Vector3(0, 100, 0);
+
+const loadingManager = new THREE.LoadingManager();
 const clock = new THREE.Clock();
 
 function isMobile() {
@@ -211,8 +214,7 @@ function openDoor() {
 } 
 
 function loadEnvironment() {
-    const manager = new THREE.LoadingManager();
-    const loader = new GLTFLoader(manager);
+    const loader = new GLTFLoader(loadingManager);
     loader.load('./resources/3d/high-end/hallway.glb', initializeEnvironment);
     loader.load('./resources/3d/high-end/painting.glb', (gltf) => {
         painting = gltf.scene;
@@ -321,6 +323,8 @@ function cameraMovement() {
 //initializes the whole scene
 function init() {
     canvas = document.querySelector('canvas.webgl');
+    if(!isMobile()) highEndGraphics = true;
+    if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
@@ -344,16 +348,22 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController(scene, -1150, 150);
+    player = new CharacterController(scene, loadingManager, -1150, 150);
     inputSystem = new InputSystem();
     
-    //post processing effects
-    // if(highEndGraphics) {
-        effect = new OutlineEffect(renderer, {
-            defaultThickness: 0.002,
-            defaultColor: [0, 0, 0]
-        });
-    // }
+    effect = new OutlineEffect(renderer, {
+        defaultThickness: 0.002,
+        defaultColor: [0, 0, 0]
+    });
+
+    loadingManager.onProgress = function(url, loaded, total) {
+        const progress = (loaded / total) * 100;
+        console.log(`Loading: ${progress}`);
+    }
+
+    loadingManager.onLoad = function() {
+        console.log(`Finished loading!`);
+    }
 
     initializeGUI();
     loadEnvironment();
@@ -379,10 +389,7 @@ function update() {
     stats.update();
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);
-    
-    // if(highEndGraphics) {
-        effect.render(scene, camera);
-    // }
+    effect.render(scene, camera);
     
     const delta = clock.getDelta();
     if(hallway) {
