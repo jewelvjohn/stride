@@ -1,13 +1,13 @@
-import './style.css'
+import './styles/main.css'
 import * as THREE from 'three'
 import Stats from 'three/addons/libs/stats.module.js'; 
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {OutlineEffect} from 'three/addons/effects/OutlineEffect.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
-import {InputSystem} from './resources/system/input.js';
-import {CharacterController} from './resources/system/character.js';
-import {InteractionContainer} from './resources/system/interaction.js';
+import {InputSystem} from './lib/input.js';
+import {CharacterController} from './lib/character.js';
+import {InteractionContainer} from './lib/interaction.js';
 
 /* 
     Current Bugs :-
@@ -31,7 +31,7 @@ const cameraLerp = 0.1;
 const cameraLookAtOffset = new THREE.Vector3(0, 120, 0);
 const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
-const highEndGraphics = false;
+const highEndGraphics = true;
 
 var isDoorOpen = true;
 var isTextBubbleVisible = false;
@@ -74,7 +74,7 @@ function initializeGUI() {
     const coneDiv = document.createElement('div');
     coneDiv.id = 'textCone';
     const coneImg = document.createElement('img');
-    coneImg.src = 'resources/sprites/cone.svg';
+    coneImg.src = 'src/assets/images/cone.svg';
     coneDiv.appendChild(coneImg);
 
     interactionContainer = new InteractionContainer();
@@ -209,8 +209,8 @@ function openDoor() {
 function loadEnvironment() {
     const manager = new THREE.LoadingManager();
     const loader = new GLTFLoader(manager);
-    loader.load('resources/models/hallway.glb', initializeEnvironment);
-    loader.load('resources/models/painting.glb', (gltf) => {
+    loader.load('src/assets/3d/high-end/hallway.glb', initializeEnvironment);
+    loader.load('src/assets/3d/high-end/painting.glb', (gltf) => {
         painting = gltf.scene;
         painting.traverse(function(child) {
             if(child.isMesh) {
@@ -229,10 +229,6 @@ function loadEnvironment() {
 function initializeEnvironment(gltf) {
     hallway = gltf.scene;
     const animations = gltf.animations;
-
-    // animations.forEach((clip, index) => {
-    //     console.log(`Animation ${index}: ${clip.name}`);
-    // });
     
     hallway.traverse(function(child) {
         if(child.isMesh) {
@@ -370,11 +366,6 @@ function onWindowResize() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     interfaceRenderer.setSize(window.innerWidth, window.innerHeight);
 }
-
-// function levitationAnimation(model, delta, frequency, amplitude, offset) {
-//     model.userData.time = (model.userData.time || 0) + delta * frequency;
-//     model.position.y = offset + (Math.sin(model.userData.time) * amplitude);
-// }
 
 //game loop
 function update() {

@@ -28,7 +28,7 @@ export class CharacterController {
         window.addEventListener('blur',() => { this.pause = true; });
         window.addEventListener('focus',() => { this.pause = false; });
 
-        this.loadCharacter('resources/models/character.glb');
+        this.loadCharacter('src/assets/3d/high-end/character.glb');
     }
 
     //loads the player model file
