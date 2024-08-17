@@ -28,14 +28,14 @@ export class CharacterController {
         window.addEventListener('blur',() => { this.pause = true; });
         window.addEventListener('focus',() => { this.pause = false; });
 
-        this.loadCharacter('src/assets/3d/high-end/character.glb');
+        this.loadCharacter();
     }
 
     //loads the player model file
-    loadCharacter(filename) {
+    loadCharacter() {
         const manager = new THREE.LoadingManager();
         const loader = new GLTFLoader(manager);
-        loader.load(filename, this.initializeCharacter.bind(this));
+        loader.load('./resources/3d/high-end/character.glb', this.initializeCharacter.bind(this));
     }
     
     //after player model is loaded it passed to this function to load additional animations

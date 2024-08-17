@@ -1,13 +1,13 @@
-import './styles/main.css'
+import './src/styles/main.css'
 import * as THREE from 'three'
 import Stats from 'three/addons/libs/stats.module.js'; 
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {OutlineEffect} from 'three/addons/effects/OutlineEffect.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
-import {InputSystem} from './lib/input.js';
-import {CharacterController} from './lib/character.js';
-import {InteractionContainer} from './lib/interaction.js';
+import {InputSystem} from './src/lib/input.js';
+import {CharacterController} from './src/lib/character.js';
+import {InteractionContainer} from './src/lib/interaction.js';
 
 /* 
     Current Bugs :-
@@ -78,7 +78,7 @@ function initializeGUI() {
     const coneDiv = document.createElement('div');
     coneDiv.id = 'textCone';
     const coneImg = document.createElement('img');
-    coneImg.src = 'src/assets/images/cone.svg';
+    coneImg.src = './resources/images/cone.svg';
     coneDiv.appendChild(coneImg);
 
     interactionContainer = new InteractionContainer();
@@ -213,8 +213,8 @@ function openDoor() {
 function loadEnvironment() {
     const manager = new THREE.LoadingManager();
     const loader = new GLTFLoader(manager);
-    loader.load('src/assets/3d/high-end/hallway.glb', initializeEnvironment);
-    loader.load('src/assets/3d/high-end/painting.glb', (gltf) => {
+    loader.load('./resources/3d/high-end/hallway.glb', initializeEnvironment);
+    loader.load('./resources/3d/high-end/painting.glb', (gltf) => {
         painting = gltf.scene;
         painting.traverse(function(child) {
             if(child.isMesh) {
@@ -366,14 +366,12 @@ function onWindowResize() {
     sizes.height = window.innerHeight;
     
     camera.aspect = sizes.width / sizes.height;
-    camera.fov = THREE.MathUtils.clamp((-24 * camera.aspect)+70 , 35, 60);
+    camera.fov = THREE.MathUtils.clamp((-26*camera.aspect)+80 , 35, 80);
     camera.updateProjectionMatrix();
     
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     interfaceRenderer.setSize(sizes.width, sizes.height);
-
-    if(canvas) console.log(sizes.width, sizes.height);
 }
 
 //game loop
