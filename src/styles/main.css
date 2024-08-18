@@ -75,12 +75,12 @@ body {
 }
 
 #leftButton {
-    background-image: url(/resources/images/left.png);
+    background-image: url(/resources/images/left.svg);
     background-size: cover;
 }
 
 #rightButton {
-    background-image: url(/resources/images/right.png);
+    background-image: url(/resources/images/right.svg);
     background-size: cover;
 }
 
@@ -95,7 +95,7 @@ body {
     align-items: center;
     outline: none;
 
-    background-image: url(resources/sprites/run.svg);
+    background-image: url(/resources/sprites/run.svg);
     background-size: cover;
     filter: invert(1);
     transform: scale(1.1);
