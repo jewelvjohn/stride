@@ -3,7 +3,7 @@ import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
 //class for storing character data like animations
 export class CharacterController {
-    constructor(scene, manager, minBound, maxBound) {
+    constructor(filename, scene, manager, minBound, maxBound) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
@@ -28,13 +28,13 @@ export class CharacterController {
         window.addEventListener('blur',() => { this.pause = true; });
         window.addEventListener('focus',() => { this.pause = false; });
 
-        this.loadCharacter(manager);
+        this.loadCharacter(filename, manager);
     }
 
     //loads the player model file
-    loadCharacter(manager) {
+    loadCharacter(filename, manager) {
         const loader = new GLTFLoader(manager);
-        loader.load('./resources/3d/high-end/character.glb', this.initializeCharacter.bind(this));
+        loader.load(filename, this.initializeCharacter.bind(this));
     }
     
     //after player model is loaded it passed to this function to load additional animations

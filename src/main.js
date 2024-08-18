@@ -1,13 +1,13 @@
-import './src/styles/main.css'
+import './styles/main.css'
 import * as THREE from 'three'
 import Stats from 'three/addons/libs/stats.module.js'; 
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {OutlineEffect} from 'three/addons/effects/OutlineEffect.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
-import {InputSystem} from './src/lib/input.js';
-import {CharacterController} from './src/lib/character.js';
-import {InteractionContainer} from './src/lib/interaction.js';
+import {InputSystem} from './lib/input.js';
+import {CharacterController} from './lib/character.js';
+import {InteractionContainer} from './lib/interaction.js';
 
 /* 
     Current Bugs :-
@@ -94,7 +94,7 @@ function initializeGUI() {
         range: 150 
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="living-room.html"><i>Go Ahead</i></a>',
+        message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>',
         position: -1150,
         light: false,
         focus: false,
@@ -349,7 +349,7 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController(scene, loadingManager, -1150, 150);
+    player = new CharacterController('./resources/3d/high-end/character.glb', scene, loadingManager, -1150, 150);
     inputSystem = new InputSystem();
     
     effect = new OutlineEffect(renderer, {
