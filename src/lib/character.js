@@ -1,12 +1,13 @@
 import * as THREE from 'three'
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
-//class for storing character data like animations
 export class CharacterController {
-    constructor(filename, scene, manager, minBound, maxBound) {
+    constructor(filename, scene, manager, minBound, maxBound, wakeup = false) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
+        this.wakeup = wakeup;
+        this.takeInputs = true;
 
         this.mixer = null;
         this.actions = {};
@@ -25,8 +26,8 @@ export class CharacterController {
         this.minBound = minBound;
         this.maxBound = maxBound;
     
-        window.addEventListener('blur',() => { this.pause = true; });
-        window.addEventListener('focus',() => { this.pause = false; });
+        window.addEventListener('blur',() => { if(!this.pause) this.pause = true; });
+        window.addEventListener('focus',() => { if(this.pause) this.pause = false; });
 
         this.loadCharacter(filename, manager);
     }
@@ -43,6 +44,8 @@ export class CharacterController {
         const step = new Uint8Array([64, 128, 255]);
         const gradientMap = new THREE.DataTexture(step, step.length, 1, THREE.RedFormat);
         gradientMap.needsUpdate = true;
+
+        console.log(gltf.animations);
     
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -57,17 +60,33 @@ export class CharacterController {
         this.mixer = new THREE.AnimationMixer(model);
     
         //after animations are all loaded up the animations mixer is initialized with all the animation clips
-        this.actions[0] = this.mixer.clipAction(gltf.animations[1]);
-        this.actions[1] = this.mixer.clipAction(gltf.animations[2]);
-        this.actions[2] = this.mixer.clipAction(gltf.animations[3]);
-        this.startIdle();
-        this.model.rotation.y = (1/2) * Math.PI;
+        this.actions[0] = this.mixer.clipAction(gltf.animations[1]); //idle
+        this.actions[1] = this.mixer.clipAction(gltf.animations[2]); //running
+        this.actions[2] = this.mixer.clipAction(gltf.animations[3]); //walking
+        this.actions[3] = this.mixer.clipAction(gltf.animations[4]); //waking up
+
+        if(this.wakeup) this.startWakeUp();
+        else this.startIdle();
+        this.model.rotation.y = Math.PI;
         this.scene.add(this.model);
     }
 
     //start off animation
     startIdle() {
         this.activeAction = this.actions[0];
+        this.activeAction.play();
+    }
+
+    startWakeUp() {
+        this.takeInputs = false;
+        this.actions[3].clampWhenFinished = true;
+        this.actions[3].loop = THREE.LoopOnce;
+        this.actions[3].getMixer().addEventListener('finished', () => {
+            this.playAction(0, 0.4);
+            this.takeInputs = true;
+        });
+
+        this.activeAction = this.actions[3];
         this.activeAction.play();
     }
 
@@ -84,16 +103,16 @@ export class CharacterController {
             .setEffectiveWeight(1)
             .fadeIn(duration)
             .play();
-        }
-        
-        //change character animation according to input
+    }
+    
+    //change character animation according to input
     characterAnimation(delta) {
         this.mixer.update(delta);
         const insideBound = (this.positionRef > this.minBound) && (this.positionRef < this.maxBound);
         if((Math.abs(this.moveInput) > 0) && insideBound) {
             if(!this.runAnimation) {
                 this.runAnimation = true;
-                this.playAction(2, 0.15);
+                this.playAction(1, 0.15);
             }
         } else {
             if(this.runAnimation) {
@@ -115,7 +134,8 @@ export class CharacterController {
     }
 
     update(input, delta) {
-        this.moveInput = input;
+        if(this.takeInputs) this.moveInput = input;
+        else this.moveInput = 0;
         this.characterMovement(delta);
         this.characterAnimation(delta);
     }

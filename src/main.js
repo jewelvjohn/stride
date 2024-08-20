@@ -29,14 +29,16 @@ let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
 
-const cameraLerp = 0.1;
-const cameraLookAtOffset = new THREE.Vector3(0, 170, 0);
-const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
+const cameraLookAtLerp = 5;
+const cameraPositionLerp = 5;
+const cameraLookAtOffset = new THREE.Vector3(0, 140, 0);
+const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
+
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
-}
+};
 
 var highEndGraphics = false;
 var isDoorOpen = true;
@@ -44,8 +46,8 @@ var isTextBubbleVisible = false;
 var isInteracting = false; 
 var interactionId = -1;
 var currentInteractionId = -1;
-var cameraPosition = new THREE.Vector3(-500, 250, 250);
-var cameraLookAt = new THREE.Vector3(0, 170, 0);
+var cameraLookAt = cameraLookAtOffset;
+var cameraPosition = cameraPositionOffset;
 
 const loadingManager = new THREE.LoadingManager();
 const clock = new THREE.Clock();
@@ -314,10 +316,10 @@ function initializeEnvironment(gltf) {
 }
 
 //move camera with player
-function cameraMovement() {
-    cameraLookAt = lerpVector3(cameraLookAt, player.model.position.clone().add(cameraLookAtOffset), cameraLerp);
+function cameraMovement(delta) {
+    cameraLookAt = lerpVector3(cameraLookAt, player.model.position.clone().add(cameraLookAtOffset), cameraLookAtLerp * delta);
     camera.lookAt(cameraLookAt);
-    cameraPosition = lerpVector3(cameraPosition, player.model.position.clone().add(cameraPositionOffset), cameraLerp);
+    cameraPosition = lerpVector3(cameraPosition, player.model.position.clone().add(cameraPositionOffset), cameraPositionLerp * delta);
     camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 }
 
@@ -331,9 +333,8 @@ function init() {
     scene.background = new THREE.Color(0x000000);
     
     camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 1, 2000);
-    camera.position.set(-500, 250, 250);
-    camera.rotation.set(0, 0, 0)
-    camera.lookAt(0, 100, 0);
+    camera.position.set(cameraPositionOffset);
+    camera.lookAt(cameraLookAtOffset);
     
     renderer = new THREE.WebGLRenderer({ 
         antialias: true,
@@ -349,7 +350,7 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/high-end/character.glb', scene, loadingManager, -1150, 150);
+    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -1150, 150, true);
     inputSystem = new InputSystem();
     
     effect = new OutlineEffect(renderer, {
@@ -398,7 +399,7 @@ function update() {
     } if(player.model) {
         player.update(inputSystem.axes.horizontal, delta);
         textBubbleUpdate();
-        cameraMovement();
+        cameraMovement(delta);
     } if(player.model && hallway) {
         if(player.model.position.z < -1100 && !isDoorOpen) openDoor();
         if(player.model.position.z > -1100 && isDoorOpen) closeDoor();
