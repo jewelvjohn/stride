@@ -2,11 +2,10 @@ import * as THREE from 'three'
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
 export class CharacterController {
-    constructor(filename, scene, manager, minBound, maxBound, wakeup = false) {
+    constructor(filename, scene, manager, minBound, maxBound) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
-        this.wakeup = wakeup;
         this.takeInputs = true;
 
         this.mixer = null;
@@ -65,8 +64,6 @@ export class CharacterController {
         this.actions[2] = this.mixer.clipAction(gltf.animations[3]); //walking
         this.actions[3] = this.mixer.clipAction(gltf.animations[4]); //waking up
 
-        if(this.wakeup) this.startWakeUp();
-        else this.startIdle();
         this.model.rotation.y = Math.PI;
         this.scene.add(this.model);
     }

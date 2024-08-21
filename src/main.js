@@ -1,4 +1,5 @@
 import './styles/main.css'
+import './styles/loading.css'
 import * as THREE from 'three'
 import Stats from 'three/addons/libs/stats.module.js'; 
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
@@ -28,6 +29,7 @@ let hallwayMixer, hallwayActions = {};
 let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
+let loadingScreen, loadingBar, loadingText, startButton;
 
 const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
 const cameraLookAtLerp = 5;
@@ -325,6 +327,17 @@ function cameraMovement(delta) {
 
 //initializes the whole scene
 function init() {
+    loadingScreen = document.querySelector('#loading-screen');
+    loadingBar = document.querySelector('#loading-bar');
+    loadingText = document.querySelector('#loading-text');
+    
+    startButton = document.querySelector('#start-button');
+    startButton.disabled = true;
+    startButton.onclick = () => {
+        player.startWakeUp();
+        loadingScreen.style.display = 'none' 
+    }
+
     canvas = document.querySelector('canvas.webgl');
     if(!isMobile()) highEndGraphics = true;
     if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
@@ -360,11 +373,13 @@ function init() {
 
     loadingManager.onProgress = function(url, loaded, total) {
         const progress = (loaded / total) * 100;
-        console.log(`Loading: ${progress}`);
+        loadingText.innerText = `Loading assets ${loaded} out of ${total}`;
+        loadingBar.value = progress;
     }
 
     loadingManager.onLoad = function() {
-        console.log(`Finished loading!`);
+        startButton.disabled = false;
+        loadingText.innerText = `Finished Loading`;
     }
 
     initializeGUI();
