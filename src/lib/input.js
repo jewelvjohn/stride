@@ -59,7 +59,7 @@ export class InputSystem {
     }
     
     //methods used for calling input start and input end methods when player interacts with html buttons  
-    onTouchLeftHoldStart(event) {
+    onTouchLeftHoldStart() {
         if(!this.isTouchLeftHeld) {
             this.isTouchLeftHeld = true;
             this.buttonPressedAnimation(this.touchLeft)
@@ -67,7 +67,7 @@ export class InputSystem {
             this.inputStart(buttonEvent);
         }
     }
-    onTouchRightHoldStart(event) {
+    onTouchRightHoldStart() {
         if(!this.isTouchRightHeld) {
             this.isTouchRightHeld = true;
             this.buttonPressedAnimation(this.touchRight)
@@ -75,7 +75,7 @@ export class InputSystem {
             this.inputStart(buttonEvent);
         }
     }
-    onTouchLeftHoldEnd(event) {
+    onTouchLeftHoldEnd() {
         if(this.isTouchLeftHeld) {
             this.buttonReleasedAnimation(this.touchLeft)   
             this.isTouchLeftHeld = false;
@@ -83,7 +83,7 @@ export class InputSystem {
             this.inputEnd(buttonEvent);
         }
     }
-    onTouchRightHoldEnd(event) {
+    onTouchRightHoldEnd() {
         if(this.isTouchRightHeld) {
             this.buttonReleasedAnimation(this.touchRight)
             this.isTouchRightHeld = false;
@@ -106,7 +106,7 @@ export class InputSystem {
         ['mousedown', 'touchstart'].forEach(type => {
             this.touchLeft.addEventListener(type, this.onTouchLeftHoldStart.bind(this));
         });
-        ['mouseup', 'mouseleave', 'touchend', 'touchcanel', 'touch', 'contextmenu'].forEach(type => {
+        ['mouseup', 'mouseleave', 'touchend', 'touchcanel', 'touch'].forEach(type => {
             this.touchLeft.addEventListener(type, this.onTouchLeftHoldEnd.bind(this));
         });
     }
@@ -116,7 +116,7 @@ export class InputSystem {
         ['mousedown', 'touchstart'].forEach(type => {
             this.touchRight.addEventListener(type, this.onTouchRightHoldStart.bind(this));
         });
-        ['mouseup', 'mouseleave', 'touchend', 'touchcanel', 'touch', 'contextmenu'].forEach(type => {
+        ['mouseup', 'mouseleave', 'touchend', 'touchcanel', 'touch'].forEach(type => {
             this.touchRight.addEventListener(type, this.onTouchRightHoldEnd.bind(this));
         });
     }

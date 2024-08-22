@@ -43,8 +43,6 @@ export class CharacterController {
         const step = new Uint8Array([64, 128, 255]);
         const gradientMap = new THREE.DataTexture(step, step.length, 1, THREE.RedFormat);
         gradientMap.needsUpdate = true;
-
-        console.log(gltf.animations);
     
         model.traverse(function(child) {
             if(child.isMesh) {

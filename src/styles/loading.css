@@ -14,9 +14,10 @@
 }
 
 #start-button {
-    margin: 8px;
+    margin-bottom: 16px;
+    width: 100%;
     height: 48px;
-    font-size: 18px;
+    font-size: clamp(16px, 2.8vw, 18px);
     font-family: "Space Grotesk";
     border-radius: 12px;
     background-color: #362447;
@@ -31,10 +32,12 @@
 
 .loading-container {
     width: 360px;
-    height: 600px;
-    /* border: 2px solid #be63f9; */
+    height: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    padding-left: 6vmin;
+    padding-right: 6vmin;
 }
 
 .loading-icon {
@@ -52,7 +55,7 @@
 
 .loading-container h2 {
     color: white;
-    font-size: 22px;
+    font-size: clamp(18px, 3.2vw, 22px);
     font-family: "Space Grotesk";
     font-weight: 600;
     text-align: center;
@@ -61,22 +64,24 @@
 
 .loading-container p {
     color: white;
-    font-size: 16px;
+    font-size: clamp(14px, 2.2vw, 16px);
     font-family: "Space Grotesk";
     font-weight: 400;
     text-align: left;
-    margin: 8px;
+    margin-top: 16px;
     margin-bottom: 22px;
 }
 
+.loading-grow-element {
+    flex-grow: 1;
+}
+
 .loadingbar-container {
-    margin: 8px;
-    margin-top: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    align-items: left;
 }
 
 .loadingbar-container progress{
@@ -105,5 +110,31 @@
 .loadingbar-container p{
     margin: 0;
     color: #AD94C7;
-    font-size: 14px;
+    font-size: clamp(12px, 2.2vw, 14px);
+}
+
+@media (min-aspect-ratio: 1) {
+    .loading-icon {
+        width: 100%;
+        height: 40vh;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .loading-icon img {
+        width: 75%;
+        height: 75%;
+    }
+
+    .loading-container h2 {
+        margin: 0;
+    }
+
+    .loading-container p {
+        margin: 4vh 0 4vh 0;
+    }
+
+    .loadingbar-container p {
+        margin: 0;
+    }
 }
