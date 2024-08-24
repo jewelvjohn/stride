@@ -19,9 +19,9 @@ export class CharacterController {
         this.positionRef = 0;
 
         //constants
-        this.runSpeed = 470;
-        this.rotationLerp = 20;
-        this.positionLerp = 20;
+        this.runSpeed = 190;
+        this.rotationLerp = 10;
+        this.positionLerp = 10;
         this.minBound = minBound;
         this.maxBound = maxBound;
     
@@ -29,6 +29,10 @@ export class CharacterController {
         window.addEventListener('focus',() => { if(this.pause) this.pause = false; });
 
         this.loadCharacter(filename, manager);
+    }
+
+    static toRadian(angle) {
+        return angle * Math.PI / 180;
     }
 
     //loads the player model file
@@ -62,7 +66,7 @@ export class CharacterController {
         this.actions[2] = this.mixer.clipAction(gltf.animations[3]); //walking
         this.actions[3] = this.mixer.clipAction(gltf.animations[4]); //waking up
 
-        this.model.rotation.y = Math.PI;
+        this.model.rotation.y = CharacterController.toRadian(-90);
         this.scene.add(this.model);
     }
 
@@ -107,12 +111,12 @@ export class CharacterController {
         if((Math.abs(this.moveInput) > 0) && insideBound) {
             if(!this.runAnimation) {
                 this.runAnimation = true;
-                this.playAction(1, 0.15);
+                this.playAction(2, 0.3);
             }
         } else {
             if(this.runAnimation) {
                 this.runAnimation = false;
-                this.playAction(0, 0.15);
+                this.playAction(0, 0.3);
             }
         }
     }
@@ -123,8 +127,8 @@ export class CharacterController {
             this.positionRef += (this.runSpeed * this.moveInput * delta);
             this.positionRef = THREE.MathUtils.clamp(this.positionRef, this.minBound, this.maxBound);
             this.model.position.z = THREE.MathUtils.lerp(this.model.position.z, this.positionRef, this.positionLerp * delta);
-            if(this.interactionMode) this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, ((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
-            else if(this.moveInput != 0)this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, ((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
+            if(this.interactionMode) this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, -((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
+            else if(this.moveInput != 0)this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, -((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
         }
     }
 

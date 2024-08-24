@@ -12,7 +12,6 @@ import {InteractionContainer} from './lib/interaction.js';
 
 /* 
     Current Bugs :-
-    7. Sub-pages have problem accessing js files after deployment
     --null--
     Solved Bugs  :-
     1. Player rotates opposite direction to reach idle rotation when tab refocuses
@@ -21,29 +20,25 @@ import {InteractionContainer} from './lib/interaction.js';
     4. The movement speed changes with the frame rate
     5. Input system freezes when modifier keys are held
     6. Mobile button buzz when held pressed
+    7. Sub-pages have problem accessing js files after deployment
  */
 
 let scene, camera, renderer, effect, stats, canvas;
-let hallway, painting;
-let hallwayMixer, hallwayActions = {};
 let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
 let loadingScreen, loadingBar, loadingText, startButton;
 
-const talkBubbleOffset = new THREE.Vector3(0, 210, 0);
-const cameraLookAtLerp = 5;
-const cameraPositionLerp = 5;
-const cameraLookAtOffset = new THREE.Vector3(0, 140, 0);
-const cameraPositionOffset = new THREE.Vector3(-500, 250, 250);
+const talkBubbleOffset = new THREE.Vector3(0, 200, 0);
+const cameraLookAtOffset = new THREE.Vector3(0, 125, 0);
+const cameraPositionOffset = new THREE.Vector3(-600, 150, 0);
 
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 };
 
-var highEndGraphics = false;
-var isDoorOpen = true;
+var highEndGraphics = true;
 var isTextBubbleVisible = false;
 var isInteracting = false; 
 var interactionId = -1;
@@ -70,17 +65,12 @@ function lerpVector3(start, end, t) {
     );
 }
 
-function toRadian(angle) {
-    return angle * Math.PI / 180;
-}
-
 //function used for creating CSS renderer for rendering html elements in the 3D scene
 function initializeGUI() {
     interfaceRenderer = new CSS2DRenderer();
     interfaceRenderer.setSize(sizes.width, sizes.height);
     interfaceRenderer.domElement.style.position = 'fixed';
     interfaceRenderer.domElement.style.top = '0px';
-    // interfaceRenderer.domElement.style.pointerEvents = 'none';
     document.body.appendChild(interfaceRenderer.domElement);
 
     const coneDiv = document.createElement('div');
@@ -92,21 +82,36 @@ function initializeGUI() {
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
         message: '<p>Beautiful painting!</p>',
-        position: -950,
-        light: true,
+        position: -500,
+        light: false,
         focus: true,
-        range: 150 
+        range: 200
+    });
+    interactionContainer.addInteractionPoint({
+        message: '<p>This website was developed using Three.js, vite and Blender</p>',
+        position: -250,
+        light: false,
+        focus: true,
+        range: 200
+    });
+    interactionContainer.addInteractionPoint({
+        message: '<p>Burny Rush: A high fidelity racing game developed in unity</p>',
+        position: 250,
+        light: false,
+        focus: true,
+        range: 200
     });
     interactionContainer.addInteractionPoint({
         message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>',
-        position: -1150,
+        position: 500,
         light: false,
-        focus: false,
-        range: 100 
+        focus: true,
+        range: 200
     });
 
     textBubble = document.createElement('div');
     textBubble.className = 'talkbubble';
+    textBubble.style.pointerEvents = 'none';
     textBubble.appendChild(coneDiv);
 
     interactionContainer.points.forEach(point => {
@@ -127,10 +132,12 @@ function textBubbleFadeIn() {
     textBubble.animate([
         {
             transform: "translateY(calc(-50% - 10px))",
+            pointerEvents: 'none',
             opacity: 0,
         },
         {
             transform: "translateY(calc(-50% + 20px))",
+            pointerEvents: 'auto',
             opacity: 1,
         }
     ], {
@@ -143,10 +150,12 @@ function textBubbleFadeOut() {
     textBubble.animate([
         {
             transform: "translateY(calc(-50% + 20px))",
+            pointerEvents: 'auto',
             opacity: 1,
         },
         {
             transform: "translateY(calc(-50% - 10px))",
+            pointerEvents: 'none',
             opacity: 0,
         }
     ], {
@@ -192,136 +201,39 @@ function textBubbleUpdate() {
     textContainer.position.set(talkBubblePosition.x, talkBubblePosition.y, talkBubblePosition.z);
 }
 
-function closeDoor() {
-    if(isDoorOpen) {
-        hallwayActions[1].fadeOut(0.3);
-        hallwayActions[0]
-            .reset()
-            .setEffectiveTimeScale(1)
-            .setEffectiveWeight(1)
-            .fadeIn(0.3)
-            .play();
-        isDoorOpen = false;
-    }
-}
-
-function openDoor() {
-    if(!isDoorOpen) {
-        hallwayActions[0].fadeOut(0.3);
-        hallwayActions[1]
-            .reset()
-            .setEffectiveTimeScale(1)
-            .setEffectiveWeight(1)
-            .fadeIn(0.3)
-            .play();
-        isDoorOpen = true;
-    }
-} 
-
 function loadEnvironment() {
-    const loader = new GLTFLoader(loadingManager);
-    loader.load('./resources/3d/high-end/hallway.glb', initializeEnvironment);
-    loader.load('./resources/3d/high-end/painting.glb', (gltf) => {
-        painting = gltf.scene;
-        painting.traverse(function(child) {
-            if(child.isMesh) {
-                child.castShadow = false;
-                child.receiveShadow = false;
-                child.material.side = THREE.FrontSide;
-            }
-        });
-        painting.scale.set(50, 50, 50);
-        painting.position.set(218, 120, interactionContainer.points[0].position);
-        painting.rotation.set(toRadian(10), toRadian(-90), 0);
-        scene.add(painting);
-    });
+    const geometry = new THREE.BoxGeometry(2000, 200, 2000);
+    const material = new THREE.MeshStandardMaterial({color: 0xdddddd});
+    const mesh = new THREE.Mesh(geometry, material);
+    let gridHelper = new THREE.GridHelper(2000, 40);
+
+    mesh.position.set(500, -100, 0);
+    scene.add(mesh);
+    scene.add(gridHelper);
 }
 
-function initializeEnvironment(gltf) {
-    hallway = gltf.scene;
-    const animations = gltf.animations;
-    
-    hallway.traverse(function(child) {
-        if(child.isMesh) {
-            child.castShadow = false;
-            child.receiveShadow = true;
-            child.material.side = THREE.FrontSide;
-        }
-    });
-
-    hallway.scale.set(50, 50, 50);
-    hallway.position.set(20, 0, 0);
-    hallway.rotation.y = toRadian(-90);
-
-    hallwayMixer = new THREE.AnimationMixer(hallway);
-    hallwayActions[0] = hallwayMixer.clipAction(animations[0]);
-    hallwayActions[1] = hallwayMixer.clipAction(animations[1]);
-    hallwayActions[0].clampWhenFinished = true;
-    hallwayActions[1].clampWhenFinished = true;
-
-    closeDoor();
-    scene.add(hallway);
-    
-    //lighting
+//lighting
+function initializeLighting() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 1);
     hemiLight.position.set(0, 200, 0);
     scene.add(hemiLight);
     
     const color = 0xfffae6;
-    const distance = 600;
-    const angle = 45 * Math.PI/180;
-    const intensity = 50;
-    const penubra = 0.5;
-    const decay = 0.5;
-    const bias = -0.00005;
-    const lightPositionX = -150;
-    const lightPositionY = 280;
-    const lightTarget = 100;
-    
-    
-    if(highEndGraphics) {
-        //high end lighting
-        const centerLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-        centerLight.position.set(lightPositionX, lightPositionY, 0);
-        centerLight.target.position.set(lightTarget, 0, 0);
-        centerLight.castShadow = true;
-        centerLight.shadow.bias = bias;
-        
-        scene.add(centerLight);
-        scene.add(centerLight.target);
-        
-        for(let i=0; i<interactionContainer.points.length; i++) {
-            if(interactionContainer.points[i].light) {
-                const spotLight = new THREE.SpotLight(color, intensity, distance, angle, penubra, decay);
-                spotLight.position.set(lightPositionX, lightPositionY, interactionContainer.points[i].position);
-                spotLight.target.position.set(lightTarget, 0, interactionContainer.points[i].position);
-                spotLight.castShadow = true;
-                spotLight.shadow.bias = bias;
-                
-                scene.add(spotLight);
-                scene.add(spotLight.target);
-            }
-        }
-        renderer.shadowMap.type = THREE.PCFShadowMap;
-        renderer.shadowMap.enabled = true;
-    } else {
-        //simple lighting
-        const dirLight = new THREE.DirectionalLight(color, 3);
-        dirLight.position.set(-200, 200, -100);
-        dirLight.target.position.set(0, 0, 0);
-        scene.add(dirLight);
-        scene.add(dirLight.target);
+    const dirLight = new THREE.DirectionalLight(color, 3);
+    dirLight.position.set(-200, 200, -100);
+    dirLight.target.position.set(0, 0, 0);
+    scene.add(dirLight);
+    scene.add(dirLight.target);
 
-        renderer.shadowMap.type = THREE.BasicShadowMap;
-        renderer.shadowMap.enabled = false;
-    }
+    renderer.shadowMap.type = THREE.BasicShadowMap;
+    renderer.shadowMap.enabled = false;
 }
 
 //move camera with player
-function cameraMovement(delta) {
-    cameraLookAt = lerpVector3(cameraLookAt, player.model.position.clone().add(cameraLookAtOffset), cameraLookAtLerp * delta);
+function cameraMovement() {
+    cameraLookAt = player.model.position.clone().add(cameraLookAtOffset);
+    cameraPosition = player.model.position.clone().add(cameraPositionOffset);
     camera.lookAt(cameraLookAt);
-    cameraPosition = lerpVector3(cameraPosition, player.model.position.clone().add(cameraPositionOffset), cameraPositionLerp * delta);
     camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 }
 
@@ -334,7 +246,7 @@ function init() {
     startButton = document.querySelector('#start-button');
     startButton.disabled = true;
     startButton.onclick = () => {
-        player.startWakeUp();
+        player.startIdle();
         loadingScreen.style.display = 'none' 
     }
 
@@ -343,9 +255,10 @@ function init() {
     if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
     
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+    scene.background = new THREE.Color(0x909090);
+    scene.fog = new THREE.Fog(scene.background, 750, 2000);
     
-    camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 1, 2000);
+    camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 1, 2000);
     camera.position.set(cameraPositionOffset);
     camera.lookAt(cameraLookAtOffset);
     
@@ -363,7 +276,7 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -1150, 150, true);
+    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -750, 750);
     inputSystem = new InputSystem();
     
     effect = new OutlineEffect(renderer, {
@@ -384,6 +297,7 @@ function init() {
 
     initializeGUI();
     loadEnvironment();
+    initializeLighting();
     onWindowResize();
 }
 
@@ -393,7 +307,7 @@ function onWindowResize() {
     sizes.height = window.innerHeight;
     
     camera.aspect = sizes.width / sizes.height;
-    camera.fov = THREE.MathUtils.clamp((-26*camera.aspect)+80 , 35, 80);
+    camera.fov = THREE.MathUtils.clamp((-20*camera.aspect)+60 , 30, 50);
     camera.updateProjectionMatrix();
     
     renderer.setSize(sizes.width, sizes.height);
@@ -401,25 +315,29 @@ function onWindowResize() {
     interfaceRenderer.setSize(sizes.width, sizes.height);
 }
 
+const fixedTimeStep = 1 / 60;
+const maxDelta = 0.1;
+let accumulator = 0;
+
 //game loop
 function update() {
+    const delta = Math.min(clock.getDelta(), maxDelta);
+    accumulator += delta;
+
+    while (accumulator >= fixedTimeStep) {
+        if(player.model) {
+            player.update(inputSystem.axes.horizontal, fixedTimeStep);
+            textBubbleUpdate();
+            cameraMovement();
+        }
+        accumulator -= fixedTimeStep;
+    }
+
     stats.update();
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);
     effect.render(scene, camera);
     
-    const delta = clock.getDelta();
-    if(hallway) {
-        hallwayMixer.update(delta);
-    } if(player.model) {
-        player.update(inputSystem.axes.horizontal, delta);
-        textBubbleUpdate();
-        cameraMovement(delta);
-    } if(player.model && hallway) {
-        if(player.model.position.z < -1100 && !isDoorOpen) openDoor();
-        if(player.model.position.z > -1100 && isDoorOpen) closeDoor();
-    }
-
     requestAnimationFrame(update);
     // console.log(renderer.info.render.triangles);
 }
