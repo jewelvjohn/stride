@@ -73,37 +73,31 @@ function initializeGUI() {
     interfaceRenderer.domElement.style.top = '0px';
     document.body.appendChild(interfaceRenderer.domElement);
 
-    const coneDiv = document.createElement('div');
-    coneDiv.id = 'textCone';
-    const coneImg = document.createElement('img');
-    coneImg.src = './resources/images/cone.svg';
-    coneDiv.appendChild(coneImg);
-
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
         message: '<p>Beautiful painting!</p>',
-        position: -500,
+        position: -600,
         light: false,
         focus: true,
         range: 200
     });
     interactionContainer.addInteractionPoint({
         message: '<p>This website was developed using Three.js, vite and Blender</p>',
-        position: -250,
+        position: -200,
         light: false,
         focus: true,
         range: 200
     });
     interactionContainer.addInteractionPoint({
         message: '<p>Burny Rush: A high fidelity racing game developed in unity</p>',
-        position: 250,
+        position: 200,
         light: false,
         focus: true,
         range: 200
     });
     interactionContainer.addInteractionPoint({
         message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>',
-        position: 500,
+        position: 600,
         light: false,
         focus: true,
         range: 200
@@ -112,7 +106,10 @@ function initializeGUI() {
     textBubble = document.createElement('div');
     textBubble.className = 'talkbubble';
     textBubble.style.pointerEvents = 'none';
-    textBubble.appendChild(coneDiv);
+
+    const triangle = document.createElement('div');
+    triangle.id = 'triangle';
+    textBubble.appendChild(triangle);
 
     interactionContainer.points.forEach(point => {
         textBubble.appendChild(point.text);
@@ -131,12 +128,12 @@ function initializeGUI() {
 function textBubbleFadeIn() {
     textBubble.animate([
         {
-            transform: "translateY(calc(-50% - 10px))",
+            transform: "translateY(calc(-50% - 20px))",
             pointerEvents: 'none',
             opacity: 0,
         },
         {
-            transform: "translateY(calc(-50% + 20px))",
+            transform: "translateY(calc(-50% + 10px))",
             pointerEvents: 'auto',
             opacity: 1,
         }
@@ -149,12 +146,12 @@ function textBubbleFadeIn() {
 function textBubbleFadeOut() {
     textBubble.animate([
         {
-            transform: "translateY(calc(-50% + 20px))",
+            transform: "translateY(calc(-50% + 10px))",
             pointerEvents: 'auto',
             opacity: 1,
         },
         {
-            transform: "translateY(calc(-50% - 10px))",
+            transform: "translateY(calc(-50% - 20px))",
             pointerEvents: 'none',
             opacity: 0,
         }

@@ -7,7 +7,7 @@ const outDir = path.resolve(__dirname, 'dist');
 
 export default defineConfig({
     root: root,
-    base: '/hunted-estate/',
+    base: '/stride/',
     build: {
         outDir: outDir,
         emptyOutDir: true,

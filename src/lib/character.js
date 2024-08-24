@@ -21,7 +21,7 @@ export class CharacterController {
         //constants
         this.runSpeed = 190;
         this.rotationLerp = 10;
-        this.positionLerp = 10;
+        this.positionLerp = 20;
         this.minBound = minBound;
         this.maxBound = maxBound;
     
