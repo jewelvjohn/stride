@@ -249,7 +249,7 @@ function init() {
 
     canvas = document.querySelector('canvas.webgl');
     if(!isMobile()) highEndGraphics = true;
-    if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
+    // if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x909090);

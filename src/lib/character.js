@@ -111,12 +111,12 @@ export class CharacterController {
         if((Math.abs(this.moveInput) > 0) && insideBound) {
             if(!this.runAnimation) {
                 this.runAnimation = true;
-                this.playAction(2, 0.3);
+                this.playAction(2, 0.2);
             }
         } else {
             if(this.runAnimation) {
                 this.runAnimation = false;
-                this.playAction(0, 0.3);
+                this.playAction(0, 0.2);
             }
         }
     }

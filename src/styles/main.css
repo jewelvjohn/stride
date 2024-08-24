@@ -45,11 +45,9 @@ body {
     margin: 16px;
     margin-right: 32px;
     padding: 16px;
-    gap: 2vmin;
+    gap: 6vmin;
     justify-content: center;
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
 }
 
 .button-flex {
@@ -66,12 +64,11 @@ body {
     max-height: 60px;
     display: flex;
     border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
     justify-content: center;
     align-items: center;
     outline: none;
-
-    color: white;
-    border: none;
     transition: all ease-in-out 0.2s;
 }
 
