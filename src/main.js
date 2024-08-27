@@ -6,6 +6,7 @@ import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {OutlineEffect} from 'three/addons/effects/OutlineEffect.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
+import {Stage} from './lib/stage.js';
 import {InputSystem} from './lib/input.js';
 import {CharacterController} from './lib/character.js';
 import {InteractionContainer} from './lib/interaction.js';
@@ -38,6 +39,8 @@ const sizes = {
     height: window.innerHeight
 };
 
+var stages = [];
+var currentStage = -1;
 var highEndGraphics = true;
 var isTextBubbleVisible = false;
 var isInteracting = false; 
@@ -76,28 +79,35 @@ function initializeGUI() {
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
         message: '<p>Beautiful painting!</p>',
-        position: -600,
+        position: -800,
         light: false,
         focus: true,
         range: 200
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>This website was developed using Three.js, vite and Blender</p>',
-        position: -200,
+        message: '<p>This website was developed using <span class="highlight">three.js</span>, <span class="highlight">vite</span> and <span class="highlight">blender</span></p>',
+        position: -400,
         light: false,
         focus: true,
         range: 200
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Burny Rush: A high fidelity racing game developed in unity</p>',
-        position: 200,
+        message: '<p>Use keyboard arrows, A, D or <, > buttons to move</p>',
+        position: 0,
+        light: false,
+        focus: true,
+        range: 200
+    });
+    interactionContainer.addInteractionPoint({
+        message: '<p><span class="highlight">Burny Rush</span> is a high fidelity racing game developed in unity</p>',
+        position: 400,
         light: false,
         focus: true,
         range: 200
     });
     interactionContainer.addInteractionPoint({
         message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>',
-        position: 600,
+        position: 800,
         light: false,
         focus: true,
         range: 200
@@ -199,31 +209,105 @@ function textBubbleUpdate() {
 }
 
 function loadEnvironment() {
-    const geometry = new THREE.BoxGeometry(2000, 200, 2000);
-    const material = new THREE.MeshStandardMaterial({color: 0xdddddd});
-    const mesh = new THREE.Mesh(geometry, material);
-    let gridHelper = new THREE.GridHelper(2000, 40);
-
-    mesh.position.set(500, -100, 0);
-    scene.add(mesh);
+    const gridHelper = new THREE.GridHelper(2000, 40);
     scene.add(gridHelper);
+
+    const ground = new THREE.BoxGeometry(2000, 200, 2000);
+    const box = new THREE.BoxGeometry(200, 100, 200, 10, 10, 10);
+
+    const yellow = new THREE.MeshStandardMaterial({color: 0xFF69B4});
+    const yellowGround = new THREE.Mesh(ground, yellow);
+    const yellowBox = new THREE.Mesh(box, yellow);
+    yellowGround.position.set(500, -100, -800);
+    yellowBox.position.set(200, 50, -800);
+
+    const red = new THREE.MeshStandardMaterial({color: 0xFFD700});
+    const redGround = new THREE.Mesh(ground, red);
+    const redBox = new THREE.Mesh(box, red);
+    redGround.position.set(500, -100, -400);
+    redBox.position.set(200, 50, -400);
+    
+    const green = new THREE.MeshStandardMaterial({color: 0x008000});
+    const greenGround = new THREE.Mesh(ground, green);
+    const greenBox = new THREE.Mesh(box, green);
+    greenGround.position.set(500, -100, 0);
+    greenBox.position.set(200, 50, 0);
+    
+    const blue = new THREE.MeshStandardMaterial({color: 0x00FFFF});
+    const blueGround = new THREE.Mesh(ground, blue);
+    const blueBox = new THREE.Mesh(box, blue);
+    blueGround.position.set(500, -100, 400);
+    blueBox.position.set(200, 50, 400);
+
+    const purple = new THREE.MeshStandardMaterial({color: 0x800080});
+    const purpleGround = new THREE.Mesh(ground, purple);
+    const purpleBox = new THREE.Mesh(box, purple);
+    purpleGround.position.set(500, -100, 800);
+    purpleBox.position.set(200, 50, 800);
+
+    const stage1 = new Stage(scene);
+    const stage2 = new Stage(scene);
+    const stage3 = new Stage(scene);
+    const stage4 = new Stage(scene);
+    const stage5 = new Stage(scene);
+
+    stage1.addObject(yellowGround);
+    stage1.addObject(yellowBox);
+    stage2.addObject(redGround);
+    stage2.addObject(redBox);
+    stage3.addObject(greenGround);
+    stage3.addObject(greenBox);
+    stage4.addObject(blueGround);
+    stage4.addObject(blueBox);
+    stage5.addObject(purpleGround);
+    stage5.addObject(purpleBox);
+
+    stages.push(stage1, stage2, stage3, stage4, stage5);
+}
+
+function selectStage(index) {
+    if(index !== currentStage) {
+        for(let i=0; i<stages.length; i++) {
+            if(i === index) {
+                if(!stages[i].isActive) { stages[i].showStage(); }
+            } else {
+                if(stages[i].isActive) { stages[i].hideStage(); }
+            }
+        }
+        currentStage = index;
+    }
+}
+
+function updateStages() {
+    const position = player.model.position.z;
+
+    if(position <= -600) {
+        selectStage(0);
+    } else if(position <= -200) {
+        selectStage(1);
+    } else if(position <= 200) {
+        selectStage(2);
+    } else if(position <= 600) {
+        selectStage(3);
+    } else {
+        selectStage(4);
+    }
 }
 
 //lighting
 function initializeLighting() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 1);
     hemiLight.position.set(0, 200, 0);
-    scene.add(hemiLight);
-    
     const color = 0xfffae6;
     const dirLight = new THREE.DirectionalLight(color, 3);
     dirLight.position.set(-200, 200, -100);
     dirLight.target.position.set(0, 0, 0);
+    scene.add(hemiLight);
     scene.add(dirLight);
     scene.add(dirLight.target);
-
-    renderer.shadowMap.type = THREE.BasicShadowMap;
-    renderer.shadowMap.enabled = false;
+    
+    // renderer.shadowMap.type = THREE.BasicShadowMap;
+    // renderer.shadowMap.enabled = false;
 }
 
 //move camera with player
@@ -273,7 +357,7 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -750, 750);
+    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -1000, 1000);
     inputSystem = new InputSystem();
     
     effect = new OutlineEffect(renderer, {
@@ -312,7 +396,7 @@ function onWindowResize() {
     interfaceRenderer.setSize(sizes.width, sizes.height);
 }
 
-const fixedTimeStep = 1 / 60;
+const fixedTimeStep = 1/60;
 const maxDelta = 0.1;
 let accumulator = 0;
 
@@ -326,6 +410,7 @@ function update() {
             player.update(inputSystem.axes.horizontal, fixedTimeStep);
             textBubbleUpdate();
             cameraMovement();
+            updateStages();
         }
         accumulator -= fixedTimeStep;
     }
