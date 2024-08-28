@@ -208,7 +208,26 @@ function textBubbleUpdate() {
     textContainer.position.set(talkBubblePosition.x, talkBubblePosition.y, talkBubblePosition.z);
 }
 
+function createBlinder(position, width, height) {
+    const geometry = new THREE.PlaneGeometry(width, height);
+    const material = new THREE.MeshBasicMaterial({color: 0x000000});
+    const mesh = new THREE.Mesh(geometry, material);
+
+    mesh.material.side = THREE.FrontSide;
+    mesh.receiveShadow = false;
+    mesh.castShadow = false;
+
+    mesh.position.set(position.x, position.y, position.z);
+    mesh.rotation.y = -90 * (Math.PI/180);
+    scene.add(mesh);
+}
+
 function loadEnvironment() {
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 20, 200, -600), 30, 400);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 20, 200, -200), 30, 400);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 20, 200, 200), 30, 400);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 20, 200, 600), 30, 400);
+
     const gridHelper = new THREE.GridHelper(2000, 40);
     scene.add(gridHelper);
 
@@ -382,11 +401,24 @@ function init() {
     onWindowResize();
 }
 
+function clampScreenSize(min, max) {
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    if(aspectRatio > max) {
+        sizes.width = window.innerHeight * max;
+        sizes.height = window.innerHeight;
+    } else if(aspectRatio < min) {
+        sizes.width = window.innerWidth;
+        sizes.height = window.innerWidth / min;
+    } else {
+        sizes.width = window.innerWidth;
+        sizes.height = window.innerHeight;
+    } 
+}
+
 //resize event used for resizing camera and renderer when window is resized
 function onWindowResize() {
-    sizes.width = window.innerWidth;
-    sizes.height = window.innerHeight;
-    
+    clampScreenSize(0.25, 2.5);
+
     camera.aspect = sizes.width / sizes.height;
     camera.fov = THREE.MathUtils.clamp((-20*camera.aspect)+60 , 30, 50);
     camera.updateProjectionMatrix();
