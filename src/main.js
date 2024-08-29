@@ -2,6 +2,8 @@ import './styles/main.css'
 import './styles/loading.css'
 import * as THREE from 'three'
 import Stats from 'three/addons/libs/stats.module.js'; 
+import {CSM} from 'three/addons/csm/CSM.js'
+import {CSMHelper} from 'three/addons/csm/CSMHelper.js'
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {OutlineEffect} from 'three/addons/effects/OutlineEffect.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
@@ -24,24 +26,25 @@ import {InteractionContainer} from './lib/interaction.js';
     7. Sub-pages have problem accessing js files after deployment
  */
 
-let scene, camera, renderer, effect, stats, canvas;
+let scene, camera, renderer, effect, stats, canvas, csm, csmHelper;
 let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
 let loadingScreen, loadingBar, loadingText, startButton;
-let gasStation;
 
-const talkBubbleOffset = new THREE.Vector3(0, 2, 0);
-const cameraLookAtOffset = new THREE.Vector3(0, 1.25, 0);
-const cameraPositionOffset = new THREE.Vector3(-6, 1.5, 0);
+const lightIntensity = 2;
+const lightDirection = new THREE.Vector3(1, -1, -1);
+const talkBubbleOffset = new THREE.Vector3(0, 40, 0);
+const cameraLookAtOffset = new THREE.Vector3(0, 25, 0);
+const cameraPositionOffset = new THREE.Vector3(-120, 30, 0);
 
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 };
 
-var stages = [];
-var currentStage = -1;
+var stages = {};
+var currentStage = '';
 var highEndGraphics = true;
 var isTextBubbleVisible = false;
 var isInteracting = false; 
@@ -84,38 +87,38 @@ function initializeGUI() {
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
         message: '<p>Beautiful painting!</p>',
-        position: -8,
+        position: -160,
         light: false,
         focus: true,
-        range: 2
+        range: 40
     });
     interactionContainer.addInteractionPoint({
         message: '<p>This website was developed using <span class="highlight">three.js</span>, <span class="highlight">vite</span> and <span class="highlight">blender</span></p>',
-        position: -4,
+        position: -80,
         light: false,
         focus: true,
-        range: 2
+        range: 40
     });
     interactionContainer.addInteractionPoint({
         message: '<p>Use keyboard arrows, A, D or <, > buttons to move</p>',
         position: 0,
         light: false,
         focus: true,
-        range: 2
+        range: 40
     });
     interactionContainer.addInteractionPoint({
         message: '<p><span class="highlight">Burny Rush</span> is a high fidelity racing game developed in unity</p>',
-        position: 4,
+        position: 80,
         light: false,
         focus: true,
-        range: 2
+        range: 40
     });
     interactionContainer.addInteractionPoint({
         message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>',
-        position: 8,
+        position: 160,
         light: false,
         focus: true,
-        range: 2
+        range: 40
     });
 
     textBubble = document.createElement('div');
@@ -227,42 +230,42 @@ function createBlinder(position, width, height) {
     scene.add(mesh);
 }
 
+function createDummyStage(color = 0xffffff, position, key) {
+    const groundGeometry = new THREE.BoxGeometry(400, 40, 400);
+    const boxGeometry = new THREE.BoxGeometry(40, 20, 40, 10, 10, 10);
+    const material = new THREE.MeshStandardMaterial({color: color});
+    csm.setupMaterial(material);
+
+    const groundMesh = new THREE.Mesh(groundGeometry, material);
+    groundGeometry.castShadow = true;
+    groundGeometry.receiveShadow = true;
+    groundMesh.position.set(100, -20, position);
+
+    const boxMesh = new THREE.Mesh(boxGeometry, material);
+    boxMesh.castShadow = true;
+    boxMesh.receiveShadow = true;
+    boxMesh.position.set(40, 10, position);
+
+    const stage = new Stage(scene);
+    stage.addObject(groundMesh);
+    stage.addObject(boxMesh);
+
+    stages[key] = stage;
+}
+
 function loadEnvironment() {
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 0.2, 2, -6), 0.3, 4);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 0.2, 2, -2), 0.3, 4);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 0.2, 2, 2), 0.3, 4);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 0.2, 2, 6), 0.3, 4);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -120), 6, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -40), 6, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 40), 6, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 120), 6, 80);
 
-    const stage1 = new Stage(scene);
-    const stage2 = new Stage(scene);
-    const stage3 = new Stage(scene);
-    const stage4 = new Stage(scene);
-    const stage5 = new Stage(scene);
-
-    const gridHelper = new THREE.GridHelper(20, 40);
+    const gridHelper = new THREE.GridHelper(400, 40);
     scene.add(gridHelper);
 
-    const ground = new THREE.BoxGeometry(20, 2, 20);
-    const box = new THREE.BoxGeometry(2, 1, 2, 10, 10, 10);
-
-    const yellow = new THREE.MeshStandardMaterial({color: 0xFF69B4});
-    const yellowGround = new THREE.Mesh(ground, yellow);
-    const yellowBox = new THREE.Mesh(box, yellow);
-    yellowGround.position.set(5, -1, -8);
-    yellowBox.position.set(2, 0.5, -8);
-
-    const red = new THREE.MeshStandardMaterial({color: 0xFFD700});
-    const redGround = new THREE.Mesh(ground, red);
-    const redBox = new THREE.Mesh(box, red);
-    redGround.position.set(5, -1, -4);
-    redBox.position.set(2, 0.5, -4);
+    createDummyStage(0xFFD700, -160, 'yellow'); //yellow
+    createDummyStage(0xFF69B4, -80, 'red'); //red
     
-    //stage3
-    // const green = new THREE.MeshStandardMaterial({color: 0x008000});
-    // const greenGround = new THREE.Mesh(ground, green);
-    // const greenBox = new THREE.Mesh(box, green);
-    // greenGround.position.set(500, -100, 0);
-    // greenBox.position.set(200, 50, 0);
+    //Gas Station
     const loader = new GLTFLoader(loadingManager);
     loader.load("./resources/3d/high-end/gas station.glb", (gltf) => {
         const model = gltf.scene;
@@ -271,84 +274,53 @@ function loadEnvironment() {
                 child.castShadow = true;
                 child.receiveShadow = true;
                 child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
+                csm.setupMaterial(child.material);
             }
         });
-        model.scale.set(0.5, 0.5, 0.5);
+        model.scale.set(10, 10, 10);
         model.rotation.y = toRadian(-90);
-        stage3.addObject(model);
+
+        const stage = new Stage(scene);
+        stage.addObject(model);
+        stages['gas_station'] = stage;
     });
-    
-    const blue = new THREE.MeshStandardMaterial({color: 0x00FFFF});
-    const blueGround = new THREE.Mesh(ground, blue);
-    const blueBox = new THREE.Mesh(box, blue);
-    blueGround.position.set(5, -1, 4);
-    blueBox.position.set(2, 0.5, 4);
 
-    const purple = new THREE.MeshStandardMaterial({color: 0x800080});
-    const purpleGround = new THREE.Mesh(ground, purple);
-    const purpleBox = new THREE.Mesh(box, purple);
-    purpleGround.position.set(5, -1, 8);
-    purpleBox.position.set(2, 0.5, 8);
-
-    stage1.addObject(yellowGround);
-    stage1.addObject(yellowBox);
-    stage2.addObject(redGround);
-    stage2.addObject(redBox);
-    // stage3.addObject(greenGround);
-    // stage3.addObject(greenBox);
-    stage4.addObject(blueGround);
-    stage4.addObject(blueBox);
-    stage5.addObject(purpleGround);
-    stage5.addObject(purpleBox);
-
-    stages.push(stage1, stage2, stage3, stage4, stage5);
+    createDummyStage(0x00FFFF, 80, 'blue'); //blue
+    createDummyStage(0x800080, 160, 'purple'); //purple
 }
 
-function selectStage(index) {
-    if(index !== currentStage) {
-        for(let i=0; i<stages.length; i++) {
-            if(i === index) {
-                if(!stages[i].isActive) { stages[i].showStage(); }
+function selectStage(stage) {
+    if(stage !== currentStage) {
+        Object.entries(stages).forEach(([key, value]) => {
+            if(key === stage) {
+                if(!value.isActive) {
+                    value.showStage();
+                }
+                currentStage = stage;
             } else {
-                if(stages[i].isActive) { stages[i].hideStage(); }
+                if(value.isActive) {
+                    value.hideStage();
+                }
             }
-        }
-        currentStage = index;
+        });
     }
 }
 
 function updateStages() {
     const position = player.model.position.z;
 
-    if(position <= -6) {
-        selectStage(0);
-    } else if(position <= -2) {
-        selectStage(1);
-    } else if(position <= 2) {
-        selectStage(2);
-    } else if(position <= 6) {
-        selectStage(3);
+    if(position <= -120) {
+        selectStage('yellow');
+    } else if(position <= -40) {
+        selectStage('red');
+    } else if(position <= 40) {
+        selectStage('gas_station');
+    } else if(position <= 120) {
+        selectStage('blue');
     } else {
-        selectStage(4);
+        selectStage('purple');
     }
-}
-
-//lighting
-function initializeLighting() {
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 1);
-    hemiLight.position.set(0, 2, 0);
-    const color = 0xfffae6;
-    const dirLight = new THREE.DirectionalLight(color, 3);
-    dirLight.position.set(-2, 2, -1);
-    dirLight.target.position.set(0, 0, 0);
-    dirLight.castShadow = true;
-    scene.add(hemiLight);
-    scene.add(dirLight);
-    scene.add(dirLight.target);
-    
-    // renderer.shadowMap.type = THREE.BasicShadowMap;
-    renderer.shadowMap.type = THREE.PCFShadowMap;
-    renderer.shadowMap.enabled = true;
 }
 
 //move camera with player
@@ -380,7 +352,7 @@ function init() {
     scene.background = new THREE.Color(0x909090);
     // scene.fog = new THREE.Fog(scene.background, 750, 2000);
     
-    camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 1, 200);
+    camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 0.1, 1000);
     camera.position.set(cameraPositionOffset);
     camera.lookAt(cameraLookAtOffset);
     
@@ -393,12 +365,37 @@ function init() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(sizes.width, sizes.height);
     renderer.render(scene, camera);
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.shadowMap.enabled = true;
+
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 0.35);
+    hemiLight.position.set(0, 2, 0);
+    scene.add(hemiLight);
+
+    csm = new CSM({
+        maxFar: 800,
+        cascades: 3,
+        mode: 'practical',
+        parent: scene,
+        shadowMapSize: 1024,
+        lightDirection: lightDirection.normalize(),
+        camera: camera
+    });
+
+    for(let i=0; i<csm.lights.length; i++) {
+        csm.lights[i].intensity = lightIntensity;
+        csm.lights[i].shadow.bias = -0.002;
+    }
+
+    csmHelper = new CSMHelper(csm);
+    csmHelper.visible = false;
+    scene.add(csmHelper);
     
     stats = new Stats();
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -10, 10);
+    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -200, 200);
     inputSystem = new InputSystem();
     
     effect = new OutlineEffect(renderer, {
@@ -419,7 +416,6 @@ function init() {
 
     initializeGUI();
     loadEnvironment();
-    initializeLighting();
     onWindowResize();
 }
 
@@ -448,6 +444,8 @@ function onWindowResize() {
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     interfaceRenderer.setSize(sizes.width, sizes.height);
+
+    csm.updateFrustums();
 }
 
 const fixedTimeStep = 1/60;
@@ -460,6 +458,7 @@ function update() {
     accumulator += delta;
 
     while (accumulator >= fixedTimeStep) {
+        
         if(player.model) {
             player.update(inputSystem.axes.horizontal, fixedTimeStep);
             textBubbleUpdate();
@@ -468,7 +467,10 @@ function update() {
         }
         accumulator -= fixedTimeStep;
     }
-
+    
+    camera.updateMatrixWorld();
+    csm.update();
+    csmHelper.update();
     stats.update();
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);

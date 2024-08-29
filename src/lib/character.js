@@ -19,7 +19,7 @@ export class CharacterController {
         this.positionRef = 0;
 
         //constants
-        this.runSpeed = 1.9;
+        this.runSpeed = 38;
         this.rotationLerp = 10;
         this.positionLerp = 20;
         this.minBound = minBound;
@@ -54,9 +54,9 @@ export class CharacterController {
                 child.castShadow = true;
                 child.receiveShadow = false;
                 child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
             }
         });
-        model.scale.set(0.5, 0.5, 0.5);
         this.model = model;
         this.mixer = new THREE.AnimationMixer(model);
     
@@ -66,6 +66,7 @@ export class CharacterController {
         this.actions[2] = this.mixer.clipAction(gltf.animations[3]); //walking
         this.actions[3] = this.mixer.clipAction(gltf.animations[4]); //waking up
 
+        this.model.scale.set(10, 10, 10);
         this.model.rotation.y = CharacterController.toRadian(-90);
         this.scene.add(this.model);
     }
