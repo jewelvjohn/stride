@@ -29,10 +29,11 @@ let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
 let loadingScreen, loadingBar, loadingText, startButton;
+let gasStation;
 
-const talkBubbleOffset = new THREE.Vector3(0, 200, 0);
-const cameraLookAtOffset = new THREE.Vector3(0, 125, 0);
-const cameraPositionOffset = new THREE.Vector3(-600, 150, 0);
+const talkBubbleOffset = new THREE.Vector3(0, 2, 0);
+const cameraLookAtOffset = new THREE.Vector3(0, 1.25, 0);
+const cameraPositionOffset = new THREE.Vector3(-6, 1.5, 0);
 
 const sizes = {
     width: window.innerWidth,
@@ -68,6 +69,10 @@ function lerpVector3(start, end, t) {
     );
 }
 
+function toRadian(angle) {
+    return angle * Math.PI / 180;
+}
+
 //function used for creating CSS renderer for rendering html elements in the 3D scene
 function initializeGUI() {
     interfaceRenderer = new CSS2DRenderer();
@@ -79,38 +84,38 @@ function initializeGUI() {
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
         message: '<p>Beautiful painting!</p>',
-        position: -800,
+        position: -8,
         light: false,
         focus: true,
-        range: 200
+        range: 2
     });
     interactionContainer.addInteractionPoint({
         message: '<p>This website was developed using <span class="highlight">three.js</span>, <span class="highlight">vite</span> and <span class="highlight">blender</span></p>',
-        position: -400,
+        position: -4,
         light: false,
         focus: true,
-        range: 200
+        range: 2
     });
     interactionContainer.addInteractionPoint({
         message: '<p>Use keyboard arrows, A, D or <, > buttons to move</p>',
         position: 0,
         light: false,
         focus: true,
-        range: 200
+        range: 2
     });
     interactionContainer.addInteractionPoint({
         message: '<p><span class="highlight">Burny Rush</span> is a high fidelity racing game developed in unity</p>',
-        position: 400,
+        position: 4,
         light: false,
         focus: true,
-        range: 200
+        range: 2
     });
     interactionContainer.addInteractionPoint({
         message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>',
-        position: 800,
+        position: 8,
         light: false,
         focus: true,
-        range: 200
+        range: 2
     });
 
     textBubble = document.createElement('div');
@@ -218,51 +223,15 @@ function createBlinder(position, width, height) {
     mesh.castShadow = false;
 
     mesh.position.set(position.x, position.y, position.z);
-    mesh.rotation.y = -90 * (Math.PI/180);
+    mesh.rotation.y = toRadian(-90);
     scene.add(mesh);
 }
 
 function loadEnvironment() {
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 20, 200, -600), 30, 400);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 20, 200, -200), 30, 400);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 20, 200, 200), 30, 400);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 20, 200, 600), 30, 400);
-
-    const gridHelper = new THREE.GridHelper(2000, 40);
-    scene.add(gridHelper);
-
-    const ground = new THREE.BoxGeometry(2000, 200, 2000);
-    const box = new THREE.BoxGeometry(200, 100, 200, 10, 10, 10);
-
-    const yellow = new THREE.MeshStandardMaterial({color: 0xFF69B4});
-    const yellowGround = new THREE.Mesh(ground, yellow);
-    const yellowBox = new THREE.Mesh(box, yellow);
-    yellowGround.position.set(500, -100, -800);
-    yellowBox.position.set(200, 50, -800);
-
-    const red = new THREE.MeshStandardMaterial({color: 0xFFD700});
-    const redGround = new THREE.Mesh(ground, red);
-    const redBox = new THREE.Mesh(box, red);
-    redGround.position.set(500, -100, -400);
-    redBox.position.set(200, 50, -400);
-    
-    const green = new THREE.MeshStandardMaterial({color: 0x008000});
-    const greenGround = new THREE.Mesh(ground, green);
-    const greenBox = new THREE.Mesh(box, green);
-    greenGround.position.set(500, -100, 0);
-    greenBox.position.set(200, 50, 0);
-    
-    const blue = new THREE.MeshStandardMaterial({color: 0x00FFFF});
-    const blueGround = new THREE.Mesh(ground, blue);
-    const blueBox = new THREE.Mesh(box, blue);
-    blueGround.position.set(500, -100, 400);
-    blueBox.position.set(200, 50, 400);
-
-    const purple = new THREE.MeshStandardMaterial({color: 0x800080});
-    const purpleGround = new THREE.Mesh(ground, purple);
-    const purpleBox = new THREE.Mesh(box, purple);
-    purpleGround.position.set(500, -100, 800);
-    purpleBox.position.set(200, 50, 800);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 0.2, 2, -6), 0.3, 4);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 0.2, 2, -2), 0.3, 4);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 0.2, 2, 2), 0.3, 4);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 0.2, 2, 6), 0.3, 4);
 
     const stage1 = new Stage(scene);
     const stage2 = new Stage(scene);
@@ -270,12 +239,63 @@ function loadEnvironment() {
     const stage4 = new Stage(scene);
     const stage5 = new Stage(scene);
 
+    const gridHelper = new THREE.GridHelper(20, 40);
+    scene.add(gridHelper);
+
+    const ground = new THREE.BoxGeometry(20, 2, 20);
+    const box = new THREE.BoxGeometry(2, 1, 2, 10, 10, 10);
+
+    const yellow = new THREE.MeshStandardMaterial({color: 0xFF69B4});
+    const yellowGround = new THREE.Mesh(ground, yellow);
+    const yellowBox = new THREE.Mesh(box, yellow);
+    yellowGround.position.set(5, -1, -8);
+    yellowBox.position.set(2, 0.5, -8);
+
+    const red = new THREE.MeshStandardMaterial({color: 0xFFD700});
+    const redGround = new THREE.Mesh(ground, red);
+    const redBox = new THREE.Mesh(box, red);
+    redGround.position.set(5, -1, -4);
+    redBox.position.set(2, 0.5, -4);
+    
+    //stage3
+    // const green = new THREE.MeshStandardMaterial({color: 0x008000});
+    // const greenGround = new THREE.Mesh(ground, green);
+    // const greenBox = new THREE.Mesh(box, green);
+    // greenGround.position.set(500, -100, 0);
+    // greenBox.position.set(200, 50, 0);
+    const loader = new GLTFLoader(loadingManager);
+    loader.load("./resources/3d/high-end/gas station.glb", (gltf) => {
+        const model = gltf.scene;
+        model.traverse(function(child) {
+            if(child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                child.material.side = THREE.FrontSide;
+            }
+        });
+        model.scale.set(0.5, 0.5, 0.5);
+        model.rotation.y = toRadian(-90);
+        stage3.addObject(model);
+    });
+    
+    const blue = new THREE.MeshStandardMaterial({color: 0x00FFFF});
+    const blueGround = new THREE.Mesh(ground, blue);
+    const blueBox = new THREE.Mesh(box, blue);
+    blueGround.position.set(5, -1, 4);
+    blueBox.position.set(2, 0.5, 4);
+
+    const purple = new THREE.MeshStandardMaterial({color: 0x800080});
+    const purpleGround = new THREE.Mesh(ground, purple);
+    const purpleBox = new THREE.Mesh(box, purple);
+    purpleGround.position.set(5, -1, 8);
+    purpleBox.position.set(2, 0.5, 8);
+
     stage1.addObject(yellowGround);
     stage1.addObject(yellowBox);
     stage2.addObject(redGround);
     stage2.addObject(redBox);
-    stage3.addObject(greenGround);
-    stage3.addObject(greenBox);
+    // stage3.addObject(greenGround);
+    // stage3.addObject(greenBox);
     stage4.addObject(blueGround);
     stage4.addObject(blueBox);
     stage5.addObject(purpleGround);
@@ -300,13 +320,13 @@ function selectStage(index) {
 function updateStages() {
     const position = player.model.position.z;
 
-    if(position <= -600) {
+    if(position <= -6) {
         selectStage(0);
-    } else if(position <= -200) {
+    } else if(position <= -2) {
         selectStage(1);
-    } else if(position <= 200) {
+    } else if(position <= 2) {
         selectStage(2);
-    } else if(position <= 600) {
+    } else if(position <= 6) {
         selectStage(3);
     } else {
         selectStage(4);
@@ -316,17 +336,19 @@ function updateStages() {
 //lighting
 function initializeLighting() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 1);
-    hemiLight.position.set(0, 200, 0);
+    hemiLight.position.set(0, 2, 0);
     const color = 0xfffae6;
     const dirLight = new THREE.DirectionalLight(color, 3);
-    dirLight.position.set(-200, 200, -100);
+    dirLight.position.set(-2, 2, -1);
     dirLight.target.position.set(0, 0, 0);
+    dirLight.castShadow = true;
     scene.add(hemiLight);
     scene.add(dirLight);
     scene.add(dirLight.target);
     
     // renderer.shadowMap.type = THREE.BasicShadowMap;
-    // renderer.shadowMap.enabled = false;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.shadowMap.enabled = true;
 }
 
 //move camera with player
@@ -356,9 +378,9 @@ function init() {
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x909090);
-    scene.fog = new THREE.Fog(scene.background, 750, 2000);
+    // scene.fog = new THREE.Fog(scene.background, 750, 2000);
     
-    camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 1, 2000);
+    camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 1, 200);
     camera.position.set(cameraPositionOffset);
     camera.lookAt(cameraLookAtOffset);
     
@@ -376,7 +398,7 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -1000, 1000);
+    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -10, 10);
     inputSystem = new InputSystem();
     
     effect = new OutlineEffect(renderer, {

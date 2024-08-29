@@ -19,7 +19,7 @@ export class CharacterController {
         this.positionRef = 0;
 
         //constants
-        this.runSpeed = 190;
+        this.runSpeed = 1.9;
         this.rotationLerp = 10;
         this.positionLerp = 20;
         this.minBound = minBound;
@@ -56,7 +56,7 @@ export class CharacterController {
                 child.material.side = THREE.FrontSide;
             }
         });
-        model.scale.set(50, 50, 50);
+        model.scale.set(0.5, 0.5, 0.5);
         this.model = model;
         this.mixer = new THREE.AnimationMixer(model);
     
