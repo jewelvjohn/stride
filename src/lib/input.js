@@ -59,7 +59,8 @@ export class InputSystem {
     }
     
     //methods used for calling input start and input end methods when player interacts with html buttons  
-    onTouchLeftHoldStart() {
+    onTouchLeftHoldStart(event) {
+        event.preventDefault();
         if(!this.isTouchLeftHeld) {
             this.isTouchLeftHeld = true;
             this.buttonPressedAnimation(this.touchLeft)
@@ -67,7 +68,8 @@ export class InputSystem {
             this.inputStart(buttonEvent);
         }
     }
-    onTouchRightHoldStart() {
+    onTouchRightHoldStart(event) {
+        event.preventDefault();
         if(!this.isTouchRightHeld) {
             this.isTouchRightHeld = true;
             this.buttonPressedAnimation(this.touchRight)
@@ -75,7 +77,8 @@ export class InputSystem {
             this.inputStart(buttonEvent);
         }
     }
-    onTouchLeftHoldEnd() {
+    onTouchLeftHoldEnd(event) {
+        event.preventDefault();
         if(this.isTouchLeftHeld) {
             this.buttonReleasedAnimation(this.touchLeft)   
             this.isTouchLeftHeld = false;
@@ -83,7 +86,8 @@ export class InputSystem {
             this.inputEnd(buttonEvent);
         }
     }
-    onTouchRightHoldEnd() {
+    onTouchRightHoldEnd(event) {
+        event.preventDefault();
         if(this.isTouchRightHeld) {
             this.buttonReleasedAnimation(this.touchRight)
             this.isTouchRightHeld = false;

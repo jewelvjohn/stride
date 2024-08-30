@@ -26,13 +26,13 @@ import {InteractionContainer} from './lib/interaction.js';
     7. Sub-pages have problem accessing js files after deployment
  */
 
-let scene, camera, renderer, effect, stats, canvas, csm, csmHelper;
+let scene, camera, renderer, effect, stats, canvas, csm, csmHelper, sky;
 let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
 let loadingScreen, loadingBar, loadingText, startButton;
 
-const lightIntensity = 2;
+const lightIntensity = 3;
 const lightDirection = new THREE.Vector3(1, -1, -1);
 const talkBubbleOffset = new THREE.Vector3(0, 40, 0);
 const cameraLookAtOffset = new THREE.Vector3(0, 30, 0);
@@ -272,6 +272,7 @@ function loadEnvironment() {
     createDummyStage(0xFFD700, -160, 'yellow'); //yellow
     createDummyStage(0xFF69B4, -80, 'red'); //red
     
+//gas station
     const loader = new GLTFLoader(loadingManager);
     loader.load("./resources/3d/low-end/gas station.glb", (gltf) => {
         const model = gltf.scene;
@@ -287,11 +288,48 @@ function loadEnvironment() {
         model.scale.set(10, 10, 10);
         model.rotation.y = toRadian(-90);
 
-        const stage = new Stage(scene);
-        stage.addObject(model);
-        stages['gas_station'] = stage;
+        if(stages['gas_station']) {
+            stages['gas_station'].addObject(model);
+        } else {
+            const stage = new Stage(scene);
+            stage.addObject(model);
+            stages['gas_station'] = stage;
+        }
     });
 
+    loader.load("./resources/3d/high-end/lfa.glb", (gltf) => {
+        const model = gltf.scene;
+        const step = new Uint8Array([0, 32, 64, 255]);
+        const gradientMap = new THREE.DataTexture(step, step.length, 1, THREE.RedFormat);
+        gradientMap.needsUpdate = true;
+
+        model.traverse(function(child) {
+            if(child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = false;
+                if(child.material && child.material.name !== "glass" && child.material.name !== "brake") {
+                    child.material = new THREE.MeshToonMaterial({color: 0xFFFFFF, map: child.material.map, gradientMap: gradientMap});
+                    // console.log(child.material.name);
+                }
+                child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
+                csm.setupMaterial(child.material);
+            }
+        });
+        model.scale.set(10, 10, 10);
+        model.position.set(100, 0, -60);
+        model.rotation.y = toRadian(-45);
+
+        if(stages['gas_station']) {
+            stages['gas_station'].addObject(model);
+        } else {
+            const stage = new Stage(scene);
+            stage.addObject(model);
+            stages['gas_station'] = stage;
+        }
+    });
+
+//medieval town
     loader.load("./resources/3d/low-end/medieval town.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
@@ -312,6 +350,7 @@ function loadEnvironment() {
         stages['medieval_town'] = stage;
     });
 
+//light house
     loader.load("./resources/3d/low-end/light house.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
@@ -387,18 +426,21 @@ function init() {
         loadingScreen.style.display = 'none' 
     }
 
+    sky = document.getElementById('sky');
+    // sky.style.backgroundImage = "url('/resources/images/left.svg')";
     canvas = document.querySelector('canvas.webgl');
-    const gl = canvas.getContext('webgl2');
-    const dbgRenderInfo = gl.getExtension("WEBGL_debug_renderer_info");
-    const gpu = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);;
-    console.log('Graphics Card Vendor:', gpu);
+
+    // const gl = canvas.getContext('webgl2');
+    // const dbgRenderInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    // const gpu = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);;
+    // console.log('Graphics Card Vendor:', gpu);
     
     if(!isMobile()) highEndGraphics = true;
     // if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
     
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x63b0cd);
-    scene.fog = new THREE.Fog(scene.background, 580, 1000);
+    scene.fog = new THREE.Fog(0xADDDF0, 580, 1000);
+    // scene.background = new THREE.Color(0x63b0cd);
     
     camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 0.1, 1000);
     camera.position.set(cameraPositionOffset);
@@ -419,7 +461,7 @@ function init() {
     renderer.shadowMap.type = THREE.VSMShadowMap;
     renderer.shadowMap.enabled = true;
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 0.35);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 0.5);
     hemiLight.position.set(0, 2, 0);
     scene.add(hemiLight);
 

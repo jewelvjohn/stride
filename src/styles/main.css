@@ -21,22 +21,33 @@ body {
                     user-select: none; 
 }
 
-.webgl
-{
+.webgl {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     outline: none;
-    background: black;
+}
+
+#sky {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100dvw;
+    height: 100dvh;
+    transform: translate(-50%, -50%);
+    outline: none;
+    background-size: cover;
+    background-position: center;
+    background-image: url(/resources/images/anime-sky.jpg);
 }
 
 .touch-inputs {
     position: fixed;
     display: flex;
     left: 0;
-    bottom: 5vh;
-    width: 100vw;
+    bottom: 5dvh;
+    width: 100dvw;
     justify-content: right;
     z-index: 10;
 }
