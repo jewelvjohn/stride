@@ -7,6 +7,7 @@ export class CharacterController {
         this.model = null;
         this.pause = false;
         this.takeInputs = true;
+        // this.csm = csm;
 
         this.mixer = null;
         this.actions = {};
@@ -48,13 +49,14 @@ export class CharacterController {
         const gradientMap = new THREE.DataTexture(step, step.length, 1, THREE.RedFormat);
         gradientMap.needsUpdate = true;
     
-        model.traverse(function(child) {
+        model.traverse((child) => {
             if(child.isMesh) {
                 child.material = new THREE.MeshToonMaterial({color: 0xFFFFFF, map: child.material.map, gradientMap: gradientMap});
                 child.castShadow = true;
                 child.receiveShadow = false;
                 child.material.side = THREE.FrontSide;
                 child.material.shadowSide = THREE.FrontSide;
+                // this.csm.setupMaterial(child.material);
             }
         });
         this.model = model;

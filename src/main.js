@@ -35,8 +35,8 @@ let loadingScreen, loadingBar, loadingText, startButton;
 const lightIntensity = 2;
 const lightDirection = new THREE.Vector3(1, -1, -1);
 const talkBubbleOffset = new THREE.Vector3(0, 40, 0);
-const cameraLookAtOffset = new THREE.Vector3(0, 25, 0);
-const cameraPositionOffset = new THREE.Vector3(-120, 30, 0);
+const cameraLookAtOffset = new THREE.Vector3(0, 30, 0);
+const cameraPositionOffset = new THREE.Vector3(-160, 35, 0);
 
 const sizes = {
     width: window.innerWidth,
@@ -45,7 +45,7 @@ const sizes = {
 
 var stages = {};
 var currentStage = '';
-var highEndGraphics = true;
+var highEndGraphics = false;
 var isTextBubbleVisible = false;
 var isInteracting = false; 
 var interactionId = -1;
@@ -231,19 +231,23 @@ function createBlinder(position, width, height) {
 }
 
 function createDummyStage(color = 0xffffff, position, key) {
-    const groundGeometry = new THREE.BoxGeometry(400, 40, 400);
+    const groundGeometry = new THREE.BoxGeometry(400, 2, 400);
     const boxGeometry = new THREE.BoxGeometry(40, 20, 40, 10, 10, 10);
     const material = new THREE.MeshStandardMaterial({color: color});
     csm.setupMaterial(material);
 
     const groundMesh = new THREE.Mesh(groundGeometry, material);
-    groundGeometry.castShadow = true;
-    groundGeometry.receiveShadow = true;
-    groundMesh.position.set(100, -20, position);
+    groundMesh.castShadow = true;
+    groundMesh.receiveShadow = true;
+    groundMesh.side = THREE.FrontSide;
+    groundMesh.shadowSide = THREE.FrontSide;
+    groundMesh.position.set(100, -1, position);
 
     const boxMesh = new THREE.Mesh(boxGeometry, material);
     boxMesh.castShadow = true;
     boxMesh.receiveShadow = true;
+    boxMesh.side = THREE.FrontSide;
+    boxMesh.shadowSide = THREE.FrontSide;
     boxMesh.position.set(40, 10, position);
 
     const stage = new Stage(scene);
@@ -259,8 +263,8 @@ function loadEnvironment() {
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 40), 6, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 120), 6, 80);
 
-    const gridHelper = new THREE.GridHelper(400, 40);
-    scene.add(gridHelper);
+    // const gridHelper = new THREE.GridHelper(400, 40);
+    // scene.add(gridHelper);
 
     createDummyStage(0xFFD700, -160, 'yellow'); //yellow
     createDummyStage(0xFF69B4, -80, 'red'); //red
@@ -345,16 +349,23 @@ function init() {
     }
 
     canvas = document.querySelector('canvas.webgl');
+    const gl = canvas.getContext('webgl2');
+    const dbgRenderInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    const gpu = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);;
+    console.log('Graphics Card Vendor:', gpu);
+    
     if(!isMobile()) highEndGraphics = true;
     // if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
     
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x909090);
-    // scene.fog = new THREE.Fog(scene.background, 750, 2000);
+    scene.background = new THREE.Color(0x63b0cd);
+    scene.fog = new THREE.Fog(scene.background, 500, 1000);
     
     camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 0.1, 1000);
     camera.position.set(cameraPositionOffset);
     camera.lookAt(cameraLookAtOffset);
+
+    THREE.Cache.enabled = true;
     
     renderer = new THREE.WebGLRenderer({ 
         antialias: true,
@@ -365,7 +376,8 @@ function init() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(sizes.width, sizes.height);
     renderer.render(scene, camera);
-    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.type = THREE.VSMShadowMap;
     renderer.shadowMap.enabled = true;
 
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 0.35);
@@ -373,29 +385,29 @@ function init() {
     scene.add(hemiLight);
 
     csm = new CSM({
-        maxFar: 800,
-        cascades: 3,
-        mode: 'practical',
+        maxFar: 500,
+        cascades: highEndGraphics ? 2 : 1,
+        mode: 'uniform',
         parent: scene,
-        shadowMapSize: 1024,
+        shadowMapSize: highEndGraphics ? 2048 : 1024,
         lightDirection: lightDirection.normalize(),
         camera: camera
     });
 
     for(let i=0; i<csm.lights.length; i++) {
         csm.lights[i].intensity = lightIntensity;
-        csm.lights[i].shadow.bias = -0.002;
+        csm.lights[i].shadow.normalBias = highEndGraphics ? 0.05 : 0.1;
     }
 
-    csmHelper = new CSMHelper(csm);
-    csmHelper.visible = false;
-    scene.add(csmHelper);
+    // csmHelper = new CSMHelper(csm);
+    // csmHelper.visible = true;
+    // scene.add(csmHelper);
     
     stats = new Stats();
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/high-end/character v2.glb', scene, loadingManager, -200, 200);
+    player = new CharacterController('./resources/3d/high-end/character.glb', scene, loadingManager, -200, 200);
     inputSystem = new InputSystem();
     
     effect = new OutlineEffect(renderer, {
@@ -468,9 +480,9 @@ function update() {
         accumulator -= fixedTimeStep;
     }
     
-    camera.updateMatrixWorld();
+    // camera.updateMatrixWorld();
+    // csmHelper.update();
     csm.update();
-    csmHelper.update();
     stats.update();
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);
