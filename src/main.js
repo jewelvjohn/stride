@@ -81,7 +81,10 @@ function initializeGUI() {
     interfaceRenderer = new CSS2DRenderer();
     interfaceRenderer.setSize(sizes.width, sizes.height);
     interfaceRenderer.domElement.style.position = 'fixed';
-    interfaceRenderer.domElement.style.top = '0px';
+    interfaceRenderer.domElement.style.top = '50%';
+    interfaceRenderer.domElement.style.left = '50%';
+    interfaceRenderer.domElement.style.left = '50%';
+    interfaceRenderer.domElement.style.transform = 'translate(-50%, -50%)';
     document.body.appendChild(interfaceRenderer.domElement);
 
     interactionContainer = new InteractionContainer();
@@ -269,9 +272,8 @@ function loadEnvironment() {
     createDummyStage(0xFFD700, -160, 'yellow'); //yellow
     createDummyStage(0xFF69B4, -80, 'red'); //red
     
-    //Gas Station
     const loader = new GLTFLoader(loadingManager);
-    loader.load("./resources/3d/high-end/gas station.glb", (gltf) => {
+    loader.load("./resources/3d/low-end/gas station.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -290,8 +292,45 @@ function loadEnvironment() {
         stages['gas_station'] = stage;
     });
 
-    createDummyStage(0x00FFFF, 80, 'blue'); //blue
-    createDummyStage(0x800080, 160, 'purple'); //purple
+    loader.load("./resources/3d/low-end/medieval town.glb", (gltf) => {
+        const model = gltf.scene;
+        model.traverse(function(child) {
+            if(child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
+                csm.setupMaterial(child.material);
+            }
+        });
+        model.scale.set(10, 10, 10);
+        model.position.set(0, 0, 80);
+        model.rotation.y = toRadian(-90);
+
+        const stage = new Stage(scene);
+        stage.addObject(model);
+        stages['medieval_town'] = stage;
+    });
+
+    loader.load("./resources/3d/low-end/light house.glb", (gltf) => {
+        const model = gltf.scene;
+        model.traverse(function(child) {
+            if(child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
+                csm.setupMaterial(child.material);
+            }
+        });
+        model.scale.set(10, 10, 10);
+        model.position.set(0, 0, 160);
+        model.rotation.y = toRadian(-90);
+
+        const stage = new Stage(scene);
+        stage.addObject(model);
+        stages['light_house'] = stage;
+    });
 }
 
 function selectStage(stage) {
@@ -321,9 +360,9 @@ function updateStages() {
     } else if(position <= 40) {
         selectStage('gas_station');
     } else if(position <= 120) {
-        selectStage('blue');
+        selectStage('medieval_town');
     } else {
-        selectStage('purple');
+        selectStage('light_house');
     }
 }
 
@@ -359,7 +398,7 @@ function init() {
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x63b0cd);
-    scene.fog = new THREE.Fog(scene.background, 500, 1000);
+    scene.fog = new THREE.Fog(scene.background, 580, 1000);
     
     camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 0.1, 1000);
     camera.position.set(cameraPositionOffset);
