@@ -1,7 +1,9 @@
 export class Stage {
-    constructor(scene, active = false) {
+    constructor(scene, sky, fog) {
         this.objects = [];
-        this.isActive = active;
+        this.sky = sky;
+        this.fog = fog;
+        this.isActive = false;
         this.scene = scene;
     }
 

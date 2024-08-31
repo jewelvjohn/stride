@@ -253,7 +253,9 @@ function createDummyStage(color = 0xffffff, position, key) {
     boxMesh.shadowSide = THREE.FrontSide;
     boxMesh.position.set(40, 10, position);
 
-    const stage = new Stage(scene);
+    const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+    const sky = "./resources/images/sunny.png";
+    const stage = new Stage(scene, sky, fog);
     stage.addObject(groundMesh);
     stage.addObject(boxMesh);
 
@@ -291,7 +293,9 @@ function loadEnvironment() {
         if(stages['gas_station']) {
             stages['gas_station'].addObject(model);
         } else {
-            const stage = new Stage(scene);
+            const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+            const sky = "./resources/images/sunny.png";
+            const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['gas_station'] = stage;
         }
@@ -323,7 +327,9 @@ function loadEnvironment() {
         if(stages['gas_station']) {
             stages['gas_station'].addObject(model);
         } else {
-            const stage = new Stage(scene);
+            const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+            const sky = "./resources/images/sunny.png";
+            const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['gas_station'] = stage;
         }
@@ -345,9 +351,15 @@ function loadEnvironment() {
         model.position.set(0, 0, 80);
         model.rotation.y = toRadian(-90);
 
-        const stage = new Stage(scene);
-        stage.addObject(model);
-        stages['medieval_town'] = stage;
+        if(stages['medieval_town']) {
+            stages['medieval_town'].addObject(model);
+        } else {
+            const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+            const sky = "./resources/images/forest.png";
+            const stage = new Stage(scene, sky, fog);
+            stage.addObject(model);
+            stages['medieval_town'] = stage;
+        }
     });
 
 //light house
@@ -366,9 +378,15 @@ function loadEnvironment() {
         model.position.set(0, 0, 160);
         model.rotation.y = toRadian(-90);
 
-        const stage = new Stage(scene);
-        stage.addObject(model);
-        stages['light_house'] = stage;
+        if(stages['light_house']) {
+            stages['light_house'].addObject(model);
+        } else {
+            const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+            const sky = "./resources/images/cloudy.png";
+            const stage = new Stage(scene, sky, fog);
+            stage.addObject(model);
+            stages['light_house'] = stage;
+        }
     });
 }
 
@@ -378,6 +396,8 @@ function selectStage(stage) {
             if(key === stage) {
                 if(!value.isActive) {
                     value.showStage();
+                    sky.style.backgroundImage = `url(${value.sky})`;
+                    scene.fog = value.fog;
                 }
                 currentStage = stage;
             } else {
@@ -427,7 +447,6 @@ function init() {
     }
 
     sky = document.getElementById('sky');
-    // sky.style.backgroundImage = "url('/resources/images/left.svg')";
     canvas = document.querySelector('canvas.webgl');
 
     // const gl = canvas.getContext('webgl2');
@@ -533,6 +552,9 @@ function onWindowResize() {
     camera.aspect = sizes.width / sizes.height;
     camera.fov = THREE.MathUtils.clamp((-20*camera.aspect)+60 , 30, 50);
     camera.updateProjectionMatrix();
+
+    sky.style.width = `${sizes.width}px`;
+    sky.style.height = `${sizes.height}px`;
     
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
