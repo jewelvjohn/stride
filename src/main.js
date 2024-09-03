@@ -1,11 +1,10 @@
-import './styles/main.css'
-import './styles/loading.css'
-import * as THREE from 'three'
+import './styles/main.css';
+import './styles/loading.css';
+import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js'; 
-import {CSM} from 'three/addons/csm/CSM.js'
-import {CSMHelper} from 'three/addons/csm/CSMHelper.js'
+import {CSM} from 'three/addons/csm/CSM.js';
+import {CSMHelper} from 'three/addons/csm/CSMHelper.js';
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
-import {OutlineEffect} from 'three/addons/effects/OutlineEffect.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
 import {Stage} from './lib/stage.js';
@@ -26,7 +25,7 @@ import {InteractionContainer} from './lib/interaction.js';
     7. Sub-pages have problem accessing js files after deployment
  */
 
-let scene, camera, renderer, effect, stats, canvas, csm, csmHelper, sky;
+let scene, camera, renderer, composer, stats, canvas, csm, csmHelper, sky;
 let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
@@ -233,35 +232,6 @@ function createBlinder(position, width, height) {
     scene.add(mesh);
 }
 
-function createDummyStage(color = 0xffffff, position, key) {
-    const groundGeometry = new THREE.BoxGeometry(400, 2, 400);
-    const boxGeometry = new THREE.BoxGeometry(40, 20, 40, 10, 10, 10);
-    const material = new THREE.MeshStandardMaterial({color: color});
-    csm.setupMaterial(material);
-
-    const groundMesh = new THREE.Mesh(groundGeometry, material);
-    groundMesh.castShadow = true;
-    groundMesh.receiveShadow = true;
-    groundMesh.side = THREE.FrontSide;
-    groundMesh.shadowSide = THREE.FrontSide;
-    groundMesh.position.set(100, -1, position);
-
-    const boxMesh = new THREE.Mesh(boxGeometry, material);
-    boxMesh.castShadow = true;
-    boxMesh.receiveShadow = true;
-    boxMesh.side = THREE.FrontSide;
-    boxMesh.shadowSide = THREE.FrontSide;
-    boxMesh.position.set(40, 10, position);
-
-    const fog = new THREE.Fog(0xADDDF0, 580, 1000);
-    const sky = "./resources/images/sunny.png";
-    const stage = new Stage(scene, sky, fog);
-    stage.addObject(groundMesh);
-    stage.addObject(boxMesh);
-
-    stages[key] = stage;
-}
-
 function loadEnvironment() {
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -120), 6, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -40), 6, 80);
@@ -271,11 +241,62 @@ function loadEnvironment() {
     // const gridHelper = new THREE.GridHelper(400, 40);
     // scene.add(gridHelper);
 
-    createDummyStage(0xFFD700, -160, 'yellow'); //yellow
-    createDummyStage(0xFF69B4, -80, 'red'); //red
+//exo planet
+    const loader = new GLTFLoader(loadingManager);
+    loader.load("./resources/3d/low-end/exo planet.glb", (gltf) => {
+        const model = gltf.scene;
+        model.traverse(function(child) {
+            if(child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
+                csm.setupMaterial(child.material);
+            }
+        });
+        model.scale.set(10, 10, 10);
+        model.position.set(0, 0, -160);
+        model.rotation.y = toRadian(-90);
+
+        if(stages['exo_planet']) {
+            stages['exo_planet'].addObject(model);
+        } else {
+            const fog = new THREE.Fog(0xCCFFFA, 1500, 2500);
+            const sky = "./resources/images/green.png";
+            const stage = new Stage(scene, sky, fog);
+            stage.addObject(model);
+            stages['exo_planet'] = stage;
+        }
+    });
+
+//spiral city
+    loader.load("./resources/3d/low-end/spiral city.glb", (gltf) => {
+        const model = gltf.scene;
+        model.traverse(function(child) {
+            if(child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
+                csm.setupMaterial(child.material);
+            }
+        });
+        model.scale.set(10, 10, 10);
+        model.position.set(0, 0, -80);
+        model.rotation.y = toRadian(-90);
+
+        if(stages['spiral_city']) {
+            stages['spiral_city'].addObject(model);
+        } else {
+            const fog = new THREE.Fog(0xFFE4B4, 500, 1000);
+            const sky = "./resources/images/sunset.png";
+            const stage = new Stage(scene, sky, fog);
+            stage.addObject(model);
+            stages['spiral_city'] = stage;
+        }
+    });
     
 //gas station
-    const loader = new GLTFLoader(loadingManager);
     loader.load("./resources/3d/low-end/gas station.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
@@ -293,7 +314,7 @@ function loadEnvironment() {
         if(stages['gas_station']) {
             stages['gas_station'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+            const fog = new THREE.Fog(0xCCF9FF, 500, 1000);
             const sky = "./resources/images/sunny.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -327,7 +348,7 @@ function loadEnvironment() {
         if(stages['gas_station']) {
             stages['gas_station'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+            const fog = new THREE.Fog(0xCCF9FF, 500, 1000);
             const sky = "./resources/images/sunny.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -354,7 +375,7 @@ function loadEnvironment() {
         if(stages['medieval_town']) {
             stages['medieval_town'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+            const fog = new THREE.Fog(0xE3ECFF, 500, 1000);
             const sky = "./resources/images/forest.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -381,7 +402,7 @@ function loadEnvironment() {
         if(stages['light_house']) {
             stages['light_house'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xADDDF0, 580, 1000);
+            const fog = new THREE.Fog(0xBDE5E4, 500, 1000);
             const sky = "./resources/images/cloudy.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -413,9 +434,9 @@ function updateStages() {
     const position = player.model.position.z;
 
     if(position <= -120) {
-        selectStage('yellow');
+        selectStage('exo_planet');
     } else if(position <= -40) {
-        selectStage('red');
+        selectStage('spiral_city');
     } else if(position <= 40) {
         selectStage('gas_station');
     } else if(position <= 120) {
@@ -448,20 +469,13 @@ function init() {
 
     sky = document.getElementById('sky');
     canvas = document.querySelector('canvas.webgl');
-
-    // const gl = canvas.getContext('webgl2');
-    // const dbgRenderInfo = gl.getExtension("WEBGL_debug_renderer_info");
-    // const gpu = gl.getParameter(dbgRenderInfo.UNMASKED_RENDERER_WEBGL);;
-    // console.log('Graphics Card Vendor:', gpu);
     
     if(!isMobile()) highEndGraphics = true;
     // if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
     
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xADDDF0, 580, 1000);
-    // scene.background = new THREE.Color(0x63b0cd);
     
-    camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 0.1, 2500);
     camera.position.set(cameraPositionOffset);
     camera.lookAt(cameraLookAtOffset);
 
@@ -496,7 +510,7 @@ function init() {
 
     for(let i=0; i<csm.lights.length; i++) {
         csm.lights[i].intensity = lightIntensity;
-        csm.lights[i].shadow.normalBias = highEndGraphics ? 0.05 : 0.1;
+        csm.lights[i].shadow.normalBias = highEndGraphics ? 0.05 : 0.2;
     }
 
     // csmHelper = new CSMHelper(csm);
@@ -509,11 +523,6 @@ function init() {
     
     player = new CharacterController('./resources/3d/high-end/character.glb', scene, loadingManager, -200, 200);
     inputSystem = new InputSystem();
-    
-    effect = new OutlineEffect(renderer, {
-        defaultThickness: 0.002,
-        defaultColor: [0, 0, 0]
-    });
 
     loadingManager.onProgress = function(url, loaded, total) {
         const progress = (loaded / total) * 100;
@@ -589,7 +598,6 @@ function update() {
     stats.update();
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);
-    effect.render(scene, camera);
     
     requestAnimationFrame(update);
     // console.log(renderer.info.render.triangles);
