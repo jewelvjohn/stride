@@ -25,7 +25,7 @@ import {InteractionContainer} from './lib/interaction.js';
     7. Sub-pages have problem accessing js files after deployment
  */
 
-let scene, camera, renderer, composer, stats, canvas, csm, csmHelper, sky;
+let scene, camera, renderer, stats, canvas, csm, csmHelper, sky;
 let player, inputSystem, interactionContainer;
 let interfaceRenderer;
 let textBubble, textContainer;
@@ -35,7 +35,7 @@ const lightIntensity = 3;
 const lightDirection = new THREE.Vector3(1, -1, -1);
 const talkBubbleOffset = new THREE.Vector3(0, 40, 0);
 const cameraLookAtOffset = new THREE.Vector3(0, 30, 0);
-const cameraPositionOffset = new THREE.Vector3(-160, 35, 0);
+const cameraPositionOffset = new THREE.Vector3(-160, 30, 0);
 
 const sizes = {
     width: window.innerWidth,
@@ -243,7 +243,7 @@ function loadEnvironment() {
 
 //exo planet
     const loader = new GLTFLoader(loadingManager);
-    loader.load("./resources/3d/low-end/exo planet.glb", (gltf) => {
+    loader.load("./resources/3d/exo planet.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -270,7 +270,7 @@ function loadEnvironment() {
     });
 
 //spiral city
-    loader.load("./resources/3d/low-end/spiral city.glb", (gltf) => {
+    loader.load("./resources/3d/spiral city.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -297,7 +297,7 @@ function loadEnvironment() {
     });
     
 //gas station
-    loader.load("./resources/3d/low-end/gas station.glb", (gltf) => {
+    loader.load("./resources/3d/gas station.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -314,7 +314,7 @@ function loadEnvironment() {
         if(stages['gas_station']) {
             stages['gas_station'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xCCF9FF, 500, 1000);
+            const fog = new THREE.Fog(0xB1DDDC, 650, 1000);
             const sky = "./resources/images/sunny.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -322,7 +322,7 @@ function loadEnvironment() {
         }
     });
 
-    loader.load("./resources/3d/high-end/lfa.glb", (gltf) => {
+    loader.load("./resources/3d/lfa.glb", (gltf) => {
         const model = gltf.scene;
         const step = new Uint8Array([0, 32, 64, 255]);
         const gradientMap = new THREE.DataTexture(step, step.length, 1, THREE.RedFormat);
@@ -342,13 +342,13 @@ function loadEnvironment() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(100, 0, -60);
+        model.position.set(40, 0, -60);
         model.rotation.y = toRadian(-45);
 
         if(stages['gas_station']) {
             stages['gas_station'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xCCF9FF, 500, 1000);
+            const fog = new THREE.Fog(0xB1DDDC, 650, 1000);
             const sky = "./resources/images/sunny.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -357,7 +357,7 @@ function loadEnvironment() {
     });
 
 //medieval town
-    loader.load("./resources/3d/low-end/medieval town.glb", (gltf) => {
+    loader.load("./resources/3d/medieval town.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -384,7 +384,7 @@ function loadEnvironment() {
     });
 
 //light house
-    loader.load("./resources/3d/low-end/light house.glb", (gltf) => {
+    loader.load("./resources/3d/light house.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -494,7 +494,7 @@ function init() {
     renderer.shadowMap.type = THREE.VSMShadowMap;
     renderer.shadowMap.enabled = true;
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 0.5);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444400, 1);
     hemiLight.position.set(0, 2, 0);
     scene.add(hemiLight);
 
@@ -521,7 +521,7 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/high-end/character.glb', scene, loadingManager, -200, 200);
+    player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200);
     inputSystem = new InputSystem();
 
     loadingManager.onProgress = function(url, loaded, total) {
