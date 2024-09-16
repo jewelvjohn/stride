@@ -97,35 +97,89 @@ function initializeGUI() {
 
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
-        message: '<p>This website was developed using <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>, <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a> and <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a></p> <p>Thanks to <a class="highlight" href="https://sketchfab.com/Han66st" target="_blank">Han66st</a> for the Sports Car 3D model</p>',
+        message: `
+        <p>
+            This website was developed using 
+            <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>, 
+            <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a> 
+            and <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
+        </p> 
+        <p>
+            Thanks to 
+            <a class="highlight" href="https://sketchfab.com/Han66st" target="_blank">Han66st</a> 
+            for the Sports Car 3D model
+        </p>`,
         position: -160,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Check out my artwork. I use <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> for digital art</p> <div class="gallery"><div class="art"><img src="./artwork/alone.webp"></div><div class="art"><img src="./artwork/weatherin-with-you.webp"></div><div class="art"><img src="./artwork/ip-girl.webp"></div><div class="art"><img src="./artwork/for-weirdos.webp"></div><div class="art"><img src="./artwork/batman.webp"></div><div class="art"><img src="./artwork/ashutti.webp"></div></div>',
+        message: `
+        <p>
+            Check out my artwork. I use 
+            <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> 
+            for digital art
+        </p> 
+        <div class="gallery">
+            <div class="art"><img src="./artwork/alone.webp"></div>
+            <div class="art"><img src="./artwork/weatherin-with-you.webp"></div>
+            <div class="art"><img src="./artwork/ip-girl.webp"></div>
+            <div class="art"><img src="./artwork/for-weirdos.webp"></div>
+            <div class="art"><img src="./artwork/batman.webp"></div>
+            <div class="art"><img src="./artwork/ashutti.webp"></div>
+        </div>`,
         position: -80,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Hey, I’m Jewel John, a game developer who builds same ol’ games a little different, and this is my portfolio</p>',
+        message: `
+        <p>
+            Hey, I’m Jewel John, a game developer who builds same ol’ games a little different, and this is my portfolio
+        </p>`,
         position: 0,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Check out my <a class="highlight" href="https://unity.com/" target="_blank">Unity</a> projects.</p> <div class="gallery"></div>',
+        message: `
+        <p>
+            Check out my <a class="highlight" href="https://unity.com/" target="_blank">Unity</a> projects.
+        </p> 
+        <div class="gallery">
+            <div class="project">
+                <a class="project-link" href="" target="_blank"><i>BurnyRush</i></a>
+                <img src="./projects/burny-rush.webp">
+            </div>
+            <div class="project">
+                <a class="project-link" href="" target="_blank"><i>Stratosphere</i></a>
+                <img src="./projects/stratosphere.webp">
+            </div>
+        </div>`,
         position: 80,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Connect with me through my socials.</p> <div class="talkbubble-social"> <a href="https://www.linkedin.com/in/jewelvjohn/" target="_blank"><lottie-player loop hover src="./resources/animations/linkedin.json"></lottie-player></a> <a href="https://github.com/jewelvjohn" target="_blank"><lottie-player loop hover src="./resources/animations/github.json"></lottie-player></a> <a href="https://www.instagram.com/jewelvjohn/" target="_blank"><lottie-player id="instagram-camera" src="./resources/animations/instagram.json"></lottie-player></a> </div>',
+        message: `
+        <p>
+            Connect with me through my socials.
+        </p> 
+        <div class="talkbubble-social"> 
+            <a href="https://www.linkedin.com/in/jewelvjohn/" target="_blank">
+                <lottie-player loop hover src="./resources/animations/linkedin.json"></lottie-player>
+            </a> 
+            <a href="https://github.com/jewelvjohn" target="_blank">
+                <lottie-player loop hover src="./resources/animations/github.json"></lottie-player>
+            </a> 
+            <a href="https://www.instagram.com/jewelvjohn/" target="_blank">
+                <lottie-player id="instagram-camera" src="./resources/animations/instagram.json"></lottie-player>
+            </a> 
+        </div>`,
         position: 160,
         light: false,
         focus: true,
