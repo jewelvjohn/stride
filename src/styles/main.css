@@ -116,13 +116,11 @@ body {
     position: absolute;
     width: 0;
     height: 0;
-    bottom: -24px;
-    border-left: 12px solid transparent;
-	border-right: 12px solid transparent;
-    left: calc(50% - 12px);
-
-	border-top: 24px solid rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
+    bottom: -16px;
+    border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+    left: calc(50% - 8px);
+	border-top: 16px solid rgba(0, 0, 0, 0.2);
 
     /*white*/
     /* border-top: 24px solid white; */
@@ -137,6 +135,25 @@ body {
 .talkbubble-message p {
     margin: 4px;
     font-size: 1rem;
+}
+
+.talkbubble-social {
+    height: 50px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.talkbubble-social a {
+    height: 40px;
+    width: 40px;
+}
+
+.talkbubble-social lottie-player {
+    height: 40px;
+    width: 40px;
 }
 
 .talkbubble-link {
@@ -160,6 +177,8 @@ body {
 }
 
 .highlight {
+    color: white;
+    text-decoration: none;
     background: #CF4647;
     padding: 0 4px 0 4px;
     margin: 0;

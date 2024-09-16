@@ -1,5 +1,8 @@
 import './styles/main.css';
 import './styles/loading.css';
+import "@lottiefiles/lottie-player";
+import {create} from '@lottiefiles/lottie-interactivity';
+
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js'; 
 import {CSM} from 'three/addons/csm/CSM.js';
@@ -25,9 +28,9 @@ import {InteractionContainer} from './lib/interaction.js';
     7. Sub-pages have problem accessing js files after deployment
  */
 
-let scene, camera, renderer, stats, canvas, csm, csmHelper, sky;
+let scene, camera, stats, canvas, csm, csmHelper, sky;
 let player, inputSystem, interactionContainer;
-let interfaceRenderer;
+let renderer, interfaceRenderer;
 let textBubble, textContainer;
 let loadingScreen, loadingBar, loadingText, startButton;
 
@@ -51,6 +54,8 @@ var interactionId = -1;
 var currentInteractionId = -1;
 var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
+var delay = 0;
+var endDelay = false;
 
 const loadingManager = new THREE.LoadingManager();
 const clock = new THREE.Clock();
@@ -75,6 +80,11 @@ function toRadian(angle) {
     return angle * Math.PI / 180;
 }
 
+function cacheImage(url) {
+    var image = new Image();
+    image.src = url;
+}
+
 //function used for creating CSS renderer for rendering html elements in the 3D scene
 function initializeGUI() {
     interfaceRenderer = new CSS2DRenderer();
@@ -88,40 +98,42 @@ function initializeGUI() {
 
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
-        message: '<p>Beautiful painting!</p>',
+        message: '<p>This website was developed using <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>, <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a> and <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a></p> <p>Thanks to <a class="highlight" href="https://sketchfab.com/Han66st" target="_blank">Han66st</a> for the Sports Car 3D model</p>',
         position: -160,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>This website was developed using <span class="highlight">three.js</span>, <span class="highlight">vite</span> and <span class="highlight">blender</span></p>',
+        message: '<p>Check out my artwork. I use <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> for digital art</p>',
         position: -80,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Use keyboard arrows, A, D or <, > buttons to move</p>',
+        message: '<p>Hey, I’m Jewel John, a game developer who builds same ol’ games a little different, and this is my portfolio</p>',
         position: 0,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p><span class="highlight">Burny Rush</span> is a high fidelity racing game developed in unity</p>',
+        message: '<p>Check out my <a class="highlight" href="https://unity.com/" target="_blank">Unity</a> projects.</p>',
         position: 80,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Should I go ahead?</p><a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>',
+        message: '<p>Connect with me through my socials.</p> <div class="talkbubble-social"> <a href="https://www.linkedin.com/in/jewelvjohn/" target="_blank"><lottie-player loop hover src="./resources/animations/linkedin.json"></lottie-player></a> <a href="https://github.com/jewelvjohn" target="_blank"><lottie-player loop hover src="./resources/animations/github.json"></lottie-player></a> <a href="https://www.instagram.com/jewelvjohn/" target="_blank"><lottie-player id="instagram-camera" src="./resources/animations/instagram.json"></lottie-player></a> </div>',
         position: 160,
         light: false,
         focus: true,
         range: 40
     });
+
+    // <a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>
 
     textBubble = document.createElement('div');
     textBubble.className = 'talkbubble';
@@ -454,6 +466,14 @@ function cameraMovement() {
     camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 }
 
+function loadSky() {
+    cacheImage('./resources/images/green.png');
+    cacheImage('./resources/images/sunset.png');
+    cacheImage('./resources/images/sunny.png');
+    cacheImage('./resources/images/forest.png');
+    cacheImage('./resources/images/cloudy.png');
+}
+
 //initializes the whole scene
 function init() {
     loadingScreen = document.querySelector('#loading-screen');
@@ -464,7 +484,16 @@ function init() {
     startButton.disabled = true;
     startButton.onclick = () => {
         player.startIdle();
-        loadingScreen.style.display = 'none' 
+        loadingScreen.style.display = 'none';
+        create({
+            player:'#instagram-camera',
+            mode:"cursor",
+            actions: [
+                {
+                    type: "hold"
+                }
+            ]
+        });
     }
 
     sky = document.getElementById('sky');
@@ -535,6 +564,9 @@ function init() {
         loadingText.innerText = `Finished Loading`;
     }
 
+    window.addEventListener('focus', (event) => { loadSky(); });
+    
+    loadSky();
     initializeGUI();
     loadEnvironment();
     onWindowResize();
@@ -598,6 +630,11 @@ function update() {
     stats.update();
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);
+
+    delay += delta;
+    if(delay > 3 && !endDelay) {
+        endDelay = true;
+    }
     
     requestAnimationFrame(update);
     // console.log(renderer.info.render.triangles);
