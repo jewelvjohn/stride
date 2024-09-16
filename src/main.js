@@ -6,7 +6,6 @@ import {create} from '@lottiefiles/lottie-interactivity';
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js'; 
 import {CSM} from 'three/addons/csm/CSM.js';
-import {CSMHelper} from 'three/addons/csm/CSMHelper.js';
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
@@ -28,7 +27,7 @@ import {InteractionContainer} from './lib/interaction.js';
     7. Sub-pages have problem accessing js files after deployment
  */
 
-let scene, camera, stats, canvas, csm, csmHelper, sky;
+let scene, camera, stats, canvas, csm, sky;
 let player, inputSystem, interactionContainer;
 let renderer, interfaceRenderer;
 let textBubble, textContainer;
@@ -105,7 +104,7 @@ function initializeGUI() {
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Check out my artwork. I use <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> for digital art</p>',
+        message: '<p>Check out my artwork. I use <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> for digital art</p> <div class="gallery"><div class="art"><img src="./artwork/alone.webp"></div><div class="art"><img src="./artwork/weatherin-with-you.webp"></div><div class="art"><img src="./artwork/ip-girl.webp"></div><div class="art"><img src="./artwork/for-weirdos.webp"></div><div class="art"><img src="./artwork/batman.webp"></div><div class="art"><img src="./artwork/ashutti.webp"></div></div>',
         position: -80,
         light: false,
         focus: true,
@@ -119,7 +118,7 @@ function initializeGUI() {
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: '<p>Check out my <a class="highlight" href="https://unity.com/" target="_blank">Unity</a> projects.</p>',
+        message: '<p>Check out my <a class="highlight" href="https://unity.com/" target="_blank">Unity</a> projects.</p> <div class="gallery"></div>',
         position: 80,
         light: false,
         focus: true,
@@ -488,11 +487,7 @@ function init() {
         create({
             player:'#instagram-camera',
             mode:"cursor",
-            actions: [
-                {
-                    type: "hold"
-                }
-            ]
+            actions: [{type: "hold"}]
         });
     }
 
@@ -503,13 +498,11 @@ function init() {
     // if(!isTouch()) document.querySelector('div.touch-inputs').style.display = 'none';
     
     scene = new THREE.Scene();
-    
     camera = new THREE.PerspectiveCamera(30, sizes.width / sizes.height, 0.1, 2500);
     camera.position.set(cameraPositionOffset);
     camera.lookAt(cameraLookAtOffset);
 
-    THREE.Cache.enabled = true;
-    
+    THREE.Cache.enabled = true;    
     renderer = new THREE.WebGLRenderer({ 
         antialias: true,
         alpha: true,
@@ -541,14 +534,11 @@ function init() {
         csm.lights[i].intensity = lightIntensity;
         csm.lights[i].shadow.normalBias = highEndGraphics ? 0.05 : 0.2;
     }
-
-    // csmHelper = new CSMHelper(csm);
-    // csmHelper.visible = true;
-    // scene.add(csmHelper);
     
     stats = new Stats();
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
+    window.addEventListener('focus', (event) => { loadSky(); });
     
     player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200);
     inputSystem = new InputSystem();
@@ -558,13 +548,10 @@ function init() {
         loadingText.innerText = `Loading assets ${loaded} out of ${total}`;
         loadingBar.value = progress;
     }
-
     loadingManager.onLoad = function() {
         startButton.disabled = false;
         loadingText.innerText = `Finished Loading`;
     }
-
-    window.addEventListener('focus', (event) => { loadSky(); });
     
     loadSky();
     initializeGUI();
@@ -624,8 +611,6 @@ function update() {
         accumulator -= fixedTimeStep;
     }
     
-    // camera.updateMatrixWorld();
-    // csmHelper.update();
     csm.update();
     stats.update();
     renderer.render(scene, camera);
