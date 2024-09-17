@@ -24,16 +24,16 @@
 
 *::-webkit-scrollbar-thumb {
     box-sizing: border-box;
-    background-color: #dcb749;
+    background-color: #cecece;
     border-radius: 8px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-    background-color: #ffd556;
+    background-color: #ffffff;
 }
 
 *::-webkit-scrollbar-thumb:active {
-    background-color: #ffd556;
+    background-color: #ffffff;
 }
 
 body {
@@ -133,6 +133,7 @@ body {
     color: white;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
 
     /*white*/
     /* color: black;
@@ -169,6 +170,7 @@ body {
     border-radius: 18px;
     transform: translate(50%, -50%);
     background-color: white;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
 }
 
 .talkbubble-badge lottie-player {
@@ -264,6 +266,7 @@ body {
     background: #dcb749;
     border-radius: 6px;
     border-bottom: 4px solid #ab903f;
+    box-shadow: 0px 0px 8px rgba(0,0,0,0.4);
     
     text-decoration: none;
     transition: 0.3s all ease-in-out;
@@ -274,7 +277,7 @@ body {
     color: white;
     font-style: italic;
     font-weight: 700;
-    font-size: clamp(0.8rem, 3vw, 1.2rem);
+    font-size: clamp(0.7rem, 2.5vw, 1rem);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -106,12 +106,18 @@ function initializeGUI() {
             <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>, 
             <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a> 
             and 
-            <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
+            <a class="highlight" href="https://www.blender.org/" target="_blank">Blender.</a>
         </p> 
         <p>
-            Thanks to 
+            Thanks to,
+        </p>
+        <p>
             <a class="highlight" href="https://sketchfab.com/Han66st" target="_blank">Han66st</a> 
-            for the Sports Car 3D model
+            for the sport car and,
+        </p>
+        <p>
+            <a class="highlight" href="https://sketchfab.com/boiko.pavlo4" target="_blank">Pavlo Boiko</a> 
+            for the old bus 3D model.
         </p>`,
         position: -160,
         light: false,
@@ -124,9 +130,9 @@ function initializeGUI() {
             <lottie-player loop autoplay src="./resources/animations/media.json"></lottie-player>
         </div>
         <p>
-            Check out my artwork. I use 
+            I use 
             <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> 
-            for digital art
+            for digital art.
         </p> 
         <div class="gallery">
             <div class="art"><img src="./artwork/alone.webp"></div>
@@ -147,7 +153,7 @@ function initializeGUI() {
             <lottie-player loop autoplay src="./resources/animations/dna.json"></lottie-player>
         </div>
         <p>
-            Hey, I’m Jewel John, a game developer who builds same ol’ games a little different, and this is my portfolio
+            I’m Jewel John, a Game Developer who builds same ol’ games a little different. Go ahead and check out my protfolio.
         </p>
         <div class="cache">
             <img src="./resources/images/green.png">
@@ -172,11 +178,11 @@ function initializeGUI() {
         </p> 
         <div class="gallery">
             <div class="project">
-                <a class="project-link" href="" target="_blank"><span>BurnyRush</span></a>
+                <a class="project-link" href="https://jewelvjohn.github.io/burny-rush/" target="_blank"><span>BurnyRush</span></a>
                 <img src="./projects/burny-rush.webp">
             </div>
             <div class="project">
-                <a class="project-link" href="" target="_blank"><span>Stratosphere</span></a>
+                <a class="project-link" href="https://jewelvjohn.github.io/stratosphere/" target="_blank"><span>Stratosphere</span></a>
                 <img src="./projects/stratosphere.webp">
             </div>
         </div>`,
