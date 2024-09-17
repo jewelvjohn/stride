@@ -66,6 +66,10 @@ body {
     background-position: center;
 }
 
+.cache {
+    display: none;
+}
+
 .touch-inputs {
     position: fixed;
     display: flex;
@@ -120,7 +124,7 @@ body {
 
 .talkbubble {
     position: relative;
-    width: calc(100vw - 48px);
+    width: calc(100vw - 60px);
     min-width: 300px;
     max-width: 500px;
     padding: 8px;
@@ -153,6 +157,26 @@ body {
     /* border-top: 24px solid white; */
 }
 
+.talkbubble-badge {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    transform: translate(50%, -50%);
+    background-color: white;
+}
+
+.talkbubble-badge lottie-player {
+    box-sizing: border-box;
+    width: 24px;
+    height: 24px;
+}
+
 .talkbubble-message {
     flex-direction: column;
     justify-content: center;
@@ -161,7 +185,7 @@ body {
 
 .talkbubble-message p {
     margin: 4px;
-    font-size: 1rem;
+    font-size: clamp(0.8rem, 3vw, 1.2rem);
 }
 
 .talkbubble-social {
@@ -234,14 +258,26 @@ body {
     bottom: 8px;
     width: calc(100% - 16px) ;
     height: 30px;
-    border-radius: 6px;
-    background: #dcb749;
-    border-bottom: 4px solid #ab903f;
-    color: white;
-    text-decoration: none;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+
+    background: #dcb749;
+    border-radius: 6px;
+    border-bottom: 4px solid #ab903f;
+    
+    text-decoration: none;
     transition: 0.3s all ease-in-out;
+}
+
+.project-link span {
+    padding: 4px;
+    color: white;
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(0.8rem, 3vw, 1.2rem);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .project-link:hover {
@@ -256,7 +292,7 @@ body {
     padding: 0 4px 0 4px;
     margin: 0;
     border-radius: 4px;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .hidden {

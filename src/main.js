@@ -98,11 +98,15 @@ function initializeGUI() {
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
         message: `
+        <div class="talkbubble-badge">
+            <lottie-player loop autoplay src="./resources/animations/gear.json"></lottie-player>
+        </div>
         <p>
             This website was developed using 
             <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>, 
             <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a> 
-            and <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
+            and 
+            <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
         </p> 
         <p>
             Thanks to 
@@ -116,6 +120,9 @@ function initializeGUI() {
     });
     interactionContainer.addInteractionPoint({
         message: `
+        <div class="talkbubble-badge">
+            <lottie-player loop autoplay src="./resources/animations/media.json"></lottie-player>
+        </div>
         <p>
             Check out my artwork. I use 
             <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> 
@@ -136,9 +143,20 @@ function initializeGUI() {
     });
     interactionContainer.addInteractionPoint({
         message: `
+        <div class="talkbubble-badge">
+            <lottie-player loop autoplay src="./resources/animations/dna.json"></lottie-player>
+        </div>
         <p>
             Hey, I’m Jewel John, a game developer who builds same ol’ games a little different, and this is my portfolio
-        </p>`,
+        </p>
+        <div class="cache">
+            <img src="./resources/images/green.png">
+            <img src="./resources/images/sunset.png">
+            <img src="./resources/images/sunny.png">
+            <img src="./resources/images/forest.png">
+            <img src="./resources/images/cloudy.png">
+        </div>
+        `,
         position: 0,
         light: false,
         focus: true,
@@ -146,16 +164,19 @@ function initializeGUI() {
     });
     interactionContainer.addInteractionPoint({
         message: `
+        <div class="talkbubble-badge">
+            <lottie-player loop autoplay src="./resources/animations/folder.json"></lottie-player>
+        </div>
         <p>
             Check out my <a class="highlight" href="https://unity.com/" target="_blank">Unity</a> projects.
         </p> 
         <div class="gallery">
             <div class="project">
-                <a class="project-link" href="" target="_blank"><i>BurnyRush</i></a>
+                <a class="project-link" href="" target="_blank"><span>BurnyRush</span></a>
                 <img src="./projects/burny-rush.webp">
             </div>
             <div class="project">
-                <a class="project-link" href="" target="_blank"><i>Stratosphere</i></a>
+                <a class="project-link" href="" target="_blank"><span>Stratosphere</span></a>
                 <img src="./projects/stratosphere.webp">
             </div>
         </div>`,
@@ -166,6 +187,9 @@ function initializeGUI() {
     });
     interactionContainer.addInteractionPoint({
         message: `
+        <div class="talkbubble-badge">
+            <lottie-player loop autoplay src="./resources/animations/messages.json"></lottie-player>
+        </div>
         <p>
             Connect with me through my socials.
         </p> 
@@ -527,6 +551,20 @@ function loadSky() {
     cacheImage('./resources/images/cloudy.png');
 }
 
+function loadArt() {
+    cacheImage('./artwork/alone.webp');
+    cacheImage('./artwork/ashutti.webp');
+    cacheImage('./artwork/batman.webp');
+    cacheImage('./artwork/for-weirdos.webp');
+    cacheImage('./artwork/ip-girl.webp');
+    cacheImage('./artwork/weatherin-with-you.webp');
+}
+
+function loadProjects() {
+    cacheImage('./projects/burny-rush.webp');
+    cacheImage('./projects/stratosphere.webp');
+}
+
 //initializes the whole scene
 function init() {
     loadingScreen = document.querySelector('#loading-screen');
@@ -592,7 +630,6 @@ function init() {
     stats = new Stats();
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
-    window.addEventListener('focus', (event) => { loadSky(); });
     
     player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200);
     inputSystem = new InputSystem();
@@ -608,6 +645,8 @@ function init() {
     }
     
     loadSky();
+    loadArt();
+    loadProjects();
     initializeGUI();
     loadEnvironment();
     onWindowResize();
