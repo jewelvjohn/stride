@@ -53,8 +53,6 @@ var interactionId = -1;
 var currentInteractionId = -1;
 var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
-var delay = 0;
-var endDelay = false;
 
 const loadingManager = new THREE.LoadingManager();
 const clock = new THREE.Clock();
@@ -154,6 +152,7 @@ function initializeGUI() {
         </div>
         <p>
             I’m Jewel John, a Game Developer who builds same ol’ games a little different. Go ahead and check out my protfolio.
+            <span class="highlight">This website is under development.</span>
         </p>
         <div class="cache">
             <img src="./resources/images/green.png">
@@ -328,10 +327,12 @@ function createBlinder(position, width, height) {
 }
 
 function loadEnvironment() {
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -200), 6, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -120), 6, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -40), 6, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 40), 6, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 120), 6, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 200), 6, 80);
 
     // const gridHelper = new THREE.GridHelper(400, 40);
     // scene.add(gridHelper);
@@ -549,6 +550,26 @@ function cameraMovement() {
     camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 }
 
+function loopPlayer() {
+    if((player.positionRef == player.minBound) && inputSystem.axes.horizontal < 0) {
+        player.model.position.z = player.maxBound;
+        player.positionRef = player.model.position.z;
+
+        textBubbleUpdate();
+        cameraMovement();
+        updateStages();
+    }
+
+    if((player.positionRef == player.maxBound) && inputSystem.axes.horizontal > 0) {
+        player.model.position.z = player.minBound;
+        player.positionRef = player.model.position.z;
+        
+        textBubbleUpdate();
+        cameraMovement();
+        updateStages();
+    }
+}
+
 function loadSky() {
     cacheImage('./resources/images/green.png');
     cacheImage('./resources/images/sunset.png');
@@ -636,8 +657,11 @@ function init() {
     stats = new Stats();
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
+    window.addEventListener('focus', () => {
+        loadSky();
+    });
     
-    player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200);
+    player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200, true);
     inputSystem = new InputSystem();
 
     loadingManager.onProgress = function(url, loaded, total) {
@@ -700,8 +724,8 @@ function update() {
     accumulator += delta;
 
     while (accumulator >= fixedTimeStep) {
-        
         if(player.model) {
+            if(player.loop) loopPlayer();
             player.update(inputSystem.axes.horizontal, fixedTimeStep);
             textBubbleUpdate();
             cameraMovement();
@@ -714,11 +738,6 @@ function update() {
     stats.update();
     renderer.render(scene, camera);
     interfaceRenderer.render(scene, camera);
-
-    delay += delta;
-    if(delay > 3 && !endDelay) {
-        endDelay = true;
-    }
     
     requestAnimationFrame(update);
     // console.log(renderer.info.render.triangles);

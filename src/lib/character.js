@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
 export class CharacterController {
-    constructor(filename, scene, manager, minBound, maxBound) {
+    constructor(filename, scene, manager, minBound, maxBound, loop = false) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
@@ -25,6 +25,7 @@ export class CharacterController {
         this.positionLerp = 20;
         this.minBound = minBound;
         this.maxBound = maxBound;
+        this.loop = loop;
     
         window.addEventListener('blur',() => { if(!this.pause) this.pause = true; });
         window.addEventListener('focus',() => { if(this.pause) this.pause = false; });
@@ -110,16 +111,30 @@ export class CharacterController {
     //change character animation according to input
     characterAnimation(delta) {
         this.mixer.update(delta);
-        const insideBound = (this.positionRef > this.minBound) && (this.positionRef < this.maxBound);
-        if((Math.abs(this.moveInput) > 0) && insideBound) {
-            if(!this.runAnimation) {
-                this.runAnimation = true;
-                this.playAction(2, 0.2);
+        if(!this.loop) {
+            const insideBound = (this.positionRef > this.minBound) && (this.positionRef < this.maxBound);
+            if((Math.abs(this.moveInput) > 0) && insideBound) {
+                if(!this.runAnimation) {
+                    this.runAnimation = true;
+                    this.playAction(2, 0.2);
+                }
+            } else {
+                if(this.runAnimation) {
+                    this.runAnimation = false;
+                    this.playAction(0, 0.2);
+                }
             }
         } else {
-            if(this.runAnimation) {
-                this.runAnimation = false;
-                this.playAction(0, 0.2);
+            if(Math.abs(this.moveInput) > 0) {
+                if(!this.runAnimation) {
+                    this.runAnimation = true;
+                    this.playAction(2, 0.2);
+                }
+            } else {
+                if(this.runAnimation) {
+                    this.runAnimation = false;
+                    this.playAction(0, 0.2);
+                }
             }
         }
     }
