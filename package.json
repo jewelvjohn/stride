@@ -17,6 +17,7 @@
   "dependencies": {
     "@lottiefiles/lottie-interactivity": "^1.6.2",
     "@lottiefiles/lottie-player": "^2.0.4",
+    "@rive-app/canvas": "^2.21.2",
     "three": "^0.164.1"
   }
 }

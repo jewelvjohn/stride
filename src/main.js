@@ -1,5 +1,6 @@
 import './styles/main.css';
 import './styles/loading.css';
+import {Rive} from "@rive-app/canvas";
 import "@lottiefiles/lottie-player";
 import {create} from '@lottiefiles/lottie-interactivity';
 
@@ -27,7 +28,7 @@ import {InteractionContainer} from './lib/interaction.js';
     7. Sub-pages have problem accessing js files after deployment
  */
 
-let scene, camera, stats, canvas, csm, sky;
+let scene, camera, stats, canvas, csm, sky, map;
 let player, inputSystem, interactionContainer;
 let renderer, interfaceRenderer;
 let textBubble, textContainer;
@@ -326,6 +327,22 @@ function createBlinder(position, width, height) {
     scene.add(mesh);
 }
 
+function updateMap() {
+    const position = ((player.model.position.z) + 200) / 100;
+    map.scrub("flow", position);
+}
+
+function loadMap() {
+    map = new Rive({
+        src: "./resources/animations/map.riv",
+        canvas: document.getElementById("map-canvas"),
+        autoplay: false,
+        onLoad: () => {
+          map.resizeDrawingSurfaceToCanvas();
+        },
+    });
+}
+
 function loadEnvironment() {
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -200), 6, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -120), 6, 80);
@@ -453,7 +470,7 @@ function loadEnvironment() {
     });
 
 //medieval town
-    loader.load("./resources/3d/medieval town.glb", (gltf) => {
+    loader.load("./resources/3d/medieval town(dev).glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -471,7 +488,7 @@ function loadEnvironment() {
         if(stages['medieval_town']) {
             stages['medieval_town'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xE3ECFF, 500, 1000);
+            const fog = new THREE.Fog(0xE3ECFF, 550, 1200);
             const sky = "./resources/images/forest.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -676,6 +693,7 @@ function init() {
     
     loadSky();
     loadArt();
+    loadMap();
     loadProjects();
     initializeGUI();
     loadEnvironment();
@@ -699,6 +717,8 @@ function clampScreenSize(min, max) {
 //resize event used for resizing camera and renderer when window is resized
 function onWindowResize() {
     clampScreenSize(0.25, 2.5);
+    
+    map.resizeDrawingSurfaceToCanvas();
 
     camera.aspect = sizes.width / sizes.height;
     camera.fov = THREE.MathUtils.clamp((-20*camera.aspect)+60 , 30, 50);
@@ -730,6 +750,7 @@ function update() {
             textBubbleUpdate();
             cameraMovement();
             updateStages();
+            updateMap();
         }
         accumulator -= fixedTimeStep;
     }

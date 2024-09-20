@@ -70,20 +70,33 @@ body {
     display: none;
 }
 
-.touch-inputs {
+.hud {
     position: fixed;
     display: flex;
     left: 0;
-    bottom: 5dvh;
-    width: 100dvw;
+    bottom: 2vh;
+    width: 100vw;
     justify-content: right;
     z-index: 10;
+}
+
+#map-canvas {
+    position: absolute;
+    margin: 16px;
+    margin-left: 32px;
+    border-radius: 5%;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+    left: 0;
+    bottom: 0;
+    width: clamp(128px, 40vw, 192px);
+    height: clamp(128px, 40vw, 192px);
 }
 
 .button-container {
     display: flex;
     margin: 16px;
-    margin-right: 32px;
     padding: 16px;
     gap: 6vmin;
     justify-content: center;
