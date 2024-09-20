@@ -103,9 +103,11 @@ function initializeGUI() {
         <p>
             This website was developed using 
             <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>, 
-            <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a> 
+            <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>,
+            <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>,
+            <a class="highlight" href="https://rive.app/" target="_blank">Rive</a>,
             and 
-            <a class="highlight" href="https://www.blender.org/" target="_blank">Blender.</a>
+            <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
         </p> 
         <p>
             Thanks to,
@@ -208,6 +210,9 @@ function initializeGUI() {
             </a> 
             <a href="https://www.instagram.com/jewelvjohn/" target="_blank">
                 <lottie-player id="instagram-camera" src="./resources/animations/instagram.json"></lottie-player>
+            </a> 
+            <a href="https://dribbble.com/jeweljohn" target="_blank">
+                <lottie-player loop hover id="instagram-camera" src="./resources/animations/dribbble.json"></lottie-player>
             </a> 
         </div>`,
         position: 160,
