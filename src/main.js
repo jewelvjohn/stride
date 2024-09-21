@@ -178,14 +178,22 @@ function initializeGUI() {
         <p>
             Check out my <a class="highlight" href="https://unity.com/" target="_blank">Unity</a> projects.
         </p> 
-        <div class="gallery">
+        <div class="portfolio">
             <div class="project">
-                <a class="project-link" href="https://jewelvjohn.github.io/burny-rush/" target="_blank"><span>BurnyRush</span></a>
                 <img src="./projects/burny-rush.webp">
+                <div class="content">
+                    <h2>Burny Rush</h2>
+                    <p>High-fidelity racing game for desktop. <span class="highlight">current project.</span></p>
+                    <a href="https://jewelvjohn.github.io/burny-rush/" target="_blank"><span>Check out</span></a>
+                </div>
             </div>
             <div class="project">
-                <a class="project-link" href="https://jewelvjohn.github.io/stratosphere/" target="_blank"><span>Stratosphere</span></a>
                 <img src="./projects/stratosphere.webp">
+                <div class="content">
+                    <h2>Stratosphere</h2>
+                    <p>Third-person open-world game demo project.</p>
+                    <a href="https://jewelvjohn.github.io/stratosphere/" target="_blank"><span>Check out</span></a>
+                </div>
             </div>
         </div>`,
         position: 80,
