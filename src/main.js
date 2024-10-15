@@ -483,14 +483,16 @@ function loadEnvironment() {
     });
 
 //medieval town
-    loader.load("./resources/3d/medieval town(dev).glb", (gltf) => {
+    loader.load("./resources/3d/medieval town.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
-                child.material.side = THREE.FrontSide;
-                child.material.shadowSide = THREE.FrontSide;
+                if(child.material.name != "branch") {
+                    child.material.side = THREE.FrontSide;
+                    child.material.shadowSide = THREE.FrontSide;
+                }
                 csm.setupMaterial(child.material);
             }
         });
@@ -501,7 +503,7 @@ function loadEnvironment() {
         if(stages['medieval_town']) {
             stages['medieval_town'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xE3ECFF, 550, 1200);
+            const fog = new THREE.Fog(0xE3ECFF, 650, 1200);
             const sky = "./resources/images/forest.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -670,7 +672,7 @@ function init() {
     scene.add(hemiLight);
 
     csm = new CSM({
-        maxFar: 500,
+        maxFar: 1000,
         cascades: highEndGraphics ? 2 : 1,
         mode: 'uniform',
         parent: scene,
