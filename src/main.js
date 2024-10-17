@@ -489,7 +489,7 @@ function loadEnvironment() {
             if(child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
-                if(child.material.name != "branch") {
+                if(child.material.name != "vegitation") {
                     child.material.side = THREE.FrontSide;
                     child.material.shadowSide = THREE.FrontSide;
                 }
