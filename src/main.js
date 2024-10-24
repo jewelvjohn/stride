@@ -15,6 +15,9 @@ import {InputSystem} from './lib/input.js';
 import {CharacterController} from './lib/character.js';
 import {InteractionContainer} from './lib/interaction.js';
 
+import vertexShader from './lib/shaders/water/vertex.glsl';
+import fragmentShader from './lib/shaders/water/fragment.glsl';
+
 /* 
     Current Bugs :-
     --null--
@@ -136,12 +139,12 @@ function initializeGUI() {
             for digital art.
         </p> 
         <div class="gallery">
-            <div class="art"><img src="./artwork/alone.webp"></div>
-            <div class="art"><img src="./artwork/weatherin-with-you.webp"></div>
-            <div class="art"><img src="./artwork/ip-girl.webp"></div>
-            <div class="art"><img src="./artwork/for-weirdos.webp"></div>
-            <div class="art"><img src="./artwork/batman.webp"></div>
-            <div class="art"><img src="./artwork/ashutti.webp"></div>
+            <div class="art" style="background-image: url(./artwork/thumbnail/alone.jpg)"><img type="image/webp" loading="lazy" src="./artwork/alone.webp"></div>
+            <div class="art" style="background-image: url(./artwork/thumbnail/weatherin-with-you.jpg)"><img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp"></div>
+            <div class="art" style="background-image: url(./artwork/thumbnail/ig-girl.jpg)"><img type="image/webp" loading="lazy" src="./artwork/ip-girl.webp"></div>
+            <div class="art" style="background-image: url(./artwork/thumbnail/for-weirdos.jpg)"><img type="image/webp" loading="lazy" src="./artwork/for-weirdos.webp"></div>
+            <div class="art" style="background-image: url(./artwork/thumbnail/batman.jpg)"><img type="image/webp" loading="lazy" src="./artwork/batman.webp"></div>
+            <div class="art" style="background-image: url(./artwork/thumbnail/ashutti.jpg)"><img type="image/webp" loading="lazy" src="./artwork/ashutti.webp"></div>
         </div>`,
         position: -80,
         light: false,
@@ -180,7 +183,7 @@ function initializeGUI() {
         </p> 
         <div class="portfolio">
             <div class="project">
-                <img src="./projects/burny-rush.webp">
+                <img type="image/webp" loading="lazy" src="./projects/burny-rush.webp">
                 <div class="content">
                     <h2>Burny Rush</h2>
                     <p>High-fidelity racing game for desktop. <span class="highlight">current project.</span></p>
@@ -188,7 +191,7 @@ function initializeGUI() {
                 </div>
             </div>
             <div class="project">
-                <img src="./projects/stratosphere.webp">
+                <img type="image/webp" loading="lazy" src="./projects/stratosphere.webp">
                 <div class="content">
                     <h2>Stratosphere</h2>
                     <p>Third-person open-world game demo project.</p>
@@ -517,12 +520,18 @@ function loadEnvironment() {
         model.traverse(function(child) {
             if(child.isMesh) {
                 if(child.material.name == "diffuse") {
-                    const material = new THREE.MeshBasicMaterial({map: child.material.map});
-                    material.castShadow = false;
-                    material.receiveShadow = false;
-                    material.side = THREE.FrontSide;
-                    material.shadowSide = THREE.FrontSide;
-                    child.material = material;
+                    const unlitMaterial = new THREE.MeshBasicMaterial({map: child.material.map});
+                    unlitMaterial.castShadow = false;
+                    unlitMaterial.receiveShadow = false;
+                    unlitMaterial.side = THREE.FrontSide;
+                    unlitMaterial.shadowSide = THREE.FrontSide;
+                    child.material = unlitMaterial;
+                }else if(child.material.name == "ocean"){
+                    const waterMaterial = new THREE.ShaderMaterial({
+                        vertexShader: vertexShader,
+                        fragmentShader: fragmentShader
+                    });
+                    child.material = waterMaterial;
                 }else{
                     child.castShadow = true;
                     child.receiveShadow = true;
@@ -619,19 +628,19 @@ function loadSky() {
     cacheImage('./resources/images/cloudy.png');
 }
 
-function loadArt() {
-    cacheImage('./artwork/alone.webp');
-    cacheImage('./artwork/ashutti.webp');
-    cacheImage('./artwork/batman.webp');
-    cacheImage('./artwork/for-weirdos.webp');
-    cacheImage('./artwork/ip-girl.webp');
-    cacheImage('./artwork/weatherin-with-you.webp');
-}
+// function loadArt() {
+//     cacheImage('./artwork/alone.webp');
+//     cacheImage('./artwork/ashutti.webp');
+//     cacheImage('./artwork/batman.webp');
+//     cacheImage('./artwork/for-weirdos.webp');
+//     cacheImage('./artwork/ip-girl.webp');
+//     cacheImage('./artwork/weatherin-with-you.webp');
+// }
 
-function loadProjects() {
-    cacheImage('./projects/burny-rush.webp');
-    cacheImage('./projects/stratosphere.webp');
-}
+// function loadProjects() {
+//     cacheImage('./projects/burny-rush.webp');
+//     cacheImage('./projects/stratosphere.webp');
+// }
 
 //initializes the whole scene
 function init() {
@@ -716,9 +725,9 @@ function init() {
     }
     
     loadSky();
-    loadArt();
     loadMap();
-    loadProjects();
+    // loadArt();
+    // loadProjects();
     initializeGUI();
     loadEnvironment();
     onWindowResize();

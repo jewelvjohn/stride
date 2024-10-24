@@ -82,12 +82,11 @@ body {
 
 #map-canvas {
     position: absolute;
+    box-sizing: border-box;
     margin: 16px;
-    margin-left: 32px;
-    border-radius: 5%;
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+    padding: 16px;
+    margin-left: clamp(12px, 4vw, 32px);
+    background-image: radial-gradient(rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.05) 60%, rgba(0, 0, 0, 0) 70%);
     left: 0;
     bottom: 0;
     width: clamp(128px, 40vw, 192px);
@@ -110,19 +109,20 @@ body {
     justify-content: center;
 }
 
+.button-flex {
+    background-image: radial-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.05) 60%, rgba(0, 0, 0, 0) 75%);
+}
+
 .control-button {
     width: 16vmin;
     max-width: 60px;
     height: 16vmin;
     max-height: 60px;
     display: flex;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
     justify-content: center;
     align-items: center;
     outline: none;
-    transition: all ease-in-out 0.2s;
+    /* transition: all ease-in-out 0.2s; */
 }
 
 #leftButton {
@@ -144,13 +144,10 @@ body {
     border-radius: 8px;
 
     color: white;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
+    background: #344055;
+    /* background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px); */
     box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
-
-    /*white*/
-    /* color: black;
-    background: white; */
 
     transform: translateY(calc(-50% + 20px));
     pointer-events: none;
@@ -165,7 +162,7 @@ body {
     border-left: 8px solid transparent;
 	border-right: 8px solid transparent;
     left: calc(50% - 8px);
-	border-top: 16px solid rgba(0, 0, 0, 0.3);
+	border-top: 16px solid #344055;
 
     /*white*/
     /* border-top: 24px solid white; */
@@ -182,7 +179,7 @@ body {
     justify-content: center;
     border-radius: 18px;
     transform: translate(50%, -50%);
-    background-color: white;
+    background-color: #DFC2F2;
     box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
 }
 
@@ -241,15 +238,17 @@ body {
 .art {
     height: 100%;
     border-radius: 8px;
-    padding-bottom: 4px;
     box-sizing: border-box;
     overflow: hidden;
+    background-size: cover;
+    background-position: center;
 }
 
 .art img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
 }
 
 .portfolio {
@@ -339,9 +338,9 @@ body {
     text-align: center;
     text-overflow: ellipsis;
     
-    background: #dcb749;
+    background: #266DD3;
     border-radius: 6px;
-    border-bottom: 4px solid #ab903f;
+    border-bottom: 4px solid #1852a4;
     box-shadow: 0px 0px 8px rgba(0,0,0,0.4);
 
     transition: 0.3s all ease-in-out;
@@ -349,13 +348,13 @@ body {
 
 .project .content a:hover span{
     transform: translateY(4px);
-    border-bottom: 2px solid #ab903f;
+    border-bottom: 2px solid #1852a4;
 }
 
 .highlight {
     color: white;
     text-decoration: none;
-    background: #CF4647;
+    background: #888098;
     padding: 0 4px 0 4px;
     margin: 0;
     border-radius: 4px;
@@ -365,3 +364,10 @@ body {
 .hidden {
     display: none;
 }
+
+/* palette */
+/* #266DD3 */
+/* #344055 */
+/* #888098 */
+/* #CFB3CD */
+/* #DFC2F2 */
