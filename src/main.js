@@ -516,11 +516,20 @@ function loadEnvironment() {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                child.material.side = THREE.FrontSide;
-                child.material.shadowSide = THREE.FrontSide;
-                csm.setupMaterial(child.material);
+                if(child.material.name == "diffuse") {
+                    const material = new THREE.MeshBasicMaterial({map: child.material.map});
+                    material.castShadow = false;
+                    material.receiveShadow = false;
+                    material.side = THREE.FrontSide;
+                    material.shadowSide = THREE.FrontSide;
+                    child.material = material;
+                }else{
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    child.material.side = THREE.FrontSide;
+                    child.material.shadowSide = THREE.FrontSide;
+                    csm.setupMaterial(child.material);
+                }
             }
         });
         model.scale.set(10, 10, 10);
@@ -530,7 +539,7 @@ function loadEnvironment() {
         if(stages['light_house']) {
             stages['light_house'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xBDE5E4, 500, 1000);
+            const fog = new THREE.Fog(0xBDE5E4, 800, 1500);
             const sky = "./resources/images/cloudy.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
