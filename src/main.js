@@ -57,6 +57,7 @@ var interactionId = -1;
 var currentInteractionId = -1;
 var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
+var waterMaterial;
 
 const loadingManager = new THREE.LoadingManager();
 const clock = new THREE.Clock();
@@ -527,10 +528,19 @@ function loadEnvironment() {
                     unlitMaterial.shadowSide = THREE.FrontSide;
                     child.material = unlitMaterial;
                 }else if(child.material.name == "ocean"){
-                    const waterMaterial = new THREE.ShaderMaterial({
+                    const mask = new THREE.TextureLoader().load("./resources/textures/foamMask.jpg");
+                    const noise = new THREE.TextureLoader().load("./resources/textures/water.png");
+                    noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
+                    waterMaterial = new THREE.ShaderMaterial({
                         vertexShader: vertexShader,
                         fragmentShader: fragmentShader
                     });
+                    waterMaterial.uniforms.uTime = {value: 0};
+                    waterMaterial.uniforms.uFoamColor = {value: new THREE.Color(0xFFFFFF)};
+                    waterMaterial.uniforms.uWaterColor = {value: new THREE.Color(0x133A4B)};
+                    waterMaterial.uniforms.uFoamTiling = {value: 32};
+                    waterMaterial.uniforms.uMask = {value: mask};
+                    waterMaterial.uniforms.uNoise = {value: noise};
                     child.material = waterMaterial;
                 }else{
                     child.castShadow = true;
@@ -787,6 +797,10 @@ function update() {
         }
         accumulator -= fixedTimeStep;
     }
+
+    var time = clock.getElapsedTime();
+    if(waterMaterial) waterMaterial.uniforms.uTime = {value: time};
+
     
     csm.update();
     stats.update();
