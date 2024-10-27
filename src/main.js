@@ -507,13 +507,21 @@ function loadEnvironment() {
         if(stages['medieval_town']) {
             stages['medieval_town'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xE3ECFF, 650, 1200);
+            const fog = new THREE.Fog(0xE3ECFF, 700, 1200);
             const sky = "./resources/images/forest.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['medieval_town'] = stage;
         }
     });
+
+    const uniforms = {
+        uTime: { value: 0 },
+        uFoamColor: { value: new THREE.Color(0xffffff).convertLinearToSRGB() },
+        uWaterColor: { value: new THREE.Color(0x133A4B).convertLinearToSRGB() },
+        uShadowColor: { value: new THREE.Color(0x031b26).convertLinearToSRGB() },
+        uFoamTiling: { value: 32 }
+    };
 
 //light house
     loader.load("./resources/3d/light house.glb", (gltf) => {
@@ -530,17 +538,18 @@ function loadEnvironment() {
                 }else if(child.material.name == "ocean"){
                     const mask = new THREE.TextureLoader().load("./resources/textures/foamMask.jpg");
                     const noise = new THREE.TextureLoader().load("./resources/textures/water.png");
+                    const shadow = new THREE.TextureLoader().load("./resources/textures/oceanShadow.jpg");
+
                     noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
                     waterMaterial = new THREE.ShaderMaterial({
+                        uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib["fog"], uniforms]),
                         vertexShader: vertexShader,
-                        fragmentShader: fragmentShader
+                        fragmentShader: fragmentShader,
+                        fog: true
                     });
-                    waterMaterial.uniforms.uTime = {value: 0};
-                    waterMaterial.uniforms.uFoamColor = {value: new THREE.Color(0xFFFFFF)};
-                    waterMaterial.uniforms.uWaterColor = {value: new THREE.Color(0x133A4B)};
-                    waterMaterial.uniforms.uFoamTiling = {value: 32};
-                    waterMaterial.uniforms.uMask = {value: mask};
-                    waterMaterial.uniforms.uNoise = {value: noise};
+                    waterMaterial.uniforms.uMask = { value: mask };
+                    waterMaterial.uniforms.uNoise = { value: noise };
+                    waterMaterial.uniforms.uShadow = { value: shadow };
                     child.material = waterMaterial;
                 }else{
                     child.castShadow = true;
@@ -558,7 +567,7 @@ function loadEnvironment() {
         if(stages['light_house']) {
             stages['light_house'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xBDE5E4, 800, 1500);
+            const fog = new THREE.Fog(0xBDE5E4, 500, 1500);
             const sky = "./resources/images/cloudy.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
