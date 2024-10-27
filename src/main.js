@@ -140,12 +140,12 @@ function initializeGUI() {
             for digital art.
         </p> 
         <div class="gallery">
-            <div class="art" style="background-image: url(./artwork/thumbnail/alone.jpg)"><img type="image/webp" loading="lazy" src="./artwork/alone.webp"></div>
-            <div class="art" style="background-image: url(./artwork/thumbnail/weatherin-with-you.jpg)"><img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp"></div>
-            <div class="art" style="background-image: url(./artwork/thumbnail/ig-girl.jpg)"><img type="image/webp" loading="lazy" src="./artwork/ip-girl.webp"></div>
-            <div class="art" style="background-image: url(./artwork/thumbnail/for-weirdos.jpg)"><img type="image/webp" loading="lazy" src="./artwork/for-weirdos.webp"></div>
-            <div class="art" style="background-image: url(./artwork/thumbnail/batman.jpg)"><img type="image/webp" loading="lazy" src="./artwork/batman.webp"></div>
-            <div class="art" style="background-image: url(./artwork/thumbnail/ashutti.jpg)"><img type="image/webp" loading="lazy" src="./artwork/ashutti.webp"></div>
+            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/alone.webp"></div>
+            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp"></div>
+            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/ip-girl.webp"></div>
+            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/for-weirdos.webp"></div>
+            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/batman.webp"></div>
+            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/ashutti.webp"></div>
         </div>`,
         position: -80,
         light: false,
@@ -647,19 +647,26 @@ function loadSky() {
     cacheImage('./resources/images/cloudy.png');
 }
 
-// function loadArt() {
-//     cacheImage('./artwork/alone.webp');
-//     cacheImage('./artwork/ashutti.webp');
-//     cacheImage('./artwork/batman.webp');
-//     cacheImage('./artwork/for-weirdos.webp');
-//     cacheImage('./artwork/ip-girl.webp');
-//     cacheImage('./artwork/weatherin-with-you.webp');
-// }
+function loadArt() {
+    cacheImage('./artwork/alone.webp');
+    cacheImage('./artwork/ashutti.webp');
+    cacheImage('./artwork/batman.webp');
+    cacheImage('./artwork/for-weirdos.webp');
+    cacheImage('./artwork/ip-girl.webp');
+    cacheImage('./artwork/weatherin-with-you.webp');
+    
+    // cacheImage('./artwork/thumbnail/alone.jpg');
+    // cacheImage('./artwork/thumbnail/ashutti.jpg');
+    // cacheImage('./artwork/thumbnail/batman.jpg');
+    // cacheImage('./artwork/thumbnail/for-weirdos.jpg');
+    // cacheImage('./artwork/thumbnail/ip-girl.jpg');
+    // cacheImage('./artwork/thumbnail/weatherin-with-you.jpg');
+}
 
-// function loadProjects() {
-//     cacheImage('./projects/burny-rush.webp');
-//     cacheImage('./projects/stratosphere.webp');
-// }
+function loadProjects() {
+    cacheImage('./projects/burny-rush.webp');
+    cacheImage('./projects/stratosphere.webp');
+}
 
 //initializes the whole scene
 function init() {
@@ -745,8 +752,8 @@ function init() {
     
     loadSky();
     loadMap();
-    // loadArt();
-    // loadProjects();
+    loadArt();
+    loadProjects();
     initializeGUI();
     loadEnvironment();
     onWindowResize();
