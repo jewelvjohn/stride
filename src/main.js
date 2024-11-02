@@ -15,8 +15,11 @@ import {InputSystem} from './lib/input.js';
 import {CharacterController} from './lib/character.js';
 import {InteractionContainer} from './lib/interaction.js';
 
-import vertexShader from './lib/shaders/water/vertex.glsl';
-import fragmentShader from './lib/shaders/water/fragment.glsl';
+import WaterVertexShader from './lib/shaders/water/vertex.glsl';
+import WaterFragmentShader from './lib/shaders/water/fragment.glsl';
+
+import CloudVertexShader from './lib/shaders/cloud/vertex.glsl';
+import CloudFragmentShader from './lib/shaders/cloud/fragment.glsl';
 
 /* 
     Current Bugs :-
@@ -377,15 +380,37 @@ function loadEnvironment() {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                child.material.side = THREE.FrontSide;
-                child.material.shadowSide = THREE.FrontSide;
-                csm.setupMaterial(child.material);
+                if(child.material.name == "cloud") {
+                    child.castShadow = false;
+                    child.receiveShadow = false;
+
+                    const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
+                    // const mask = new THREE.TextureLoader().load("./resources/textures/cloud.jpg");
+                    noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
+                    var cloudMaterial = new THREE.ShaderMaterial({
+                        name: "cloud",
+                        vertexShader: CloudVertexShader,
+                        fragmentShader: CloudFragmentShader,
+                        transparent: true,
+                        side: THREE.FrontSide,
+                        shadowSide: THREE.FrontSide 
+                    });
+                    cloudMaterial.uniforms.uTime = { value: 0 };
+                    cloudMaterial.uniforms.uSpeed = { value: 0.02 };
+                    // cloudMaterial.uniforms.uMask = { value: mask };
+                    cloudMaterial.uniforms.uNoise = { value: noise };
+                    child.material = cloudMaterial;
+                } else {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    child.material.side = THREE.FrontSide;
+                    child.material.shadowSide = THREE.FrontSide;
+                    csm.setupMaterial(child.material);
+                }
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, -160);
+        // model.position.set(0, 0, -160);
         model.rotation.y = toRadian(-90);
 
         if(stages['exo_planet']) {
@@ -537,15 +562,17 @@ function loadEnvironment() {
                     child.material = unlitMaterial;
                 }else if(child.material.name == "ocean"){
                     const mask = new THREE.TextureLoader().load("./resources/textures/foamMask.jpg");
-                    const noise = new THREE.TextureLoader().load("./resources/textures/water.png");
+                    const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
                     const shadow = new THREE.TextureLoader().load("./resources/textures/oceanShadow.jpg");
 
                     noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
                     waterMaterial = new THREE.ShaderMaterial({
                         uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib["fog"], uniforms]),
-                        vertexShader: vertexShader,
-                        fragmentShader: fragmentShader,
-                        fog: true
+                        vertexShader: WaterVertexShader,
+                        fragmentShader: WaterFragmentShader,
+                        fog: true,
+                        side: THREE.FrontSide,
+                        shadowSide: THREE.FrontSide 
                     });
                     waterMaterial.uniforms.uMask = { value: mask };
                     waterMaterial.uniforms.uNoise = { value: noise };
@@ -599,11 +626,11 @@ function updateStages() {
     const position = player.model.position.z;
 
     if(position <= -120) {
-        selectStage('exo_planet');
+        selectStage('gas_station');
     } else if(position <= -40) {
         selectStage('spiral_city');
     } else if(position <= 40) {
-        selectStage('gas_station');
+        selectStage('exo_planet');
     } else if(position <= 120) {
         selectStage('medieval_town');
     } else {
@@ -675,7 +702,7 @@ function init() {
     loadingText = document.querySelector('#loading-text');
     
     startButton = document.querySelector('#start-button');
-    startButton.disabled = true;
+    // startButton.disabled = true;
     startButton.onclick = () => {
         player.startIdle();
         loadingScreen.style.display = 'none';
@@ -816,7 +843,15 @@ function update() {
 
     var time = clock.getElapsedTime();
     if(waterMaterial) waterMaterial.uniforms.uTime = {value: time};
-
+    if(stages['exo_planet']) {
+        stages['exo_planet'].objects[0].traverse(function(child) {
+            if(child.isMesh) {
+                if(child.material.name == "cloud") {
+                    child.material.uniforms.uTime = {value: time};
+                }
+            }
+        });
+    }
     
     csm.update();
     stats.update();

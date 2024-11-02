@@ -144,9 +144,8 @@ body {
     border-radius: 8px;
 
     color: white;
-    background: #344055;
-    /* background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px); */
+    background: rgba(52, 64, 85, 0.75);
+    backdrop-filter: blur(10px);
     box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
 
     transform: translateY(calc(-50% + 20px));
@@ -162,7 +161,7 @@ body {
     border-left: 8px solid transparent;
 	border-right: 8px solid transparent;
     left: calc(50% - 8px);
-	border-top: 16px solid #344055;
+	border-top: 16px solid rgba(52, 64, 85, 0.75);
 
     /*white*/
     /* border-top: 24px solid white; */
