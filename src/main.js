@@ -544,9 +544,11 @@ function loadEnvironment() {
 
     const uniforms = {
         uTime: { value: 0 },
-        uFoamColor: { value: new THREE.Color(0xffffff).convertLinearToSRGB() },
-        uWaterColor: { value: new THREE.Color(0x133A4B).convertLinearToSRGB() },
+        uFoamColor: { value: new THREE.Color(0xA4CEC6).convertLinearToSRGB() },
+        uWaterColor_1: { value: new THREE.Color(0x01232F).convertLinearToSRGB() },
+        uWaterColor_2: { value: new THREE.Color(0x3B8795).convertLinearToSRGB() },
         uShadowColor: { value: new THREE.Color(0x031b26).convertLinearToSRGB() },
+        uHighlightColor: { value: new THREE.Color(0x42ACCF).convertLinearToSRGB() },
         uFoamTiling: { value: 32 }
     };
 
