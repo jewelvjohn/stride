@@ -60,7 +60,7 @@ var interactionId = -1;
 var currentInteractionId = -1;
 var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
-var waterMaterial;
+var waterMaterial, cloudMaterials = [];
 
 const loadingManager = new THREE.LoadingManager();
 const clock = new THREE.Clock();
@@ -371,9 +371,6 @@ function loadEnvironment() {
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 120), 6, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 200), 6, 80);
 
-    // const gridHelper = new THREE.GridHelper(400, 40);
-    // scene.add(gridHelper);
-
 //exo planet
     const loader = new GLTFLoader(loadingManager);
     loader.load("./resources/3d/exo planet.glb", (gltf) => {
@@ -385,7 +382,6 @@ function loadEnvironment() {
                     child.receiveShadow = false;
 
                     const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
-                    // const mask = new THREE.TextureLoader().load("./resources/textures/cloud.jpg");
                     noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
                     var cloudMaterial = new THREE.ShaderMaterial({
                         name: "cloud",
@@ -395,11 +391,14 @@ function loadEnvironment() {
                         side: THREE.FrontSide,
                         shadowSide: THREE.FrontSide 
                     });
-                    cloudMaterial.uniforms.uTime = { value: 0 };
+                    cloudMaterial.uniforms.uTime = { value: Math.random() * 10 };
                     cloudMaterial.uniforms.uSpeed = { value: 0.02 };
-                    // cloudMaterial.uniforms.uMask = { value: mask };
+                    cloudMaterial.uniforms.uColor_1 = { value: new THREE.Color(0x9C9F96).convertLinearToSRGB() };
+                    cloudMaterial.uniforms.uColor_2 = { value: new THREE.Color(0xFAFCF9).convertLinearToSRGB() };
+                    cloudMaterial.uniforms.uShadowColor = { value: new THREE.Color(0x578163).convertLinearToSRGB() };
                     cloudMaterial.uniforms.uNoise = { value: noise };
                     child.material = cloudMaterial;
+                    cloudMaterials.push(cloudMaterial);
                 } else {
                     child.castShadow = true;
                     child.receiveShadow = true;
@@ -410,13 +409,13 @@ function loadEnvironment() {
             }
         });
         model.scale.set(10, 10, 10);
-        // model.position.set(0, 0, -160);
+        model.position.set(0, 0, -160);
         model.rotation.y = toRadian(-90);
 
         if(stages['exo_planet']) {
             stages['exo_planet'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xCCFFFA, 1500, 2500);
+            const fog = new THREE.Fog(0x95C8C3, 1500, 2500);
             const sky = "./resources/images/green.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
@@ -626,11 +625,11 @@ function updateStages() {
     const position = player.model.position.z;
 
     if(position <= -120) {
-        selectStage('gas_station');
+        selectStage('exo_planet');
     } else if(position <= -40) {
         selectStage('spiral_city');
     } else if(position <= 40) {
-        selectStage('exo_planet');
+        selectStage('gas_station');
     } else if(position <= 120) {
         selectStage('medieval_town');
     } else {
@@ -841,15 +840,11 @@ function update() {
         accumulator -= fixedTimeStep;
     }
 
-    var time = clock.getElapsedTime();
-    if(waterMaterial) waterMaterial.uniforms.uTime = {value: time};
-    if(stages['exo_planet']) {
-        stages['exo_planet'].objects[0].traverse(function(child) {
-            if(child.isMesh) {
-                if(child.material.name == "cloud") {
-                    child.material.uniforms.uTime = {value: time};
-                }
-            }
+    // var time = clock.getElapsedTime();
+    if(waterMaterial) waterMaterial.uniforms.uTime.value += delta;
+    if(cloudMaterials.length > 0) {
+        cloudMaterials.forEach((material) => {
+                material.uniforms.uTime.value += delta;
         });
     }
     

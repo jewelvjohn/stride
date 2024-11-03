@@ -4,8 +4,10 @@ varying vec2 vUv;
 
 uniform float uTime;
 uniform float uSpeed;
+uniform vec3 uColor_1;
+uniform vec3 uColor_2;
+uniform vec3 uShadowColor;
 uniform sampler2D uNoise;
-// uniform sampler2D uMask;
 
 vec3 hash3(vec3 p) {
     p = vec3(
@@ -36,13 +38,22 @@ float voronoiNoise(vec3 p, float scale) {
     return minDist;
 }
 
+vec3 multiply(vec3 base, vec3 blend, float factor) {
+    vec3 multiplied = base * blend;
+    return mix(base, multiplied, factor);
+}
+
 float softlight(float base, float blend, float factor) {
 	float blended = ((1.0 - (2.0 * blend)) * base * base) + (2.0 * blend * base);
 	return mix(base, blended, factor);
 }
 
+float drawsphere(vec2 vector) {
+	return 1.0 - distance(vector, vec2(0));
+}
+
 float easeout(float x) {
-    return 1.0 - pow(1.0 - x, 4.0);
+    return 1.0 - pow(1.0 - x, 5.0);
 }
 
 float remapspace(float value) {
@@ -51,30 +62,39 @@ float remapspace(float value) {
     return curved * 2.0 - 1.0;
 }
 
-float drawsphere(vec2 vector) {
-	return 1.0 - distance(vector, vec2(0));
+vec3 remap(vec3 value, vec3 offset, vec3 scale) {
+    return (value - offset) / scale;
+}
+
+vec3 remapscale(vec3 value, vec3 scale) {
+    return value * scale;
 }
 
 void main() {
-	//position
-	vec3 pos = vPosition.xyz;
-	pos.y = remapspace(pos.y);
-	vec3 motion = pos + (uTime * uSpeed);
+	vec3 vector_1 = vPosition.xyz;
+	vector_1.y = remapspace(vector_1.y);
+	vec3 motion = vector_1 + (uTime * uSpeed);
+	float shape_1 = drawsphere(vector_1.xy);
 
-	//base
-	float shape = drawsphere(pos.xy);
-
-	//textures
 	float voro_1 = mix(1.0, 0.2, voronoiNoise(motion, 5.0));
 	float voro_2 = mix(1.0, 0.1, voronoiNoise(motion, 20.0));
 	float voro_3 = mix(1.0, 0.0, voronoiNoise(motion, 50.0));
 
-	float blend_1 = softlight(shape, voro_1, 1.0);
+	float blend_1 = softlight(shape_1, voro_1, 1.0);
 	float blend_2 = softlight(blend_1, voro_2, 0.2);
 	float blend_3 = softlight(blend_2, voro_3, 0.1);
 
-	float combined = smoothstep(0.45, 0.5, blend_3); 
+    float noise = mix(0.5, 0.6, texture2D(uNoise, vUv / 1.5).r);
+    vec3 vector_2 = remap(vPosition, vec3(0.0, -1.05, 0.0), vec3(1.0, 0.2, 1.0));
+    vector_2 = remapscale(vector_2, vec3(noise));
+    float shape_2 = drawsphere(vector_2.xy);
+    float shadowMask = mix(smoothstep(0.0, 0.5, shape_2), 0.0, 0.65);
 
-	gl_FragColor.rgb = vec3(1.0);
-	gl_FragColor.a = combined;
+    vec3 color = mix(uColor_1, uColor_2, smoothstep(0.0, 0.85, blend_3)); 
+	float alpha = smoothstep(0.45, 0.55, blend_3);
+
+    vec3 diffuse = multiply(color, uShadowColor, shadowMask);
+
+	gl_FragColor.rgb = diffuse;
+	gl_FragColor.a = alpha;
 }
