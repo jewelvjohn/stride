@@ -382,7 +382,9 @@ function loadEnvironment() {
                     child.receiveShadow = false;
 
                     const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
+                    const voronoi = new THREE.TextureLoader().load("./resources/textures/voronoi.jpg");
                     noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
+                    voronoi.wrapT = voronoi.wrapS = THREE.RepeatWrapping;
                     var cloudMaterial = new THREE.ShaderMaterial({
                         name: "cloud",
                         vertexShader: CloudVertexShader,
@@ -397,6 +399,7 @@ function loadEnvironment() {
                     cloudMaterial.uniforms.uColor_2 = { value: new THREE.Color(0xFAFCF9).convertLinearToSRGB() };
                     cloudMaterial.uniforms.uShadowColor = { value: new THREE.Color(0x578163).convertLinearToSRGB() };
                     cloudMaterial.uniforms.uNoise = { value: noise };
+                    cloudMaterial.uniforms.uVoronoi = { value: voronoi };
                     child.material = cloudMaterial;
                     cloudMaterials.push(cloudMaterial);
                 } else {
@@ -559,10 +562,10 @@ function loadEnvironment() {
                     unlitMaterial.side = THREE.FrontSide;
                     unlitMaterial.shadowSide = THREE.FrontSide;
                     child.material = unlitMaterial;
-                }else if(child.material.name == "ocean"){
-                    const mask = new THREE.TextureLoader().load("./resources/textures/foamMask.jpg");
+                } else if(child.material.name == "ocean") {
                     const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
-                    const shadow = new THREE.TextureLoader().load("./resources/textures/oceanShadow.jpg");
+                    const mask = new THREE.TextureLoader().load("./resources/textures/foammask.jpg");
+                    const shadow = new THREE.TextureLoader().load("./resources/textures/oceanshadow.jpg");
 
                     noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
                     waterMaterial = new THREE.ShaderMaterial({
@@ -577,7 +580,7 @@ function loadEnvironment() {
                     waterMaterial.uniforms.uNoise = { value: noise };
                     waterMaterial.uniforms.uShadow = { value: shadow };
                     child.material = waterMaterial;
-                }else{
+                } else {
                     child.castShadow = true;
                     child.receiveShadow = true;
                     child.material.side = THREE.FrontSide;
@@ -701,7 +704,7 @@ function init() {
     loadingText = document.querySelector('#loading-text');
     
     startButton = document.querySelector('#start-button');
-    // startButton.disabled = true;
+    startButton.disabled = true;
     startButton.onclick = () => {
         player.startIdle();
         loadingScreen.style.display = 'none';
