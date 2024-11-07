@@ -18,8 +18,8 @@ varying vec3 vNormal;
 varying vec2 vUv;
 
 void main() {
-    vec2 noiseUV = vUv * uFoamTiling + vec2(uTime * 0.05);
-    vec2 waterUV = vUv * 4.0 - vec2(uTime * 0.0025);
+    vec2 noiseUV = vUv * uFoamTiling + vec2(uTime * 0.025);
+    vec2 waterUV = vUv * 4.0 - vec2(uTime * 0.01);
     
     vec4 noiseTexture = texture2D(uNoise, noiseUV);    
     vec4 waterTexture = texture2D(uNoise, waterUV);    

@@ -2,11 +2,15 @@ import * as THREE from 'three'
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
 export class CharacterController {
-    constructor(filename, scene, manager, minBound, maxBound, loop = false) {
+    constructor(filename, scene, manager, minBound, maxBound, loop = false, autoPositions = null, autoLength = null) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
         this.takeInputs = true;
+        this.inputStarted = false;
+        this.lastInputStartTime = 0;
+        this.inputPersistance = 0.25;
+
         // this.csm = csm;
 
         this.mixer = null;
@@ -26,6 +30,11 @@ export class CharacterController {
         this.minBound = minBound;
         this.maxBound = maxBound;
         this.loop = loop;
+
+        if(autoPositions) {
+            this.autoLength = autoLength;
+            this.autoPositions = autoPositions;
+        }
     
         window.addEventListener('blur',() => { if(!this.pause) this.pause = true; });
         window.addEventListener('focus',() => { if(this.pause) this.pause = false; });
@@ -150,9 +159,36 @@ export class CharacterController {
         }
     }
 
-    update(input, delta) {
-        if(this.takeInputs) this.moveInput = input;
-        else this.moveInput = 0;
+    isAutoPosition() {
+        const halfDistance = this.autoLength * 2;
+        let flag = false;
+        for(let i=0; i<this.autoPositions.length; i++) {
+            const position = this.autoPositions[i];
+            if(i == 0) {
+                if(this.model.position.z < position + halfDistance) flag = true;
+            } else if(i == this.autoPositions.length-1) {
+                if(this.model.position.z > position - halfDistance) flag = true;
+            } else if((this.model.position.z > position - halfDistance) && (this.model.position.z < position + halfDistance)) flag = true;
+        }
+        return flag;
+    }
+    
+    controller(input, time) {
+        if(this.takeInputs) {
+            if(input !== 0) {
+                if(!this.inputStarted) {
+                    this.inputStarted = true;
+                    this.lastInputStartTime = time;
+                }
+                this.moveInput = input;
+            } else {
+                if(this.inputStarted) this.inputStarted = false;
+                if((time > this.lastInputStartTime + this.inputPersistance) && !this.isAutoPosition()) this.moveInput = input;
+            }
+        } else this.moveInput = 0;
+    }
+
+    update(delta) {
         this.characterMovement(delta);
         this.characterAnimation(delta);
     }

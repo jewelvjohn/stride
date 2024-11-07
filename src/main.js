@@ -51,6 +51,8 @@ const sizes = {
     height: window.innerHeight
 };
 
+const blinderPositions = [-200, -120, -40, 40, 120, 200];
+const blinderWidth = 6;
 var stages = {};
 var currentStage = '';
 var highEndGraphics = false;
@@ -364,12 +366,12 @@ function loadMap() {
 }
 
 function loadEnvironment() {
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -200), 6, 80);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -120), 6, 80);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, -40), 6, 80);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 40), 6, 80);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 120), 6, 80);
-    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, 200), 6, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[0]), blinderWidth, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[1]), blinderWidth, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[2]), blinderWidth, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[3]), blinderWidth, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[4]), blinderWidth, 80);
+    createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[5]), blinderWidth, 80);
 
 //exo planet
     const loader = new GLTFLoader(loadingManager);
@@ -651,7 +653,7 @@ function cameraMovement() {
 }
 
 function loopPlayer() {
-    if((player.positionRef == player.minBound) && inputSystem.axes.horizontal < 0) {
+    if((player.positionRef == player.minBound) && player.moveInput < 0) {
         player.model.position.z = player.maxBound;
         player.positionRef = player.model.position.z;
 
@@ -659,8 +661,8 @@ function loopPlayer() {
         cameraMovement();
         updateStages();
     }
-
-    if((player.positionRef == player.maxBound) && inputSystem.axes.horizontal > 0) {
+    
+    if((player.positionRef == player.maxBound) && player.moveInput > 0) {
         player.model.position.z = player.minBound;
         player.positionRef = player.model.position.z;
         
@@ -768,7 +770,7 @@ function init() {
         loadSky();
     });
     
-    player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200, true);
+    player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200, true, blinderPositions, blinderWidth);
     inputSystem = new InputSystem();
 
     loadingManager.onProgress = function(url, loaded, total) {
@@ -831,12 +833,14 @@ let accumulator = 0;
 //game loop
 function update() {
     const delta = Math.min(clock.getDelta(), maxDelta);
+    const time = clock.getElapsedTime();
     accumulator += delta;
 
     while (accumulator >= fixedTimeStep) {
         if(player.model) {
             if(player.loop) loopPlayer();
-            player.update(inputSystem.axes.horizontal, fixedTimeStep);
+            player.controller(inputSystem.axes.horizontal, time);
+            player.update(fixedTimeStep);
             textBubbleUpdate();
             cameraMovement();
             updateStages();
@@ -844,12 +848,11 @@ function update() {
         }
         accumulator -= fixedTimeStep;
     }
-
-    // var time = clock.getElapsedTime();
+    
     if(waterMaterial) waterMaterial.uniforms.uTime.value += delta;
     if(cloudMaterials.length > 0) {
         cloudMaterials.forEach((material) => {
-                material.uniforms.uTime.value += delta;
+            material.uniforms.uTime.value += delta;
         });
     }
     
