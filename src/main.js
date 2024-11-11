@@ -144,13 +144,17 @@ function initializeGUI() {
             <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> 
             for digital art.
         </p> 
-        <div class="gallery">
-            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/alone.webp"></div>
-            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp"></div>
-            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/ip-girl.webp"></div>
-            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/for-weirdos.webp"></div>
-            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/batman.webp"></div>
-            <div class="art" ><img type="image/webp" loading="lazy" src="./artwork/ashutti.webp"></div>
+        <div class="gallery-container">
+            <lottie-player id="leftLottie" src="./resources/animations/left.json"></lottie-player>
+            <div class="gallery">
+                <img type="image/webp" loading="lazy" src="./artwork/alone.webp">
+                <img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp">
+                <img type="image/webp" loading="lazy" src="./artwork/ip-girl.webp">
+                <img type="image/webp" loading="lazy" src="./artwork/for-weirdos.webp">
+                <img type="image/webp" loading="lazy" src="./artwork/batman.webp">
+                <img type="image/webp" loading="lazy" src="./artwork/ashutti.webp">
+            </div>
+            <lottie-player id="rightLottie" src="./resources/animations/right.json"></lottie-player>
         </div>`,
         position: -80,
         light: false,
@@ -260,6 +264,61 @@ function initializeGUI() {
 
     //assigning the left and right html buttons to the input system
     document.addEventListener("contextmenu", function (e) {e.preventDefault();}, false);
+}
+
+function initializeGallery() {
+    var isDragging = false;
+    var prevScrollLeft, prevPageX;
+
+    const gallery = document.querySelector(".gallery");
+    const leftButton = document.querySelector("#leftLottie");
+    const rightButton = document.querySelector("#rightLottie");
+    const cell = gallery.querySelectorAll("img")[0];
+
+    leftButton.style.display = "none";
+    
+    leftButton.addEventListener("click", () => {
+        gallery.scrollLeft += -(cell.clientWidth + 8);
+        setTimeout(() => toggleButtons(), 200);
+    });
+    rightButton.addEventListener("click", () => {
+        gallery.scrollLeft += (cell.clientWidth + 8);
+        setTimeout(() => toggleButtons(), 200);
+    });
+    
+    const toggleButtons = () => {
+        leftButton.style.display = (gallery.scrollLeft <= 16) ? "none" : "block";
+        rightButton.style.display = (gallery.scrollLeft >= gallery.scrollWidth - gallery.clientWidth - 16) ? "none" : "block";
+    }
+    
+    const startDragging = (e) => {
+        isDragging = true;
+        prevPageX = e.pageX || e.touches[0].pageX;
+        prevScrollLeft = gallery.scrollLeft;
+    }
+    const endDragging = () => {
+        isDragging = false;
+        gallery.classList.remove("dragging");
+        setTimeout(() => toggleButtons(), 200);
+    }
+    const dragging = (e) => {
+        if(!isDragging) return;
+        e.preventDefault();
+        gallery.classList.add("dragging");
+        
+        var diff = (e.pageX || e.touches[0].pageX) - prevPageX;
+        gallery.scrollLeft = prevScrollLeft - diff;
+    }
+
+    gallery.addEventListener("mousedown", startDragging);
+    gallery.addEventListener("touchstart", startDragging);
+
+    gallery.addEventListener("mousemove", dragging);
+    gallery.addEventListener("touchmove", dragging);
+    
+    gallery.addEventListener("mouseleave", endDragging);
+    gallery.addEventListener("mouseup", endDragging);
+    gallery.addEventListener("touchend", endDragging);
 }
 
 function textBubbleFadeIn() {
@@ -429,7 +488,7 @@ function loadEnvironment() {
     });
 
 //spiral city
-    loader.load("./resources/3d/spiral city.glb", (gltf) => {
+    loader.load("./resources/3d/space station.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
@@ -444,14 +503,14 @@ function loadEnvironment() {
         model.position.set(0, 0, -80);
         model.rotation.y = toRadian(-90);
 
-        if(stages['spiral_city']) {
-            stages['spiral_city'].addObject(model);
+        if(stages['space_station']) {
+            stages['space_station'].addObject(model);
         } else {
             const fog = new THREE.Fog(0xFFE4B4, 500, 1000);
             const sky = "./resources/images/sunset.png";
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
-            stages['spiral_city'] = stage;
+            stages['space_station'] = stage;
         }
     });
     
@@ -634,7 +693,7 @@ function updateStages() {
     if(position <= -120) {
         selectStage('exo_planet');
     } else if(position <= -40) {
-        selectStage('spiral_city');
+        selectStage('space_station');
     } else if(position <= 40) {
         selectStage('gas_station');
     } else if(position <= 120) {
@@ -712,10 +771,24 @@ function init() {
     startButton.onclick = () => {
         player.startIdle();
         loadingScreen.style.display = 'none';
+        initializeGallery();
+
         create({
             player:'#instagram-camera',
             mode:"cursor",
             actions: [{type: "hold"}]
+        });
+
+        create({
+            player:'#leftLottie',
+            mode:"cursor",
+            actions: [{type: "click", forceFlag: true}]
+        });
+    
+        create({
+            player:'#rightLottie',
+            mode:"cursor",
+            actions: [{type: "click", forceFlag: true}]
         });
     }
 
