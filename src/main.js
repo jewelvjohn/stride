@@ -64,6 +64,10 @@ var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
 var waterMaterial, cloudMaterials = [];
 
+//Gallery variables
+var isDraggingGallery = false;
+var prevScrollLeftGallery, prevPageXGallery;
+
 const loadingManager = new THREE.LoadingManager();
 const clock = new THREE.Clock();
 
@@ -111,23 +115,34 @@ function initializeGUI() {
         </div>
         <p>
             This website was developed using 
-            <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>, 
-            <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>,
-            <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>,
-            <a class="highlight" href="https://rive.app/" target="_blank">Rive</a>,
-            and 
-            <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
-        </p> 
-        <p>
-            Thanks to,
         </p>
+        <div class="auto-scroll">
+            <div class="tools">
+                <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a> 
+                <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>
+                <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
+                <a class="highlight" href="https://rive.app/" target="_blank">Rive</a> 
+                <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
+                <a class="highlight" href="https://useanimations.com/" target="_blank">GLSL</a>
+                <a class="highlight" href="https://useanimations.com/" target="_blank">Krita</a>
+                <a class="highlight" href="https://useanimations.com/" target="_blank">Inkscape</a>
+            </div>
+            <div class="tools">
+                <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a> 
+                <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>
+                <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
+                <a class="highlight" href="https://rive.app/" target="_blank">Rive</a> 
+                <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
+                <a class="highlight" href="https://useanimations.com/" target="_blank">GLSL</a>
+                <a class="highlight" href="https://useanimations.com/" target="_blank">Krita</a>
+                <a class="highlight" href="https://useanimations.com/" target="_blank">Inkscape</a>
+            </div>
+        </div>
         <p>
-            <a class="highlight" href="https://sketchfab.com/Han66st" target="_blank">Han66st</a> 
-            for the sport car and,
-        </p>
-        <p>
+            Thanks to,</br>
+            <a class="highlight" href="https://sketchfab.com/Han66st" target="_blank">Han66st</a> and,
             <a class="highlight" href="https://sketchfab.com/boiko.pavlo4" target="_blank">Pavlo Boiko</a> 
-            for the old bus 3D model.
+            for 3D models.
         </p>`,
         position: -160,
         light: false,
@@ -145,7 +160,7 @@ function initializeGUI() {
             for digital art.
         </p> 
         <div class="gallery-container">
-            <lottie-player id="leftLottie" src="./resources/animations/left.json"></lottie-player>
+            <lottie-player class="scroll-button left" id="leftButtonGallery" src="./resources/animations/left.json"></lottie-player>
             <div class="gallery">
                 <img type="image/webp" loading="lazy" src="./artwork/alone.webp">
                 <img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp">
@@ -154,7 +169,7 @@ function initializeGUI() {
                 <img type="image/webp" loading="lazy" src="./artwork/batman.webp">
                 <img type="image/webp" loading="lazy" src="./artwork/ashutti.webp">
             </div>
-            <lottie-player id="rightLottie" src="./resources/animations/right.json"></lottie-player>
+            <lottie-player class="scroll-button right" id="rightButtonGallery" src="./resources/animations/right.json"></lottie-player>
         </div>`,
         position: -80,
         light: false,
@@ -188,27 +203,37 @@ function initializeGUI() {
         <div class="talkbubble-badge">
             <lottie-player loop autoplay src="./resources/animations/folder.json"></lottie-player>
         </div>
-        <p>
-            Check out my <a class="highlight" href="https://unity.com/" target="_blank">Unity</a> projects.
-        </p> 
-        <div class="portfolio">
-            <div class="project">
-                <img type="image/webp" loading="lazy" src="./projects/burny-rush.webp">
-                <div class="content">
-                    <h2>Burny Rush</h2>
-                    <p>High-fidelity racing game for desktop. <span class="highlight">current project.</span></p>
-                    <a href="https://jewelvjohn.github.io/burny-rush/" target="_blank"><span>Check out</span></a>
+        <lottie-player class="scroll-button left align no-selection" id="leftButtonPortfolio" src="./resources/animations/left.json"></lottie-player>
+        <div class="portfolio-container">
+            <div class="portfolio">
+                <div class="project selected">
+                    <div class="graphic">
+                        <img type="image/webp" loading="lazy" src="./projects/burny-rush.webp">
+                    </div>
+                    <div class="content">
+                        <h2>Burny Rush</h2>
+                        <p>High-fidelity racing game for desktop. <span class="highlight">current project.</span></p>
+                        <a href="https://jewelvjohn.github.io/burny-rush/" target="_blank"><span>VIEW PROJECT</span></a>
+                    </div>
+                </div>
+                <div class="project">
+                    <div class="graphic">
+                        <img type="image/webp" loading="lazy" src="./projects/stratosphere.webp">
+                    </div>
+                    <div class="content">
+                        <h2>Stratosphere</h2>
+                        <p>Third-person open-world game demo project.</p>
+                        <a href="https://jewelvjohn.github.io/stratosphere/" target="_blank"><span>VIEW PROJECT</span></a>
+                    </div>
                 </div>
             </div>
-            <div class="project">
-                <img type="image/webp" loading="lazy" src="./projects/stratosphere.webp">
-                <div class="content">
-                    <h2>Stratosphere</h2>
-                    <p>Third-person open-world game demo project.</p>
-                    <a href="https://jewelvjohn.github.io/stratosphere/" target="_blank"><span>Check out</span></a>
-                </div>
-            </div>
-        </div>`,
+        </div>
+        <lottie-player class="scroll-button right align no-selection" id="rightButtonPortfolio" src="./resources/animations/right.json"></lottie-player>
+        <div class="dot-nav">
+            <button class="dot-button selected no-selection" ></button>
+            <button class="dot-button no-selection" ></button>
+        </div>
+        `,
         position: 80,
         light: false,
         focus: true,
@@ -266,48 +291,110 @@ function initializeGUI() {
     document.addEventListener("contextmenu", function (e) {e.preventDefault();}, false);
 }
 
-function initializeGallery() {
-    var isDragging = false;
-    var prevScrollLeft, prevPageX;
+function initializePortfolio() {
+    const container = document.querySelector(".portfolio-container");
+    const portfolio = document.querySelector(".portfolio");
+    const projects = Array.from(portfolio.children);
+    const navigation = document.querySelector(".dot-nav");
+    const navButtons = Array.from(navigation.children);
+    const prevButton = document.querySelector("#leftButtonPortfolio");
+    const nextButton = document.querySelector("#rightButtonPortfolio");
+    
+    prevButton.style.display = "none";
 
+    const movePortfolio = (currentCell, targetCell) => {
+        const amount = targetCell.getBoundingClientRect().left - currentCell.getBoundingClientRect().left;
+        container.scrollLeft += amount;
+
+        const targetIndex = projects.findIndex(project => project === targetCell);
+        const currentDot = navigation.querySelector(".selected");
+        const targetDot = navButtons[targetIndex];
+
+        if(targetIndex === projects.length - 1) nextButton.style.display = "none";
+        else nextButton.style.display = "block";
+
+        if(targetIndex === 0) prevButton.style.display = "none";
+        else prevButton.style.display = "block";
+
+        currentDot.classList.remove("selected");
+        targetDot.classList.add("selected");
+        currentCell.classList.remove("selected");
+        targetCell.classList.add("selected");
+    }
+
+    nextButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const currentCell = portfolio.querySelector(".selected");
+        const nextCell = currentCell.nextElementSibling;
+        if(!nextCell) return;
+        movePortfolio(currentCell, nextCell);
+    });
+
+    prevButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const currentCell = portfolio.querySelector(".selected");
+        const prevCell = currentCell.previousElementSibling;
+        if(!prevCell) return;
+        movePortfolio(currentCell, prevCell);
+    });
+
+    navigation.addEventListener("click", (e) => {
+        const targetDot = e.target.closest("button");
+        if(!targetDot) return;
+        if(targetDot.classList.contains("selected")) return;
+
+        const targetIndex = navButtons.findIndex(dot => dot === targetDot);
+        const targetCell = projects[targetIndex];
+        const currentCell = portfolio.querySelector(".selected");
+
+        movePortfolio(currentCell, targetCell);
+    });
+}
+
+function initializeGallery() {
     const gallery = document.querySelector(".gallery");
-    const leftButton = document.querySelector("#leftLottie");
-    const rightButton = document.querySelector("#rightLottie");
+    const prevButton = document.querySelector("#leftButtonGallery");
+    const nextButton = document.querySelector("#rightButtonGallery");
     const cell = gallery.querySelectorAll("img")[0];
 
-    leftButton.style.display = "none";
+    prevButton.style.display = "none";
     
-    leftButton.addEventListener("click", () => {
+    prevButton.addEventListener("click", (e) => {
+        e.preventDefault();
         gallery.scrollLeft += -(cell.clientWidth + 8);
-        setTimeout(() => toggleButtons(), 200);
+        setTimeout(() => toggleButtons(), 250);
     });
-    rightButton.addEventListener("click", () => {
+    nextButton.addEventListener("click", (e) => {
+        e.preventDefault();
         gallery.scrollLeft += (cell.clientWidth + 8);
-        setTimeout(() => toggleButtons(), 200);
+        setTimeout(() => toggleButtons(), 250);
     });
     
     const toggleButtons = () => {
-        leftButton.style.display = (gallery.scrollLeft <= 16) ? "none" : "block";
-        rightButton.style.display = (gallery.scrollLeft >= gallery.scrollWidth - gallery.clientWidth - 16) ? "none" : "block";
+        prevButton.style.display = (gallery.scrollLeft <= 16) ? "none" : "block";
+        nextButton.style.display = (gallery.scrollLeft >= gallery.scrollWidth - gallery.clientWidth - 16) ? "none" : "block";
     }
     
     const startDragging = (e) => {
-        isDragging = true;
-        prevPageX = e.pageX || e.touches[0].pageX;
-        prevScrollLeft = gallery.scrollLeft;
+        e.preventDefault();
+        isDraggingGallery = true;
+        prevPageXGallery = e.pageX || e.touches[0].pageX;
+        prevScrollLeftGallery = gallery.scrollLeft;
     }
-    const endDragging = () => {
-        isDragging = false;
+    const endDragging = (e) => {
+        e.preventDefault();
+        isDraggingGallery = false;
         gallery.classList.remove("dragging");
-        setTimeout(() => toggleButtons(), 200);
+        setTimeout(() => toggleButtons(), 250);
     }
     const dragging = (e) => {
-        if(!isDragging) return;
         e.preventDefault();
+        if(!isDraggingGallery) return;
         gallery.classList.add("dragging");
         
-        var diff = (e.pageX || e.touches[0].pageX) - prevPageX;
-        gallery.scrollLeft = prevScrollLeft - diff;
+        var scrollDiff = (e.pageX || e.touches[0].pageX) - prevPageXGallery;
+        gallery.scrollLeft = prevScrollLeftGallery - scrollDiff;
+        toggleButtons();
     }
 
     gallery.addEventListener("mousedown", startDragging);
@@ -772,6 +859,7 @@ function init() {
         player.startIdle();
         loadingScreen.style.display = 'none';
         initializeGallery();
+        initializePortfolio();
 
         create({
             player:'#instagram-camera',
@@ -780,13 +868,25 @@ function init() {
         });
 
         create({
-            player:'#leftLottie',
+            player:'#leftButtonGallery',
             mode:"cursor",
             actions: [{type: "click", forceFlag: true}]
         });
     
         create({
-            player:'#rightLottie',
+            player:'#rightButtonGallery',
+            mode:"cursor",
+            actions: [{type: "click", forceFlag: true}]
+        });
+
+        create({
+            player:'#leftButtonPortfolio',
+            mode:"cursor",
+            actions: [{type: "click", forceFlag: true}]
+        });
+    
+        create({
+            player:'#rightButtonPortfolio',
             mode:"cursor",
             actions: [{type: "click", forceFlag: true}]
         });

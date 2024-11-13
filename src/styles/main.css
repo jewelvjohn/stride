@@ -219,40 +219,44 @@ body {
     width: 100%;
 }
 
-.gallery-container {
-    max-width: 1200px;
-}
-
-.gallery-container lottie-player {
+.scroll-button {
     top: 50%;
     position: absolute;
     width: 28px;
     height: 28px;
-    cursor: pointer;
     border-radius: 50%;
     background-color: #DFC2F2;
     box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    z-index: 10;
 }
 
-.gallery-container lottie-player:first-child {
-    left: -10px;
+.scroll-button.align {
+    transform: translateY(-50%);
 }
-.gallery-container lottie-player:last-child {
-    right: -10px;
+
+.scroll-button.left {
+    left: -14px;
+}
+.scroll-button.right {
+    right: -14px;
+}
+
+.gallery-container {
+    max-width: 1200px;
 }
 
 .gallery {
     font-size: 0px;
+    border-radius: 8px;
     white-space: nowrap;
     overflow: hidden;
     cursor: pointer;
     scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
 }
 
 .gallery.dragging {
     cursor: grab;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
 }
 
 .gallery img {
@@ -262,83 +266,84 @@ body {
     object-fit: cover;
     margin-left: 8px;
     pointer-events: none;
-    scroll-snap-align: start;
 }
 
 .gallery img:first-child {
     margin-left: 0px;
 }
 
-.portfolio {
-    height: 22vh;
-    height: 22dvh;
+.portfolio-container {
+    overflow: hidden;
+    scroll-behavior: smooth;
+    height: 100%;
     width: 100%;
-    margin-top: 8px;
-    border-radius: 8px;
-    box-sizing: border-box;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 40%;
-    gap: 8px;
+}
 
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
+.portfolio {
+    height: 120px;
+    position: relative;
+    margin-bottom: 4px;
+    display: inline-flex;
+    box-sizing: border-box;
+    transition: transform 0.2s ease-in-out;
 }
 
 .project {
-    height: 100%;
-    border-radius: 8px;
-    position: relative;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-.project img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.project .content {
-    width: 100%;
+    width: calc(100vw - 60px);
+    min-width: 300px;
+    max-width: 500px;
     height: 100%;
     padding: 8px;
     box-sizing: border-box;
-    border-radius: 8px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
     display: flex;
-    justify-content: center;
     align-items: center;
-    flex-direction: column;
-
-    opacity: 0;
-    transition: 0.5s all ease-in-out;
+    justify-content: center;
+    gap: 16px;
+    border-radius: 8px;
 }
 
-.project .content:hover {
-    opacity: 1;
+.project .graphic {
+    width: 104px;
+    min-width: 104px;
+    height: 104px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.graphic img {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+}
+
+.project .content {
+    height: 104px;
+    width: auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .project .content h2{
     margin: 0;
     padding: 0;
-    font-size: clamp(0.8rem, 3vw, 1.2rem);
+    align-self: flex-start;
+    font-size: clamp(1.0rem, 3.5vw, 1.2rem);
     font-weight: 700;
 }
 
 .project .content p{
     margin: 0;
-    font-size: clamp(0.7rem, 2.5vw, 1rem);
+    font-size: clamp(0.75rem, 2.75vw, 1.0rem);
 }
 
 .project .content a {
     display: flex;
     width: 100%;
-    height: 30px;
+    height: 24px;
     margin-top: auto;
     align-items: center;
     justify-content: center;
@@ -349,9 +354,8 @@ body {
     width: 100%;
     padding: 4px;
     color: white;
-    font-style: italic;
     font-weight: 700;
-    font-size: clamp(0.7rem, 2.5vw, 1rem);
+    font-size: clamp(0.75rem, 2.75vw, 1.0rem);
     white-space: nowrap;
     overflow: hidden;
     text-align: center;
@@ -361,13 +365,78 @@ body {
     border-radius: 6px;
     border-bottom: 4px solid #1852a4;
     box-shadow: 0px 0px 8px rgba(0,0,0,0.4);
+    transform: translateY(-4px);
 
     transition: 0.3s all ease-in-out;
 }
 
 .project .content a:hover span{
-    transform: translateY(4px);
+    transform: translateY(0px);
     border-bottom: 2px solid #1852a4;
+}
+
+.dot-nav {
+    display: flex;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.dot-nav .dot-button {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: white;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    opacity: 0.4;
+}
+
+.dot-button.selected {
+    opacity: 1;
+}
+
+.auto-scroll {
+    overflow: hidden;
+    display: flex;
+    position: relative;
+    white-space: nowrap;
+    width: 100%;
+    font-size: clamp(1.0rem, 3.25vw, 1.3rem);
+    /* margin-bottom: 16px; */
+}
+
+.auto-scroll .tools a {
+    margin-right: 2px;
+}
+.auto-scroll:after,
+.auto-scroll:before {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    width: 10%;
+    height: 100%;
+    content: "";
+    z-index: 2;
+}
+.auto-scroll:after {
+    right: 0;
+    background: linear-gradient(to left, rgba(52, 64, 85, 0.5), rgba(52, 64, 85, 0));
+}
+.auto-scroll:before {
+    left: 0;
+    background: linear-gradient(to right, rgba(52, 64, 85, 0.5), rgba(52, 64, 85, 0));
+}
+.tools {
+    animation: 18s slide infinite linear;
+    display: inline-block;
+    margin-inline: 2px;
+}
+.auto-scroll:hover .tools {
+    animation-play-state: paused;
 }
 
 .highlight {
@@ -380,8 +449,26 @@ body {
     font-weight: 700;
 }
 
+.no_selection {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 .hidden {
     display: none;
+}
+
+@keyframes slide {
+    from{
+        transform: translateX(0);
+    }to{
+        transform: translateX(-100%);
+    }
 }
 
 @media screen and (max-width: 550px) {
