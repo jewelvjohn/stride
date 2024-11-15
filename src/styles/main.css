@@ -58,12 +58,13 @@ body {
     position: fixed;
     top: 50%;
     left: 50%;
-    /* width: 100dvw;
-    height: 100dvh; */
     transform: translate(-50%, -50%);
     outline: none;
-    background-size: cover;
-    background-position: center;
+}
+
+#sky img {
+    object-fit: cover;
+    object-position: center;
 }
 
 .cache {

@@ -21,6 +21,12 @@ import WaterFragmentShader from './lib/shaders/water/fragment.glsl';
 import CloudVertexShader from './lib/shaders/cloud/vertex.glsl';
 import CloudFragmentShader from './lib/shaders/cloud/fragment.glsl';
 
+import sky_cloudy from './resources/images/sky/cloudy.png';
+import sky_forest from './resources/images/sky/forest.png';
+import sky_green from './resources/images/sky/green.png';
+import sky_noon from './resources/images/sky/noon.png';
+import sky_sunset from './resources/images/sky/sunset.png';
+
 /* 
     Current Bugs :-
     --null--
@@ -89,11 +95,6 @@ function lerpVector3(start, end, t) {
 
 function toRadian(angle) {
     return angle * Math.PI / 180;
-}
-
-function cacheImage(url) {
-    var image = new Image();
-    image.src = url;
 }
 
 //function used for creating CSS renderer for rendering html elements in the 3D scene
@@ -185,13 +186,6 @@ function initializeGUI() {
             I’m Jewel John, a Game Developer who builds same ol’ games a little different. Go ahead and check out my protfolio.
             <span class="highlight">This website is under development.</span>
         </p>
-        <div class="cache">
-            <img src="./resources/images/green.png">
-            <img src="./resources/images/sunset.png">
-            <img src="./resources/images/sunny.png">
-            <img src="./resources/images/forest.png">
-            <img src="./resources/images/cloudy.png">
-        </div>
         `,
         position: 0,
         light: false,
@@ -567,7 +561,7 @@ function loadEnvironment() {
             stages['exo_planet'].addObject(model);
         } else {
             const fog = new THREE.Fog(0x95C8C3, 1500, 2500);
-            const sky = "./resources/images/green.png";
+            const sky = sky_green;
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['exo_planet'] = stage;
@@ -594,7 +588,7 @@ function loadEnvironment() {
             stages['space_station'].addObject(model);
         } else {
             const fog = new THREE.Fog(0xFFE4B4, 500, 1000);
-            const sky = "./resources/images/sunset.png";
+            const sky = sky_sunset;
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['space_station'] = stage;
@@ -620,7 +614,7 @@ function loadEnvironment() {
             stages['gas_station'].addObject(model);
         } else {
             const fog = new THREE.Fog(0xB1DDDC, 650, 1000);
-            const sky = "./resources/images/sunny.png";
+            const sky = sky_noon;
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['gas_station'] = stage;
@@ -654,7 +648,7 @@ function loadEnvironment() {
             stages['gas_station'].addObject(model);
         } else {
             const fog = new THREE.Fog(0xB1DDDC, 650, 1000);
-            const sky = "./resources/images/sunny.png";
+            const sky = sky_noon;
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['gas_station'] = stage;
@@ -683,7 +677,7 @@ function loadEnvironment() {
             stages['medieval_town'].addObject(model);
         } else {
             const fog = new THREE.Fog(0xE3ECFF, 700, 1200);
-            const sky = "./resources/images/forest.png";
+            const sky = sky_forest;
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['medieval_town'] = stage;
@@ -747,7 +741,7 @@ function loadEnvironment() {
             stages['light_house'].addObject(model);
         } else {
             const fog = new THREE.Fog(0xBDE5E4, 500, 1500);
-            const sky = "./resources/images/cloudy.png";
+            const sky = sky_cloudy;
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['light_house'] = stage;
@@ -761,7 +755,7 @@ function selectStage(stage) {
             if(key === stage) {
                 if(!value.isActive) {
                     value.showStage();
-                    sky.style.backgroundImage = `url(${value.sky})`;
+                    sky.src = value.sky;
                     scene.fog = value.fog;
                 }
                 currentStage = stage;
@@ -818,35 +812,6 @@ function loopPlayer() {
     }
 }
 
-function loadSky() {
-    cacheImage('./resources/images/green.png');
-    cacheImage('./resources/images/sunset.png');
-    cacheImage('./resources/images/sunny.png');
-    cacheImage('./resources/images/forest.png');
-    cacheImage('./resources/images/cloudy.png');
-}
-
-function loadArt() {
-    cacheImage('./artwork/alone.webp');
-    cacheImage('./artwork/ashutti.webp');
-    cacheImage('./artwork/batman.webp');
-    cacheImage('./artwork/for-weirdos.webp');
-    cacheImage('./artwork/ip-girl.webp');
-    cacheImage('./artwork/weatherin-with-you.webp');
-    
-    // cacheImage('./artwork/thumbnail/alone.jpg');
-    // cacheImage('./artwork/thumbnail/ashutti.jpg');
-    // cacheImage('./artwork/thumbnail/batman.jpg');
-    // cacheImage('./artwork/thumbnail/for-weirdos.jpg');
-    // cacheImage('./artwork/thumbnail/ip-girl.jpg');
-    // cacheImage('./artwork/thumbnail/weatherin-with-you.jpg');
-}
-
-function loadProjects() {
-    cacheImage('./projects/burny-rush.webp');
-    cacheImage('./projects/stratosphere.webp');
-}
-
 //initializes the whole scene
 function init() {
     loadingScreen = document.querySelector('#loading-screen');
@@ -892,7 +857,7 @@ function init() {
         });
     }
 
-    sky = document.getElementById('sky');
+    sky = document.querySelector('#sky img');
     canvas = document.querySelector('canvas.webgl');
     
     if(!isMobile()) highEndGraphics = true;
@@ -913,7 +878,7 @@ function init() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(sizes.width, sizes.height);
     renderer.render(scene, camera);
-    renderer.outputEncoding = THREE.sRGBEncoding;
+    // renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.shadowMap.type = THREE.VSMShadowMap;
     renderer.shadowMap.enabled = true;
 
@@ -939,9 +904,6 @@ function init() {
     stats = new Stats();
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
-    window.addEventListener('focus', () => {
-        loadSky();
-    });
     
     player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200, true, blinderPositions, blinderWidth);
     inputSystem = new InputSystem();
@@ -956,10 +918,7 @@ function init() {
         loadingText.innerText = `Finished Loading`;
     }
     
-    loadSky();
     loadMap();
-    loadArt();
-    loadProjects();
     initializeGUI();
     loadEnvironment();
     onWindowResize();
@@ -1021,6 +980,7 @@ function update() {
         }
         accumulator -= fixedTimeStep;
     }
+
     
     if(waterMaterial) waterMaterial.uniforms.uTime.value += delta;
     if(cloudMaterials.length > 0) {
