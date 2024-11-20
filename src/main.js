@@ -21,8 +21,8 @@ import WaterFragmentShader from './lib/shaders/water/fragment.glsl';
 import CloudVertexShader from './lib/shaders/cloud/vertex.glsl';
 import CloudFragmentShader from './lib/shaders/cloud/fragment.glsl';
 
-import GrassVertexShader from './lib/shaders/grass/vertex.glsl';
-import GrassFragmentShader from './lib/shaders/grass/fragment.glsl';
+import FlowerVertexShader from './lib/shaders/flower/vertex.glsl';
+import FlowerFragmentShader from './lib/shaders/flower/fragment.glsl';
 
 import sky_cloudy from './resources/images/sky/cloudy.png';
 import sky_forest from './resources/images/sky/forest.png';
@@ -71,7 +71,7 @@ var interactionId = -1;
 var currentInteractionId = -1;
 var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
-var waterMaterial, cloudMaterials = [];
+var waterMaterial, flowerMaterial, cloudMaterials = [];
 
 //Gallery variables
 var isDraggingGallery = false;
@@ -516,6 +516,11 @@ function loadEnvironment() {
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[5]), blinderWidth, 80);
 
 //exo planet
+    const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
+    const voronoi = new THREE.TextureLoader().load("./resources/textures/voronoi.jpg");
+    noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
+    voronoi.wrapT = voronoi.wrapS = THREE.RepeatWrapping;
+
     const loader = new GLTFLoader(loadingManager);
     loader.load("./resources/3d/exo planet.glb", (gltf) => {
         const model = gltf.scene;
@@ -525,10 +530,6 @@ function loadEnvironment() {
                     child.castShadow = false;
                     child.receiveShadow = false;
 
-                    const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
-                    const voronoi = new THREE.TextureLoader().load("./resources/textures/voronoi.jpg");
-                    noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
-                    voronoi.wrapT = voronoi.wrapS = THREE.RepeatWrapping;
                     var cloudMaterial = new THREE.ShaderMaterial({
                         name: "cloud",
                         vertexShader: CloudVertexShader,
@@ -651,35 +652,28 @@ function loadEnvironment() {
         }
     });
 
+    flowerMaterial = new THREE.ShaderMaterial({
+        vertexShader: FlowerVertexShader,
+        fragmentShader: FlowerFragmentShader,
+        side: THREE.FrontSide,
+        shadowSide: THREE.FrontSide 
+    });
+    flowerMaterial.uniforms.uNoise = { value: noise };
+    flowerMaterial.uniforms.uTime = { value: 0 };
+
     loader.load("./resources/3d/props/flower(32x).glb", (gltf) => {
         const model = gltf.scene;
         const mesh = model.children[0];
         const geometry = mesh.geometry;
         const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(32x).png");
-        const material = new THREE.ShaderMaterial({
-            vertexShader: GrassVertexShader,
-            fragmentShader: GrassFragmentShader,
-            side: THREE.FrontSide,
-            shadowSide: THREE.FrontSide 
-        });
-        material.uniforms.map = { value: map };
+        flowerMaterial.uniforms.uMap = { value: map };
 
-        // const material = new THREE.MeshStandardMaterial({
-        //     map: mesh.material.map, 
-        //     side: THREE.FrontSide,
-        //     shadowSide: THREE.FrontSide,
-        //     alphaTest: 0.5,
-        //     transparent: false
-        // });
-        // csm.setupMaterial(material);
-
-        const rows = 12;
-        const cols = 36;
+        const rows = 14;
+        const cols = 44;
         const rowSpan = 16;
         const colSpan = 14;
-        
 
-        const instanced = new THREE.InstancedMesh(geometry, material, rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial, rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
 
@@ -691,8 +685,8 @@ function loadEnvironment() {
                 dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) + 120;
                 dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
     
-                const scaleRand = Math.random() * 3;
-                dummy.scale.set(7 + scaleRand, 7 + scaleRand, 1);
+                const scaleRand = Math.random() * 5;
+                dummy.scale.set(8 + scaleRand, 8 + scaleRand, 1);
                 dummy.updateMatrix();
                 instanced.setMatrixAt(count++, dummy.matrix);
             }
@@ -714,20 +708,14 @@ function loadEnvironment() {
         const mesh = model.children[0];
         const geometry = mesh.geometry;
         const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(64x).png");
-        const material = new THREE.ShaderMaterial({
-            vertexShader: GrassVertexShader,
-            fragmentShader: GrassFragmentShader,
-            side: THREE.FrontSide,
-            shadowSide: THREE.FrontSide
-        });
-        material.uniforms.map = { value: map };
+        flowerMaterial.uniforms.uMap = { value: map };
 
         const rows = 6;
         const cols = 32;
         const rowSpan = 14;
         const colSpan = 10;
 
-        const instanced = new THREE.InstancedMesh(geometry, material, rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial, rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
 
@@ -739,8 +727,8 @@ function loadEnvironment() {
                 dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) + 10;
                 dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
     
-                const scaleRand = Math.random() * 3;
-                dummy.scale.set(7 + scaleRand, 7 + scaleRand, 1);
+                const scaleRand = Math.random() * 5;
+                dummy.scale.set(8 + scaleRand, 8 + scaleRand, 1);
                 dummy.updateMatrix();
                 instanced.setMatrixAt(count++, dummy.matrix);
             }
@@ -762,20 +750,14 @@ function loadEnvironment() {
         const mesh = model.children[0];
         const geometry = mesh.geometry;
         const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(128x).png");
-        const material = new THREE.ShaderMaterial({
-            vertexShader: GrassVertexShader,
-            fragmentShader: GrassFragmentShader,
-            side: THREE.FrontSide,
-            shadowSide: THREE.FrontSide 
-        });
-        material.uniforms.map = { value: map };
+        flowerMaterial.uniforms.uMap = { value: map };
 
         const rows = 10;
         const cols = 26;
         const rowSpan = 10;
         const colSpan = 8;
 
-        const instanced = new THREE.InstancedMesh(geometry, material, rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial, rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
 
@@ -787,8 +769,8 @@ function loadEnvironment() {
                 dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) - 120;
                 dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
     
-                const scaleRand = Math.random() * 3;
-                dummy.scale.set(7 + scaleRand, 7 + scaleRand, 1);
+                const scaleRand = Math.random() * 5;
+                dummy.scale.set(8 + scaleRand, 8 + scaleRand, 1);
                 dummy.updateMatrix();
                 instanced.setMatrixAt(count++, dummy.matrix);
             }
@@ -828,11 +810,9 @@ function loadEnvironment() {
                     unlitMaterial.shadowSide = THREE.FrontSide;
                     child.material = unlitMaterial;
                 } else if(child.material.name == "ocean") {
-                    const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
                     const mask = new THREE.TextureLoader().load("./resources/textures/foammask.jpg");
                     const shadow = new THREE.TextureLoader().load("./resources/textures/oceanshadow.jpg");
-
-                    noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
+                    
                     waterMaterial = new THREE.ShaderMaterial({
                         uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib["fog"], uniforms]),
                         vertexShader: WaterVertexShader,
@@ -1104,6 +1084,7 @@ function update() {
 
     
     if(waterMaterial) waterMaterial.uniforms.uTime.value += delta;
+    if(flowerMaterial) flowerMaterial.uniforms.uTime.value += delta;
     if(cloudMaterials.length > 0) {
         cloudMaterials.forEach((material) => {
             material.uniforms.uTime.value += delta;
