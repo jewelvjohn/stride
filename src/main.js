@@ -21,6 +21,9 @@ import WaterFragmentShader from './lib/shaders/water/fragment.glsl';
 import CloudVertexShader from './lib/shaders/cloud/vertex.glsl';
 import CloudFragmentShader from './lib/shaders/cloud/fragment.glsl';
 
+import GrassVertexShader from './lib/shaders/grass/vertex.glsl';
+import GrassFragmentShader from './lib/shaders/grass/fragment.glsl';
+
 import sky_cloudy from './resources/images/sky/cloudy.png';
 import sky_forest from './resources/images/sky/forest.png';
 import sky_green from './resources/images/sky/green.png';
@@ -141,9 +144,8 @@ function initializeGUI() {
         </div>
         <p>
             Thanks to,</br>
-            <a class="highlight" href="https://sketchfab.com/Han66st" target="_blank">Han66st</a> and,
             <a class="highlight" href="https://sketchfab.com/boiko.pavlo4" target="_blank">Pavlo Boiko</a> 
-            for 3D models.
+            for bus 3D models.
         </p>`,
         position: -160,
         light: false,
@@ -608,41 +610,8 @@ function loadEnvironment() {
             }
         });
         model.scale.set(10, 10, 10);
+        model.position.set(0, 0, 80);
         model.rotation.y = toRadian(-90);
-
-        if(stages['gas_station']) {
-            stages['gas_station'].addObject(model);
-        } else {
-            const fog = new THREE.Fog(0xB1DDDC, 650, 1000);
-            const sky = sky_noon;
-            const stage = new Stage(scene, sky, fog);
-            stage.addObject(model);
-            stages['gas_station'] = stage;
-        }
-    });
-
-    loader.load("./resources/3d/lfa.glb", (gltf) => {
-        const model = gltf.scene;
-        const step = new Uint8Array([0, 32, 64, 255]);
-        const gradientMap = new THREE.DataTexture(step, step.length, 1, THREE.RedFormat);
-        gradientMap.needsUpdate = true;
-
-        model.traverse(function(child) {
-            if(child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = false;
-                if(child.material && child.material.name !== "glass" && child.material.name !== "brake") {
-                    child.material = new THREE.MeshToonMaterial({color: 0xFFFFFF, map: child.material.map, gradientMap: gradientMap});
-                    // console.log(child.material.name);
-                }
-                child.material.side = THREE.FrontSide;
-                child.material.shadowSide = THREE.FrontSide;
-                csm.setupMaterial(child.material);
-            }
-        });
-        model.scale.set(10, 10, 10);
-        model.position.set(40, 0, -60);
-        model.rotation.y = toRadian(-45);
 
         if(stages['gas_station']) {
             stages['gas_station'].addObject(model);
@@ -656,31 +625,183 @@ function loadEnvironment() {
     });
 
 //medieval town
-    loader.load("./resources/3d/medieval town.glb", (gltf) => {
+    loader.load("./resources/3d/flower field.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
-                if(child.material.name != "vegitation") {
-                    child.material.side = THREE.FrontSide;
-                    child.material.shadowSide = THREE.FrontSide;
-                }
+                child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
                 csm.setupMaterial(child.material);
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, 80);
+        model.position.set(0, 0, 0);
         model.rotation.y = toRadian(-90);
 
-        if(stages['medieval_town']) {
-            stages['medieval_town'].addObject(model);
+        if(stages['flower_field']) {
+            stages['flower_field'].addObject(model);
         } else {
-            const fog = new THREE.Fog(0xE3ECFF, 700, 1200);
+            const fog = new THREE.Fog(0xE3ECFF, 800, 1750);
             const sky = sky_forest;
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
-            stages['medieval_town'] = stage;
+            stages['flower_field'] = stage;
+        }
+    });
+
+    loader.load("./resources/3d/props/flower(32x).glb", (gltf) => {
+        const model = gltf.scene;
+        const mesh = model.children[0];
+        const geometry = mesh.geometry;
+        const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(32x).png");
+        const material = new THREE.ShaderMaterial({
+            vertexShader: GrassVertexShader,
+            fragmentShader: GrassFragmentShader,
+            side: THREE.FrontSide,
+            shadowSide: THREE.FrontSide 
+        });
+        material.uniforms.map = { value: map };
+
+        // const material = new THREE.MeshStandardMaterial({
+        //     map: mesh.material.map, 
+        //     side: THREE.FrontSide,
+        //     shadowSide: THREE.FrontSide,
+        //     alphaTest: 0.5,
+        //     transparent: false
+        // });
+        // csm.setupMaterial(material);
+
+        const rows = 12;
+        const cols = 36;
+        const rowSpan = 16;
+        const colSpan = 14;
+        
+
+        const instanced = new THREE.InstancedMesh(geometry, material, rows * cols);
+        instanced.castShadow = false;
+        instanced.receiveShadow = false;
+
+        const dummy = new THREE.Object3D();
+        dummy.rotation.y = toRadian(-90);
+        var count = 0;
+        for(let i=0; i<rows; i++) {
+            for(let j=0; j<cols; j++) {
+                dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) + 120;
+                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
+    
+                const scaleRand = Math.random() * 3;
+                dummy.scale.set(7 + scaleRand, 7 + scaleRand, 1);
+                dummy.updateMatrix();
+                instanced.setMatrixAt(count++, dummy.matrix);
+            }
+        }
+
+        if(stages['flower_field']) {
+            stages['flower_field'].addObject(instanced);
+        } else {
+            const fog = new THREE.Fog(0xE3ECFF, 800, 1750);
+            const sky = sky_forest;
+            const stage = new Stage(scene, sky, fog);
+            stage.addObject(instanced);
+            stages['flower_field'] = stage;
+        }
+    });
+
+    loader.load("./resources/3d/props/flower(64x).glb", (gltf) => {
+        const model = gltf.scene;
+        const mesh = model.children[0];
+        const geometry = mesh.geometry;
+        const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(64x).png");
+        const material = new THREE.ShaderMaterial({
+            vertexShader: GrassVertexShader,
+            fragmentShader: GrassFragmentShader,
+            side: THREE.FrontSide,
+            shadowSide: THREE.FrontSide
+        });
+        material.uniforms.map = { value: map };
+
+        const rows = 6;
+        const cols = 32;
+        const rowSpan = 14;
+        const colSpan = 10;
+
+        const instanced = new THREE.InstancedMesh(geometry, material, rows * cols);
+        instanced.castShadow = false;
+        instanced.receiveShadow = false;
+
+        const dummy = new THREE.Object3D();
+        dummy.rotation.y = toRadian(-90);
+        var count = 0;
+        for(let i=0; i<rows; i++) {
+            for(let j=0; j<cols; j++) {
+                dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) + 10;
+                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
+    
+                const scaleRand = Math.random() * 3;
+                dummy.scale.set(7 + scaleRand, 7 + scaleRand, 1);
+                dummy.updateMatrix();
+                instanced.setMatrixAt(count++, dummy.matrix);
+            }
+        }
+
+        if(stages['flower_field']) {
+            stages['flower_field'].addObject(instanced);
+        } else {
+            const fog = new THREE.Fog(0xE3ECFF, 800, 1750);
+            const sky = sky_forest;
+            const stage = new Stage(scene, sky, fog);
+            stage.addObject(instanced);
+            stages['flower_field'] = stage;
+        }
+    });
+
+    loader.load("./resources/3d/props/flower(128x).glb", (gltf) => {
+        const model = gltf.scene;
+        const mesh = model.children[0];
+        const geometry = mesh.geometry;
+        const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(128x).png");
+        const material = new THREE.ShaderMaterial({
+            vertexShader: GrassVertexShader,
+            fragmentShader: GrassFragmentShader,
+            side: THREE.FrontSide,
+            shadowSide: THREE.FrontSide 
+        });
+        material.uniforms.map = { value: map };
+
+        const rows = 10;
+        const cols = 26;
+        const rowSpan = 10;
+        const colSpan = 8;
+
+        const instanced = new THREE.InstancedMesh(geometry, material, rows * cols);
+        instanced.castShadow = false;
+        instanced.receiveShadow = false;
+
+        const dummy = new THREE.Object3D();
+        dummy.rotation.y = toRadian(-90);
+        var count = 0;
+        for(let i=0; i<rows; i++) {
+            for(let j=0; j<cols; j++) {
+                dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) - 120;
+                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
+    
+                const scaleRand = Math.random() * 3;
+                dummy.scale.set(7 + scaleRand, 7 + scaleRand, 1);
+                dummy.updateMatrix();
+                instanced.setMatrixAt(count++, dummy.matrix);
+            }
+        }
+
+        if(stages['flower_field']) {
+            stages['flower_field'].addObject(instanced);
+        } else {
+            const fog = new THREE.Fog(0xE3ECFF, 800, 1750);
+            const sky = sky_forest;
+            const stage = new Stage(scene, sky, fog);
+            stage.addObject(instanced);
+            stages['flower_field'] = stage;
         }
     });
 
@@ -776,9 +897,9 @@ function updateStages() {
     } else if(position <= -40) {
         selectStage('space_station');
     } else if(position <= 40) {
-        selectStage('gas_station');
+        selectStage('flower_field');
     } else if(position <= 120) {
-        selectStage('medieval_town');
+        selectStage('gas_station');
     } else {
         selectStage('light_house');
     }
