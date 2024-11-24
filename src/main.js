@@ -17,12 +17,14 @@ import {InteractionContainer} from './lib/interaction.js';
 
 import WaterVertexShader from './lib/shaders/water/vertex.glsl';
 import WaterFragmentShader from './lib/shaders/water/fragment.glsl';
-
 import CloudVertexShader from './lib/shaders/cloud/vertex.glsl';
 import CloudFragmentShader from './lib/shaders/cloud/fragment.glsl';
-
 import FlowerVertexShader from './lib/shaders/flower/vertex.glsl';
 import FlowerFragmentShader from './lib/shaders/flower/fragment.glsl';
+import LeavesVertexShader from './lib/shaders/leaves/vertex.glsl';
+import LeavesFragmentShader from './lib/shaders/leaves/fragment.glsl';
+import ReactorVertexShader from './lib/shaders/reactor/vertex.glsl';
+import ReactorFragmentShader from './lib/shaders/reactor/fragment.glsl';
 
 import sky_cloudy from './resources/images/sky/cloudy.png';
 import sky_forest from './resources/images/sky/forest.png';
@@ -71,7 +73,9 @@ var interactionId = -1;
 var currentInteractionId = -1;
 var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
-var waterMaterial, flowerMaterial, cloudMaterials = [];
+
+var waterMaterial, cloudMaterials = [];
+var reactorMaterial, flowerMaterial = [];
 
 //Gallery variables
 var isDraggingGallery = false;
@@ -576,15 +580,39 @@ function loadEnvironment() {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                child.material.side = THREE.FrontSide;
-                child.material.shadowSide = THREE.FrontSide;
-                csm.setupMaterial(child.material);
+                if(child.material.name === "reactor") {
+                    child.castShadow = false;
+                    child.receiveShadow = false;
+                    reactorMaterial = new THREE.ShaderMaterial({
+                        vertexShader: ReactorVertexShader,
+                        fragmentShader: ReactorFragmentShader,
+                        side: THREE.FrontSide,
+                        shadowSide: THREE.FrontSide,
+                        transparent: true
+                    });
+                    reactorMaterial.uniforms.radius = {value: 3};
+                    reactorMaterial.uniforms.i = {value: 0};
+                    reactorMaterial.uniforms.j = {value: 0};
+                    reactorMaterial.uniforms.k = {value: 0};
+                    child.material = reactorMaterial;
+                } else if(child.material.name === "glass") {
+                    child.castShadow = false;
+                    child.receiveShadow = false;
+                    child.material.alphaTest = 0.16;
+                    child.material.side = THREE.FrontSide;
+                    child.material.shadowSide = THREE.FrontSide;
+                    csm.setupMaterial(child.material);
+                } else {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    child.material.side = THREE.FrontSide;
+                    child.material.shadowSide = THREE.FrontSide;
+                    csm.setupMaterial(child.material);
+                }
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, -80);
+        model.position.set(0, 0, 0);
         model.rotation.y = toRadian(-90);
 
         if(stages['space_station']) {
@@ -611,7 +639,7 @@ function loadEnvironment() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, 80);
+        model.position.set(0, 0, -80);
         model.rotation.y = toRadian(-90);
 
         if(stages['gas_station']) {
@@ -630,15 +658,31 @@ function loadEnvironment() {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                child.material.side = THREE.FrontSide;
-                child.material.shadowSide = THREE.FrontSide;
+                if(child.material.name === "leaves"){
+                    const map = new THREE.TextureLoader().load("./resources/textures/branch.png");
+                    child.castShadow = false;
+                    child.receiveShadow = false;
+                    const material = new THREE.ShaderMaterial({
+                        vertexShader: LeavesVertexShader,
+                        fragmentShader: LeavesFragmentShader,
+                        side: THREE.DoubleSide,
+                        shadowSide: THREE.FrontSide,
+                        transparent: true
+                    });
+                    material.uniforms.uMap = { value: map };
+                    // material.uniforms.uEdgeThresold = { value: 0.85 };
+                    child.material = material;
+                } else {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    child.material.side = THREE.FrontSide;
+                    child.material.shadowSide = THREE.FrontSide;
+                }
                 csm.setupMaterial(child.material);
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, 0);
+        model.position.set(0, 0, 80);
         model.rotation.y = toRadian(-90);
 
         if(stages['flower_field']) {
@@ -652,39 +696,46 @@ function loadEnvironment() {
         }
     });
 
-    flowerMaterial = new THREE.ShaderMaterial({
-        vertexShader: FlowerVertexShader,
-        fragmentShader: FlowerFragmentShader,
-        side: THREE.FrontSide,
-        shadowSide: THREE.FrontSide 
-    });
-    flowerMaterial.uniforms.uNoise = { value: noise };
-    flowerMaterial.uniforms.uTime = { value: 0 };
+    const flowerMap = [ 
+        new THREE.TextureLoader().load("./resources/textures/flower/plant(64x).png"),
+        new THREE.TextureLoader().load("./resources/textures/flower/plant(128x).png"),
+        new THREE.TextureLoader().load("./resources/textures/flower/plant(256x).png")
+    ];
+
+    for(let i=0; i<3; i++) {
+        const uniforms = {
+            uNoise: { value: noise },
+            uTime: { value: 0 },
+        };
+    
+        flowerMaterial[i] = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: FlowerVertexShader,
+            fragmentShader: FlowerFragmentShader,
+            side: THREE.FrontSide,
+            shadowSide: THREE.FrontSide 
+        });
+        flowerMaterial[i].uniforms.uMap = { value: flowerMap[i] };
+    }
 
     loader.load("./resources/3d/props/flower(32x).glb", (gltf) => {
         const model = gltf.scene;
         const mesh = model.children[0];
         const geometry = mesh.geometry;
-        const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(32x).png");
-        flowerMaterial.uniforms.uMap = { value: map };
-
-        const rows = 14;
-        const cols = 44;
-        const rowSpan = 16;
+        const rows = 8;
+        const cols = 50;
+        const rowSpan = 24;
         const colSpan = 14;
-
-        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial, rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial[0], rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
-
         const dummy = new THREE.Object3D();
         dummy.rotation.y = toRadian(-90);
         var count = 0;
         for(let i=0; i<rows; i++) {
             for(let j=0; j<cols; j++) {
-                dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) + 120;
-                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
-    
+                dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) + 160;
+                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2) + 80;
                 const scaleRand = Math.random() * 5;
                 dummy.scale.set(8 + scaleRand, 8 + scaleRand, 1);
                 dummy.updateMatrix();
@@ -707,25 +758,20 @@ function loadEnvironment() {
         const model = gltf.scene;
         const mesh = model.children[0];
         const geometry = mesh.geometry;
-        const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(64x).png");
-        flowerMaterial.uniforms.uMap = { value: map };
-
         const rows = 6;
-        const cols = 32;
-        const rowSpan = 14;
+        const cols = 36;
+        const rowSpan = 22;
         const colSpan = 10;
-
-        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial, rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial[1], rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
-
         const dummy = new THREE.Object3D();
         dummy.rotation.y = toRadian(-90);
         var count = 0;
         for(let i=0; i<rows; i++) {
             for(let j=0; j<cols; j++) {
                 dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) + 10;
-                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
+                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2) + 80;
     
                 const scaleRand = Math.random() * 5;
                 dummy.scale.set(8 + scaleRand, 8 + scaleRand, 1);
@@ -749,25 +795,20 @@ function loadEnvironment() {
         const model = gltf.scene;
         const mesh = model.children[0];
         const geometry = mesh.geometry;
-        const map = new THREE.TextureLoader().load("./resources/textures/flower/plant(128x).png");
-        flowerMaterial.uniforms.uMap = { value: map };
-
-        const rows = 10;
+        const rows = 6;
         const cols = 26;
-        const rowSpan = 10;
+        const rowSpan = 18;
         const colSpan = 8;
-
-        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial, rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial[2], rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
-
         const dummy = new THREE.Object3D();
         dummy.rotation.y = toRadian(-90);
         var count = 0;
         for(let i=0; i<rows; i++) {
             for(let j=0; j<cols; j++) {
                 dummy.position.x = (i*rowSpan) + (Math.random() * (rowSpan/2)) - 120;
-                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2);
+                dummy.position.z = (j*colSpan) + (Math.random() * (colSpan/2)) - ((cols*colSpan)/2) + 80;
     
                 const scaleRand = Math.random() * 5;
                 dummy.scale.set(8 + scaleRand, 8 + scaleRand, 1);
@@ -787,7 +828,7 @@ function loadEnvironment() {
         }
     });
 
-    const uniforms = {
+    const waterUniforms = {
         uTime: { value: 0 },
         uFoamColor: { value: new THREE.Color(0xA4CEC6).convertLinearToSRGB() },
         uWaterColor_1: { value: new THREE.Color(0x01232F).convertLinearToSRGB() },
@@ -814,7 +855,7 @@ function loadEnvironment() {
                     const shadow = new THREE.TextureLoader().load("./resources/textures/oceanshadow.jpg");
                     
                     waterMaterial = new THREE.ShaderMaterial({
-                        uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib["fog"], uniforms]),
+                        uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib["fog"], waterUniforms]),
                         vertexShader: WaterVertexShader,
                         fragmentShader: WaterFragmentShader,
                         fog: true,
@@ -875,11 +916,11 @@ function updateStages() {
     if(position <= -120) {
         selectStage('exo_planet');
     } else if(position <= -40) {
-        selectStage('space_station');
-    } else if(position <= 40) {
-        selectStage('flower_field');
-    } else if(position <= 120) {
         selectStage('gas_station');
+    } else if(position <= 40) {
+        selectStage('space_station');
+    } else if(position <= 120) {
+        selectStage('flower_field');
     } else {
         selectStage('light_house');
     }
@@ -1059,6 +1100,24 @@ function onWindowResize() {
     csm.updateFrustums();
 }
 
+function updateMaterials(delta) {
+    if(waterMaterial) waterMaterial.uniforms.uTime.value += delta;
+    if(reactorMaterial) {
+        reactorMaterial.uniforms.i.value += delta;
+        reactorMaterial.uniforms.j.value += delta*3;
+    }
+    if(flowerMaterial.length > 0) {
+        flowerMaterial.forEach((material) => {
+            material.uniforms.uTime.value += delta;
+        });
+    }
+    if(cloudMaterials.length > 0) {
+        cloudMaterials.forEach((material) => {
+            material.uniforms.uTime.value += delta;
+        });
+    }
+}
+
 const fixedTimeStep = 1/60;
 const maxDelta = 0.1;
 let accumulator = 0;
@@ -1081,16 +1140,7 @@ function update() {
         }
         accumulator -= fixedTimeStep;
     }
-
-    
-    if(waterMaterial) waterMaterial.uniforms.uTime.value += delta;
-    if(flowerMaterial) flowerMaterial.uniforms.uTime.value += delta;
-    if(cloudMaterials.length > 0) {
-        cloudMaterials.forEach((material) => {
-            material.uniforms.uTime.value += delta;
-        });
-    }
-    
+    updateMaterials(delta);
     csm.update();
     stats.update();
     renderer.render(scene, camera);
