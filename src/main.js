@@ -25,6 +25,8 @@ import LeavesVertexShader from './lib/shaders/leaves/vertex.glsl';
 import LeavesFragmentShader from './lib/shaders/leaves/fragment.glsl';
 import ReactorVertexShader from './lib/shaders/reactor/vertex.glsl';
 import ReactorFragmentShader from './lib/shaders/reactor/fragment.glsl';
+import RingVertexShader from './lib/shaders/ring/vertex.glsl';
+import RingFragmentShader from './lib/shaders/ring/fragment.glsl';
 
 import sky_cloudy from './resources/images/sky/cloudy.png';
 import sky_forest from './resources/images/sky/forest.png';
@@ -75,7 +77,7 @@ var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
 
 var waterMaterial, cloudMaterials = [];
-var reactorMaterial, flowerMaterial = [];
+var reactorMaterial, ringMaterials = [], flowerMaterials = [];
 
 //Gallery variables
 var isDraggingGallery = false;
@@ -533,8 +535,16 @@ function loadEnvironment() {
                 if(child.material.name == "cloud") {
                     child.castShadow = false;
                     child.receiveShadow = false;
-
                     var cloudMaterial = new THREE.ShaderMaterial({
+                        uniforms: {
+                            uTime : { value: Math.random() * 10 },
+                            uSpeed : { value: 0.02 },
+                            uColor_1 : { value: new THREE.Color(0x9C9F96).convertLinearToSRGB() },
+                            uColor_2 : { value: new THREE.Color(0xFAFCF9).convertLinearToSRGB() },
+                            uShadowColor : { value: new THREE.Color(0x578163).convertLinearToSRGB() },
+                            uNoise : { value: noise },
+                            uVoronoi : { value: voronoi }
+                        }, 
                         name: "cloud",
                         vertexShader: CloudVertexShader,
                         fragmentShader: CloudFragmentShader,
@@ -542,13 +552,6 @@ function loadEnvironment() {
                         side: THREE.FrontSide,
                         shadowSide: THREE.FrontSide 
                     });
-                    cloudMaterial.uniforms.uTime = { value: Math.random() * 10 };
-                    cloudMaterial.uniforms.uSpeed = { value: 0.02 };
-                    cloudMaterial.uniforms.uColor_1 = { value: new THREE.Color(0x9C9F96).convertLinearToSRGB() };
-                    cloudMaterial.uniforms.uColor_2 = { value: new THREE.Color(0xFAFCF9).convertLinearToSRGB() };
-                    cloudMaterial.uniforms.uShadowColor = { value: new THREE.Color(0x578163).convertLinearToSRGB() };
-                    cloudMaterial.uniforms.uNoise = { value: noise };
-                    cloudMaterial.uniforms.uVoronoi = { value: voronoi };
                     child.material = cloudMaterial;
                     cloudMaterials.push(cloudMaterial);
                 } else {
@@ -575,40 +578,67 @@ function loadEnvironment() {
         }
     });
 
-//spiral city
+//space station
+    reactorMaterial = new THREE.ShaderMaterial({
+        vertexShader: ReactorVertexShader,
+        fragmentShader: ReactorFragmentShader,
+        side: THREE.FrontSide,
+        shadowSide: THREE.FrontSide,
+        transparent: true
+    });
+
+    ringMaterials[0] = new THREE.ShaderMaterial({
+        uniforms: {
+            uTime: { value: 0 },
+            i: { value: -1.4 },
+            j: { value: 1.4 },
+            k: { value: 1.4 }
+        },
+        vertexShader: RingVertexShader,
+        fragmentShader: RingFragmentShader,
+        side: THREE.DoubleSide,
+        shadowSide: THREE.FrontSide
+    });
+
+    ringMaterials[1] = new THREE.ShaderMaterial({
+        uniforms: {
+            uTime: { value: 0 },
+            i: { value: 1 },
+            j: { value: 1 },
+            k: { value: -1 }
+        },
+        vertexShader: RingVertexShader,
+        fragmentShader: RingFragmentShader,
+        side: THREE.DoubleSide,
+        shadowSide: THREE.FrontSide
+    });
+
     loader.load("./resources/3d/space station.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
             if(child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                child.material.side = THREE.FrontSide;
+                child.material.shadowSide = THREE.FrontSide;
+
                 if(child.material.name === "reactor") {
                     child.castShadow = false;
                     child.receiveShadow = false;
-                    reactorMaterial = new THREE.ShaderMaterial({
-                        vertexShader: ReactorVertexShader,
-                        fragmentShader: ReactorFragmentShader,
-                        side: THREE.FrontSide,
-                        shadowSide: THREE.FrontSide,
-                        transparent: true
-                    });
-                    reactorMaterial.uniforms.radius = {value: 3};
-                    reactorMaterial.uniforms.i = {value: 0};
-                    reactorMaterial.uniforms.j = {value: 0};
-                    reactorMaterial.uniforms.k = {value: 0};
                     child.material = reactorMaterial;
+                } else if(child.name === "ring_1") {
+                    child.castShadow = false;
+                    child.receiveShadow = false;
+                    child.material = ringMaterials[0];
+                } else if(child.name === "ring_2") {
+                    child.castShadow = false;
+                    child.receiveShadow = false;
+                    child.material = ringMaterials[1];
                 } else if(child.material.name === "glass") {
                     child.castShadow = false;
                     child.receiveShadow = false;
                     child.material.alphaTest = 0.16;
-                    child.material.side = THREE.FrontSide;
-                    child.material.shadowSide = THREE.FrontSide;
-                    csm.setupMaterial(child.material);
-                } else {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                    child.material.side = THREE.FrontSide;
-                    child.material.shadowSide = THREE.FrontSide;
-                    csm.setupMaterial(child.material);
-                }
+                } else { csm.setupMaterial(child.material); }
             }
         });
         model.scale.set(10, 10, 10);
@@ -670,7 +700,6 @@ function loadEnvironment() {
                         transparent: true
                     });
                     material.uniforms.uMap = { value: map };
-                    // material.uniforms.uEdgeThresold = { value: 0.85 };
                     child.material = material;
                 } else {
                     child.castShadow = true;
@@ -708,14 +737,14 @@ function loadEnvironment() {
             uTime: { value: 0 },
         };
     
-        flowerMaterial[i] = new THREE.ShaderMaterial({
+        flowerMaterials[i] = new THREE.ShaderMaterial({
             uniforms: uniforms,
             vertexShader: FlowerVertexShader,
             fragmentShader: FlowerFragmentShader,
             side: THREE.FrontSide,
             shadowSide: THREE.FrontSide 
         });
-        flowerMaterial[i].uniforms.uMap = { value: flowerMap[i] };
+        flowerMaterials[i].uniforms.uMap = { value: flowerMap[i] };
     }
 
     loader.load("./resources/3d/props/flower(32x).glb", (gltf) => {
@@ -726,7 +755,7 @@ function loadEnvironment() {
         const cols = 50;
         const rowSpan = 24;
         const colSpan = 14;
-        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial[0], rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterials[0], rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
         const dummy = new THREE.Object3D();
@@ -762,7 +791,7 @@ function loadEnvironment() {
         const cols = 36;
         const rowSpan = 22;
         const colSpan = 10;
-        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial[1], rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterials[1], rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
         const dummy = new THREE.Object3D();
@@ -799,7 +828,7 @@ function loadEnvironment() {
         const cols = 26;
         const rowSpan = 18;
         const colSpan = 8;
-        const instanced = new THREE.InstancedMesh(geometry, flowerMaterial[2], rows * cols);
+        const instanced = new THREE.InstancedMesh(geometry, flowerMaterials[2], rows * cols);
         instanced.castShadow = false;
         instanced.receiveShadow = false;
         const dummy = new THREE.Object3D();
@@ -1103,15 +1132,16 @@ function onWindowResize() {
 function updateMaterials(delta) {
     if(waterMaterial) waterMaterial.uniforms.uTime.value += delta;
     if(reactorMaterial) {
-        reactorMaterial.uniforms.i.value += delta;
-        reactorMaterial.uniforms.j.value += delta*3;
-    }
-    if(flowerMaterial.length > 0) {
-        flowerMaterial.forEach((material) => {
+        //update unifroms...
+    } if(ringMaterials.length > 0) {
+        ringMaterials.forEach((material) => {
             material.uniforms.uTime.value += delta;
         });
-    }
-    if(cloudMaterials.length > 0) {
+    } if(flowerMaterials.length > 0) {
+        flowerMaterials.forEach((material) => {
+            material.uniforms.uTime.value += delta;
+        });
+    } if(cloudMaterials.length > 0) {
         cloudMaterials.forEach((material) => {
             material.uniforms.uTime.value += delta;
         });
