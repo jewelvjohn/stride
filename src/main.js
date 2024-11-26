@@ -587,31 +587,22 @@ function loadEnvironment() {
         transparent: true
     });
 
-    ringMaterials[0] = new THREE.ShaderMaterial({
-        uniforms: {
-            uTime: { value: 0 },
-            i: { value: -1.4 },
-            j: { value: 1.4 },
-            k: { value: 1.4 }
-        },
-        vertexShader: RingVertexShader,
-        fragmentShader: RingFragmentShader,
-        side: THREE.DoubleSide,
-        shadowSide: THREE.FrontSide
-    });
-
-    ringMaterials[1] = new THREE.ShaderMaterial({
-        uniforms: {
-            uTime: { value: 0 },
-            i: { value: 1 },
-            j: { value: 1 },
-            k: { value: -1 }
-        },
-        vertexShader: RingVertexShader,
-        fragmentShader: RingFragmentShader,
-        side: THREE.DoubleSide,
-        shadowSide: THREE.FrontSide
-    });
+    const ringMap = new THREE.TextureLoader().load("./resources/textures/ring.png");
+    for(let i=0; i<3; i++) {
+        ringMaterials[i] = new THREE.ShaderMaterial({
+            uniforms: {
+                uMap: { value: ringMap },
+                uTime: { value: 0 },
+                i: { value: 3-i },
+                j: { value: 3-i },
+                k: { value: 3-i },
+            },
+            vertexShader: RingVertexShader,
+            fragmentShader: RingFragmentShader,
+            side: THREE.DoubleSide,
+            shadowSide: THREE.FrontSide
+        });
+    }
 
     loader.load("./resources/3d/space station.glb", (gltf) => {
         const model = gltf.scene;
@@ -634,6 +625,10 @@ function loadEnvironment() {
                     child.castShadow = false;
                     child.receiveShadow = false;
                     child.material = ringMaterials[1];
+                } else if(child.name === "ring_3") {
+                    child.castShadow = false;
+                    child.receiveShadow = false;
+                    child.material = ringMaterials[2];
                 } else if(child.material.name === "glass") {
                     child.castShadow = false;
                     child.receiveShadow = false;
@@ -642,7 +637,7 @@ function loadEnvironment() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, 0);
+        model.position.set(0, 0, -80);
         model.rotation.y = toRadian(-90);
 
         if(stages['space_station']) {
@@ -669,7 +664,7 @@ function loadEnvironment() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, -80);
+        model.position.set(0, 0, 0);
         model.rotation.y = toRadian(-90);
 
         if(stages['gas_station']) {
@@ -945,9 +940,9 @@ function updateStages() {
     if(position <= -120) {
         selectStage('exo_planet');
     } else if(position <= -40) {
-        selectStage('gas_station');
-    } else if(position <= 40) {
         selectStage('space_station');
+    } else if(position <= 40) {
+        selectStage('gas_station');
     } else if(position <= 120) {
         selectStage('flower_field');
     } else {
