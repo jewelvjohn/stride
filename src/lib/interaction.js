@@ -1,9 +1,6 @@
 class InteractionPoint {
-    constructor(message, position, light, focus, range) {
-        Object.assign(this, { message, position, light, focus, range });
-        this.text = document.createElement('div');
-        this.text.className = 'talkbubble-message';
-        this.text.innerHTML = message;
+    constructor(position, light, focus, range) {
+        Object.assign(this, { position, light, focus, range });
     }
 
     upperBound() {
@@ -21,12 +18,11 @@ export class InteractionContainer {
     }
 
     addInteractionPoint({
-        message = 'hello', 
         position = 0, 
         light = false, 
         focus = false, 
         range = 100
     } = {}) {
-        this.points.push(new InteractionPoint(message, position, light, focus, range))
+        this.points.push(new InteractionPoint(position, light, focus, range));
     }
 }

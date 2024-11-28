@@ -154,7 +154,7 @@ body {
     opacity: 0;
 }
 
-.talkbubble #triangle {
+.talkbubble .triangle {
     position: absolute;
     width: 0;
     height: 0;

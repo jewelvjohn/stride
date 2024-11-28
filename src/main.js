@@ -1,20 +1,24 @@
+//UI Dependancies
 import './styles/main.css';
 import './styles/loading.css';
 import {Rive} from "@rive-app/canvas";
 import "@lottiefiles/lottie-player";
 import {create} from '@lottiefiles/lottie-interactivity';
 
+//THREE.js Dependancies
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js'; 
 import {CSM} from 'three/addons/csm/CSM.js';
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
 
+//Custom Classes
 import {Stage} from './lib/stage.js';
 import {InputSystem} from './lib/input.js';
 import {CharacterController} from './lib/character.js';
 import {InteractionContainer} from './lib/interaction.js';
 
+//GLSL Shaders
 import WaterVertexShader from './lib/shaders/water/vertex.glsl';
 import WaterFragmentShader from './lib/shaders/water/fragment.glsl';
 import CloudVertexShader from './lib/shaders/cloud/vertex.glsl';
@@ -28,6 +32,7 @@ import ReactorFragmentShader from './lib/shaders/reactor/fragment.glsl';
 import RingVertexShader from './lib/shaders/ring/vertex.glsl';
 import RingFragmentShader from './lib/shaders/ring/fragment.glsl';
 
+//Sky Images
 import sky_cloudy from './resources/images/sky/cloudy.png';
 import sky_forest from './resources/images/sky/forest.png';
 import sky_green from './resources/images/sky/green.png';
@@ -47,45 +52,62 @@ import sky_sunset from './resources/images/sky/sunset.png';
     7. Sub-pages have problem accessing js files after deployment
  */
 
+
+//THREE.js Variables
+const clock = new THREE.Clock();
+const loadingManager = new THREE.LoadingManager();
+
 let scene, camera, stats, canvas, csm, sky, map;
 let player, inputSystem, interactionContainer;
 let renderer, interfaceRenderer;
-let textBubble, textContainer;
 let loadingScreen, loadingBar, loadingText, startButton;
 
+//Lighting Variables
 const lightIntensity = 3;
 const lightDirection = new THREE.Vector3(1, -1, -1);
-const talkBubbleOffset = new THREE.Vector3(0, 40, 0);
-const cameraLookAtOffset = new THREE.Vector3(0, 30, 0);
-const cameraPositionOffset = new THREE.Vector3(-160, 30, 0);
 
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
-};
-
+//Stage Variables
 const blinderPositions = [-200, -120, -40, 40, 120, 200];
 const blinderWidth = 6;
 var stages = {};
 var currentStage = '';
+
+//System Variables
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+};
+var started = false;
 var highEndGraphics = false;
-var isTextBubbleVisible = false;
+
+//Interaction Variables
 var isInteracting = false; 
 var interactionId = -1;
 var currentInteractionId = -1;
+
+//UI Variables
+const talkBubbleOffset = new THREE.Vector3(0, 40, 0);
+let textContainer, textBubble;
+var isTextBubbleVisible = false;
+var sceneLoaded = false;
+var mapLoaded = false;
+var messages = [];
+
+//Camera Variables
+const cameraLookAtOffset = new THREE.Vector3(0, 30, 0);
+const cameraPositionOffset = new THREE.Vector3(-160, 30, 0);
 var cameraLookAt = cameraLookAtOffset;
 var cameraPosition = cameraPositionOffset;
 
+//Material Variables
 var waterMaterial, cloudMaterials = [];
 var reactorMaterial, ringMaterials = [], flowerMaterials = [];
 
-//Gallery variables
+//Gallery Variables
 var isDraggingGallery = false;
 var prevScrollLeftGallery, prevPageXGallery;
 
-const loadingManager = new THREE.LoadingManager();
-const clock = new THREE.Clock();
-
+//System Configuration
 function isMobile() {
     return (/Android|iphone/i.test(navigator.userAgent));
 }
@@ -94,14 +116,7 @@ function isTouch() {
     return (navigator.maxTouchPoints > 0);
 }
 
-function lerpVector3(start, end, t) {
-    return new THREE.Vector3(
-        THREE.MathUtils.lerp(start.x, end.x, t),
-        THREE.MathUtils.lerp(start.y, end.y, t),
-        THREE.MathUtils.lerp(start.z, end.z, t)
-    );
-}
-
+//Maths Functions
 function toRadian(angle) {
     return angle * Math.PI / 180;
 }
@@ -119,178 +134,134 @@ function initializeGUI() {
 
     interactionContainer = new InteractionContainer();
     interactionContainer.addInteractionPoint({
-        message: `
-        <div class="talkbubble-badge">
-            <lottie-player loop autoplay src="./resources/animations/gear.json"></lottie-player>
-        </div>
-        <p>
-            This website was developed using 
-        </p>
-        <div class="auto-scroll">
-            <div class="tools">
-                <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a> 
-                <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>
-                <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
-                <a class="highlight" href="https://rive.app/" target="_blank">Rive</a> 
-                <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
-                <a class="highlight" href="https://useanimations.com/" target="_blank">GLSL</a>
-                <a class="highlight" href="https://useanimations.com/" target="_blank">Krita</a>
-                <a class="highlight" href="https://useanimations.com/" target="_blank">Inkscape</a>
-            </div>
-            <div class="tools">
-                <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a> 
-                <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>
-                <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
-                <a class="highlight" href="https://rive.app/" target="_blank">Rive</a> 
-                <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
-                <a class="highlight" href="https://useanimations.com/" target="_blank">GLSL</a>
-                <a class="highlight" href="https://useanimations.com/" target="_blank">Krita</a>
-                <a class="highlight" href="https://useanimations.com/" target="_blank">Inkscape</a>
-            </div>
-        </div>
-        <p>
-            Thanks to,</br>
-            <a class="highlight" href="https://sketchfab.com/boiko.pavlo4" target="_blank">Pavlo Boiko</a> 
-            for bus 3D models.
-        </p>`,
         position: -160,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: `
-        <div class="talkbubble-badge">
-            <lottie-player loop autoplay src="./resources/animations/media.json"></lottie-player>
-        </div>
-        <p>
-            I use 
-            <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> 
-            for digital art.
-        </p> 
-        <div class="gallery-container">
-            <lottie-player class="scroll-button left" id="leftButtonGallery" src="./resources/animations/left.json"></lottie-player>
-            <div class="gallery">
-                <img type="image/webp" loading="lazy" src="./artwork/alone.webp">
-                <img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp">
-                <img type="image/webp" loading="lazy" src="./artwork/ip-girl.webp">
-                <img type="image/webp" loading="lazy" src="./artwork/for-weirdos.webp">
-                <img type="image/webp" loading="lazy" src="./artwork/batman.webp">
-                <img type="image/webp" loading="lazy" src="./artwork/ashutti.webp">
-            </div>
-            <lottie-player class="scroll-button right" id="rightButtonGallery" src="./resources/animations/right.json"></lottie-player>
-        </div>`,
         position: -80,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: `
-        <div class="talkbubble-badge">
-            <lottie-player loop autoplay src="./resources/animations/dna.json"></lottie-player>
-        </div>
-        <p>
-            I’m Jewel John, a Game Developer who builds same ol’ games a little different. Go ahead and check out my protfolio.
-            <span class="highlight">This website is under development.</span>
-        </p>
-        `,
         position: 0,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: `
-        <div class="talkbubble-badge">
-            <lottie-player loop autoplay src="./resources/animations/folder.json"></lottie-player>
-        </div>
-        <lottie-player class="scroll-button left align no-selection" id="leftButtonPortfolio" src="./resources/animations/left.json"></lottie-player>
-        <div class="portfolio-container">
-            <div class="portfolio">
-                <div class="project selected">
-                    <div class="graphic">
-                        <img type="image/webp" loading="lazy" src="./projects/burny-rush.webp">
-                    </div>
-                    <div class="content">
-                        <h2>Burny Rush</h2>
-                        <p>High-fidelity racing game for desktop. <span class="highlight">current project.</span></p>
-                        <a href="https://jewelvjohn.github.io/burny-rush/" target="_blank"><span>VIEW PROJECT</span></a>
-                    </div>
-                </div>
-                <div class="project">
-                    <div class="graphic">
-                        <img type="image/webp" loading="lazy" src="./projects/stratosphere.webp">
-                    </div>
-                    <div class="content">
-                        <h2>Stratosphere</h2>
-                        <p>Third-person open-world game demo project.</p>
-                        <a href="https://jewelvjohn.github.io/stratosphere/" target="_blank"><span>VIEW PROJECT</span></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <lottie-player class="scroll-button right align no-selection" id="rightButtonPortfolio" src="./resources/animations/right.json"></lottie-player>
-        <div class="dot-nav">
-            <button class="dot-button selected no-selection" ></button>
-            <button class="dot-button no-selection" ></button>
-        </div>
-        `,
         position: 80,
         light: false,
         focus: true,
         range: 40
     });
     interactionContainer.addInteractionPoint({
-        message: `
-        <div class="talkbubble-badge">
-            <lottie-player loop autoplay src="./resources/animations/messages.json"></lottie-player>
-        </div>
-        <p>
-            Connect with me through my socials.
-        </p> 
-        <div class="talkbubble-social"> 
-            <a href="https://www.linkedin.com/in/jewelvjohn/" target="_blank">
-                <lottie-player loop hover src="./resources/animations/linkedin.json"></lottie-player>
-            </a> 
-            <a href="https://github.com/jewelvjohn" target="_blank">
-                <lottie-player loop hover src="./resources/animations/github.json"></lottie-player>
-            </a> 
-            <a href="https://www.instagram.com/jewelvjohn/" target="_blank">
-                <lottie-player id="instagram-camera" src="./resources/animations/instagram.json"></lottie-player>
-            </a> 
-            <a href="https://dribbble.com/jeweljohn" target="_blank">
-                <lottie-player loop hover id="instagram-camera" src="./resources/animations/dribbble.json"></lottie-player>
-            </a> 
-        </div>`,
         position: 160,
         light: false,
         focus: true,
         range: 40
     });
 
-    // <a class="talkbubble-link" href="./about/"><i>Go Ahead</i></a>
-
-    textBubble = document.createElement('div');
-    textBubble.className = 'talkbubble';
-    textBubble.style.pointerEvents = 'none';
-
-    const triangle = document.createElement('div');
-    triangle.id = 'triangle';
-    textBubble.appendChild(triangle);
-
-    interactionContainer.points.forEach(point => {
-        textBubble.appendChild(point.text);
-    });
-
-    const containerDiv = document.createElement('div');
-    containerDiv.appendChild(textBubble);
-
+    messages[0] = document.querySelector('#about-section');
+    messages[1] = document.querySelector('#artwork-section');
+    messages[2] = document.querySelector('#intro-section');
+    messages[3] = document.querySelector('#project-section');
+    messages[4] = document.querySelector('#social-section');
+    
+    textBubble = document.querySelector("#talkbubble");
+    const containerDiv = document.querySelector('#talkbubble-container');
     textContainer = new CSS2DObject(containerDiv);
     scene.add(textContainer);
 
     //assigning the left and right html buttons to the input system
     document.addEventListener("contextmenu", function (e) {e.preventDefault();}, false);
+}
+
+function initializeLottie() {
+    create({
+        player:'#instagram-camera',
+        mode:"cursor",
+        actions: [{type: "hold"}]
+    });
+    create({
+        player:'#leftButtonGallery',
+        mode:"cursor",
+        actions: [{type: "click", forceFlag: true}]
+    });
+    create({
+        player:'#rightButtonGallery',
+        mode:"cursor",
+        actions: [{type: "click", forceFlag: true}]
+    });
+    create({
+        player:'#leftButtonPortfolio',
+        mode:"cursor",
+        actions: [{type: "click", forceFlag: true}]
+    });
+    create({
+        player:'#rightButtonPortfolio',
+        mode:"cursor",
+        actions: [{type: "click", forceFlag: true}]
+    });
+}
+
+function initializeGallery() {
+    const gallery = document.querySelector(".gallery");
+    const prevButton = document.querySelector("#leftButtonGallery");
+    const nextButton = document.querySelector("#rightButtonGallery");
+    const cell = gallery.querySelectorAll("img")[0];
+    
+    prevButton.style.display = "none";
+    
+    prevButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        gallery.scrollLeft += -(cell.clientWidth + 8);
+        setTimeout(() => toggleButtons(), 250);
+    });
+    nextButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        gallery.scrollLeft += (cell.clientWidth + 8);
+        setTimeout(() => toggleButtons(), 250);
+    });
+    
+    const toggleButtons = () => {
+        prevButton.style.display = (gallery.scrollLeft <= 16) ? "none" : "block";
+        nextButton.style.display = (gallery.scrollLeft >= gallery.scrollWidth - gallery.clientWidth - 16) ? "none" : "block";
+    }
+    
+    const startDragging = (e) => {
+        e.preventDefault();
+        isDraggingGallery = true;
+        prevPageXGallery = e.pageX || e.touches[0].pageX;
+        prevScrollLeftGallery = gallery.scrollLeft;
+    }
+    const endDragging = (e) => {
+        e.preventDefault();
+        isDraggingGallery = false;
+        gallery.classList.remove("dragging");
+        setTimeout(() => toggleButtons(), 250);
+    }
+    const dragging = (e) => {
+        e.preventDefault();
+        if(!isDraggingGallery) return;
+        gallery.classList.add("dragging");
+        
+        var scrollDiff = (e.pageX || e.touches[0].pageX) - prevPageXGallery;
+        gallery.scrollLeft = prevScrollLeftGallery - scrollDiff;
+        toggleButtons();
+    }
+    
+    gallery.addEventListener("mousedown", startDragging);
+    gallery.addEventListener("touchstart", startDragging);
+    
+    gallery.addEventListener("mousemove", dragging);
+    gallery.addEventListener("touchmove", dragging);
+    
+    gallery.addEventListener("mouseleave", endDragging);
+    gallery.addEventListener("mouseup", endDragging);
+    gallery.addEventListener("touchend", endDragging);
 }
 
 function initializePortfolio() {
@@ -353,63 +324,6 @@ function initializePortfolio() {
     });
 }
 
-function initializeGallery() {
-    const gallery = document.querySelector(".gallery");
-    const prevButton = document.querySelector("#leftButtonGallery");
-    const nextButton = document.querySelector("#rightButtonGallery");
-    const cell = gallery.querySelectorAll("img")[0];
-
-    prevButton.style.display = "none";
-    
-    prevButton.addEventListener("click", (e) => {
-        e.preventDefault();
-        gallery.scrollLeft += -(cell.clientWidth + 8);
-        setTimeout(() => toggleButtons(), 250);
-    });
-    nextButton.addEventListener("click", (e) => {
-        e.preventDefault();
-        gallery.scrollLeft += (cell.clientWidth + 8);
-        setTimeout(() => toggleButtons(), 250);
-    });
-    
-    const toggleButtons = () => {
-        prevButton.style.display = (gallery.scrollLeft <= 16) ? "none" : "block";
-        nextButton.style.display = (gallery.scrollLeft >= gallery.scrollWidth - gallery.clientWidth - 16) ? "none" : "block";
-    }
-    
-    const startDragging = (e) => {
-        e.preventDefault();
-        isDraggingGallery = true;
-        prevPageXGallery = e.pageX || e.touches[0].pageX;
-        prevScrollLeftGallery = gallery.scrollLeft;
-    }
-    const endDragging = (e) => {
-        e.preventDefault();
-        isDraggingGallery = false;
-        gallery.classList.remove("dragging");
-        setTimeout(() => toggleButtons(), 250);
-    }
-    const dragging = (e) => {
-        e.preventDefault();
-        if(!isDraggingGallery) return;
-        gallery.classList.add("dragging");
-        
-        var scrollDiff = (e.pageX || e.touches[0].pageX) - prevPageXGallery;
-        gallery.scrollLeft = prevScrollLeftGallery - scrollDiff;
-        toggleButtons();
-    }
-
-    gallery.addEventListener("mousedown", startDragging);
-    gallery.addEventListener("touchstart", startDragging);
-
-    gallery.addEventListener("mousemove", dragging);
-    gallery.addEventListener("touchmove", dragging);
-    
-    gallery.addEventListener("mouseleave", endDragging);
-    gallery.addEventListener("mouseup", endDragging);
-    gallery.addEventListener("touchend", endDragging);
-}
-
 function textBubbleFadeIn() {
     textBubble.animate([
         {
@@ -463,9 +377,9 @@ function textBubbleUpdate() {
     if(isInteracting && (interactionId !== currentInteractionId)) {
         currentInteractionId = interactionId;
 
-        for(let i=0; i<interactionContainer.points.length; i++) {
-            if(i === currentInteractionId) interactionContainer.points[i].text.style.display = 'flex';
-            else interactionContainer.points[i].text.style.display = 'none';
+        for(let i=0; i<messages.length; i++) {
+            if(i === currentInteractionId) messages[i].style.display = 'flex';
+            else messages[i].style.display = 'none';
         }
     }
 
@@ -508,7 +422,13 @@ function loadMap() {
         canvas: document.getElementById("map-canvas"),
         autoplay: false,
         onLoad: () => {
-          map.resizeDrawingSurfaceToCanvas();
+            map.resizeDrawingSurfaceToCanvas();
+            mapLoaded = true;
+
+            if(sceneLoaded) {
+                startButton.disabled = false;
+                loadingText.innerText = `Finished Loading`;
+            }
         },
     });
 }
@@ -709,14 +629,19 @@ function loadEnvironment() {
         model.position.set(0, 0, 80);
         model.rotation.y = toRadian(-90);
 
+        const mixer = new THREE.AnimationMixer(model);
+        const action = mixer.clipAction(gltf.animations[0]);
+
         if(stages['flower_field']) {
             stages['flower_field'].addObject(model);
+            stages['flower_field'].initializeAnimations(mixer, action);
         } else {
             const fog = new THREE.Fog(0xE3ECFF, 800, 1750);
             const sky = sky_forest;
             const stage = new Stage(scene, sky, fog);
             stage.addObject(model);
             stages['flower_field'] = stage;
+            stages['flower_field'].initializeAnimations(mixer, { 0: action });
         }
     });
 
@@ -934,9 +859,8 @@ function selectStage(stage) {
     }
 }
 
-function updateStages() {
+function updateStages(delta) {
     const position = player.model.position.z;
-
     if(position <= -120) {
         selectStage('exo_planet');
     } else if(position <= -40) {
@@ -948,6 +872,7 @@ function updateStages() {
     } else {
         selectStage('light_house');
     }
+    if(started && stages[currentStage].mixer) stages[currentStage].mixer.update(delta);
 }
 
 //move camera with player
@@ -987,40 +912,12 @@ function init() {
     startButton = document.querySelector('#start-button');
     startButton.disabled = true;
     startButton.onclick = () => {
+        started = true;
         player.startIdle();
         loadingScreen.style.display = 'none';
+        initializeLottie();
         initializeGallery();
         initializePortfolio();
-
-        create({
-            player:'#instagram-camera',
-            mode:"cursor",
-            actions: [{type: "hold"}]
-        });
-
-        create({
-            player:'#leftButtonGallery',
-            mode:"cursor",
-            actions: [{type: "click", forceFlag: true}]
-        });
-    
-        create({
-            player:'#rightButtonGallery',
-            mode:"cursor",
-            actions: [{type: "click", forceFlag: true}]
-        });
-
-        create({
-            player:'#leftButtonPortfolio',
-            mode:"cursor",
-            actions: [{type: "click", forceFlag: true}]
-        });
-    
-        create({
-            player:'#rightButtonPortfolio',
-            mode:"cursor",
-            actions: [{type: "click", forceFlag: true}]
-        });
     }
 
     sky = document.querySelector('#sky img');
@@ -1080,8 +977,13 @@ function init() {
         loadingBar.value = progress;
     }
     loadingManager.onLoad = function() {
-        startButton.disabled = false;
-        loadingText.innerText = `Finished Loading`;
+        if(mapLoaded) {
+            startButton.disabled = false;
+            loadingText.innerText = `Finished Loading`;
+        } else {
+            sceneLoaded = true;
+            loadingText.innerText = `Loading map...`;
+        }
     }
     
     loadMap();
@@ -1160,7 +1062,7 @@ function update() {
             player.update(fixedTimeStep);
             textBubbleUpdate();
             cameraMovement();
-            updateStages();
+            updateStages(fixedTimeStep);
             updateMap();
         }
         accumulator -= fixedTimeStep;
