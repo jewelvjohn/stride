@@ -52,10 +52,16 @@ import sky_sunset from './resources/images/sky/sunset.png';
     7. Sub-pages have problem accessing js files after deployment
  */
 
+//Shader Variables
+const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
+const voronoi = new THREE.TextureLoader().load("./resources/textures/voronoi.jpg");
+noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
+voronoi.wrapT = voronoi.wrapS = THREE.RepeatWrapping;
 
 //THREE.js Variables
 const clock = new THREE.Clock();
 const loadingManager = new THREE.LoadingManager();
+const loader = new GLTFLoader(loadingManager);
 
 let scene, camera, stats, canvas, csm, sky, map;
 let player, inputSystem, interactionContainer;
@@ -441,13 +447,15 @@ function loadEnvironment() {
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[4]), blinderWidth, 80);
     createBlinder(new THREE.Vector3(cameraPositionOffset.x + 4, 40, blinderPositions[5]), blinderWidth, 80);
 
-//exo planet
-    const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
-    const voronoi = new THREE.TextureLoader().load("./resources/textures/voronoi.jpg");
-    noise.wrapT = noise.wrapS = THREE.RepeatWrapping;
-    voronoi.wrapT = voronoi.wrapS = THREE.RepeatWrapping;
+    initializeStage01();
+    initializeStage02();
+    initializeStage03();
+    initializeStage04();
+    initializeStage05();
+}
 
-    const loader = new GLTFLoader(loadingManager);
+function initializeStage01() {
+    //exo planet
     loader.load("./resources/3d/exo planet.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
@@ -497,8 +505,10 @@ function loadEnvironment() {
             stages['exo_planet'] = stage;
         }
     });
+}
 
-//space station
+function initializeStage02() {
+    //space station
     reactorMaterial = new THREE.ShaderMaterial({
         vertexShader: ReactorVertexShader,
         fragmentShader: ReactorFragmentShader,
@@ -570,8 +580,10 @@ function loadEnvironment() {
             stages['space_station'] = stage;
         }
     });
+}
     
-//gas station
+function initializeStage03() {
+    //gas station
     loader.load("./resources/3d/gas station.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
@@ -597,8 +609,10 @@ function loadEnvironment() {
             stages['gas_station'] = stage;
         }
     });
+}
 
-//medieval town
+function initializeStage04() {
+    //medieval town
     loader.load("./resources/3d/flower field.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
@@ -776,6 +790,7 @@ function loadEnvironment() {
             stages['flower_field'] = stage;
         }
     });
+}
 
     const waterUniforms = {
         uTime: { value: 0 },
@@ -787,7 +802,8 @@ function loadEnvironment() {
         uFoamTiling: { value: 32 }
     };
 
-//light house
+function initializeStage05() {
+    //light house
     loader.load("./resources/3d/light house.glb", (gltf) => {
         const model = gltf.scene;
         model.traverse(function(child) {
