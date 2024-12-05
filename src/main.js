@@ -17,6 +17,7 @@ import {Stage} from './lib/stage.js';
 import {InputSystem} from './lib/input.js';
 import {CharacterController} from './lib/character.js';
 import {InteractionContainer} from './lib/interaction.js';
+import {ObjectOutline} from './lib/outline.js';
 
 //GLSL Shaders
 import WaterVertexShader from './lib/shaders/water/vertex.glsl';
@@ -63,7 +64,7 @@ const clock = new THREE.Clock();
 const loadingManager = new THREE.LoadingManager();
 const loader = new GLTFLoader(loadingManager);
 
-let scene, camera, stats, canvas, csm, sky, map;
+let scene, camera, stats, canvas, csm, sky, map, effect = null;
 let player, inputSystem, interactionContainer;
 let renderer, interfaceRenderer;
 let loadingScreen, loadingBar, loadingText, startButton;
@@ -609,6 +610,40 @@ function initializeStage03() {
             stages['gas_station'] = stage;
         }
     });
+
+    loader.load("./resources/3d/temp.glb", (gltf) => {
+        const model = gltf.scene;
+
+        const step = new Uint8Array([64, 128, 255]);
+        const gradientMap = new THREE.DataTexture(step, step.length, 1, THREE.RedFormat);
+        gradientMap.needsUpdate = true;
+
+        model.traverse(function(child) {
+            if(child.isMesh) {
+                child.material = new THREE.MeshToonMaterial({color: 0xFFFFFF, map: child.material.map, gradientMap: gradientMap});
+                child.castShadow = true;
+                child.receiveShadow = false;
+                child.material.side = THREE.DoubleSide;
+                child.material.shadowSide = THREE.FrontSide;
+                // csm.setupMaterial(child.material);
+            }
+        });
+        model.scale.set(10, 10, 10);
+        model.position.set(0, 0, -40);
+        model.rotation.y = toRadian(-90);
+
+        if(stages['gas_station']) {
+            stages['gas_station'].addObject(model);
+        } else {
+            const fog = new THREE.Fog(0xB1DDDC, 650, 1000);
+            const sky = sky_noon;
+            const stage = new Stage(scene, sky, fog);
+            stage.addObject(model);
+            stages['gas_station'] = stage;
+        }
+
+        playerOnLoad(model);
+    });
 }
 
 function initializeStage04() {
@@ -919,6 +954,14 @@ function loopPlayer() {
     }
 }
 
+function playerOnLoad(object) {
+    // effect = new ObjectOutline(renderer, player.model);
+    effect = new ObjectOutline(renderer, object, { 
+        defaultThickness: 0.0015,
+        defaultColor: [0, 0, 0]
+    });
+}
+
 //initializes the whole scene
 function init() {
     loadingScreen = document.querySelector('#loading-screen');
@@ -947,7 +990,7 @@ function init() {
     camera.position.set(cameraPositionOffset);
     camera.lookAt(cameraLookAtOffset);
 
-    THREE.Cache.enabled = true;    
+    THREE.Cache.enabled = true;
     renderer = new THREE.WebGLRenderer({ 
         antialias: true,
         alpha: true,
@@ -984,7 +1027,7 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/character.glb', scene, loadingManager, -200, 200, true, blinderPositions, blinderWidth);
+    player = new CharacterController('./resources/3d/character(new).glb', playerOnLoad, scene, loadingManager, -200, 200, true, blinderPositions, blinderWidth);
     inputSystem = new InputSystem();
 
     loadingManager.onProgress = function(url, loaded, total) {
@@ -1086,7 +1129,10 @@ function update() {
     updateMaterials(delta);
     csm.update();
     stats.update();
-    renderer.render(scene, camera);
+
+    if(effect === null) renderer.render(scene, camera);
+    else effect.render(scene, camera);
+
     interfaceRenderer.render(scene, camera);
     
     requestAnimationFrame(update);

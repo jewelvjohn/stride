@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
 export class CharacterController {
-    constructor(filename, scene, manager, minBound, maxBound, loop = false, autoPositions = null, autoLength = null) {
+    constructor(filename, onLoad, scene, manager, minBound, maxBound, loop = false, autoPositions = null, autoLength = null) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
@@ -10,6 +10,7 @@ export class CharacterController {
         this.inputStarted = false;
         this.lastInputStartTime = 0;
         this.inputPersistance = 0.25;
+        this.onLoad = onLoad;
 
         // this.csm = csm;
 
@@ -81,6 +82,7 @@ export class CharacterController {
         this.model.scale.set(10, 10, 10);
         this.model.rotation.y = CharacterController.toRadian(-90);
         this.scene.add(this.model);
+        // this.onLoad();
     }
 
     //start off animation
