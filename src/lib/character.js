@@ -74,8 +74,10 @@ export class CharacterController {
         this.mixer = new THREE.AnimationMixer(model);
     
         //after animations are all loaded up the animations mixer is initialized with all the animation clips
-        this.actions[0] = this.mixer.clipAction(gltf.animations[0]); //idle
-        this.actions[1] = this.mixer.clipAction(gltf.animations[1]); //running
+        this.actions[0] = this.mixer.clipAction(gltf.animations[1]); //idle
+        this.actions[1] = this.mixer.clipAction(gltf.animations[2]); //running
+
+        console.log(gltf.animations);
 
         this.model.scale.set(10, 10, 10);
         this.model.rotation.y = CharacterController.toRadian(-90);

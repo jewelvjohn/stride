@@ -493,7 +493,7 @@ function initializeStage01() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, -160);
+        model.position.set(0, -0.1, -160);
         model.rotation.y = toRadian(-90);
 
         if(stages['exo_planet']) {
@@ -568,7 +568,7 @@ function initializeStage02() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, -80);
+        model.position.set(0, -0.1, -80);
         model.rotation.y = toRadian(-90);
 
         if(stages['space_station']) {
@@ -597,7 +597,7 @@ function initializeStage03() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, 0);
+        model.position.set(0, -0.1, 0);
         model.rotation.y = toRadian(-90);
 
         if(stages['gas_station']) {
@@ -641,7 +641,7 @@ function initializeStage04() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, 80);
+        model.position.set(0, -0.1, 80);
         model.rotation.y = toRadian(-90);
 
         const mixer = new THREE.AnimationMixer(model);
@@ -842,7 +842,7 @@ function initializeStage05() {
             }
         });
         model.scale.set(10, 10, 10);
-        model.position.set(0, 0, 160);
+        model.position.set(0, -0.1, 160);
         model.rotation.y = toRadian(-90);
 
         if(stages['light_house']) {
