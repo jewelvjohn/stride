@@ -56,7 +56,7 @@ export class CharacterController {
     //after player model is loaded it passed to this function to load additional animations
     initializeCharacter(gltf) {
         const model = gltf.scene;
-        const step = new Uint8Array([64, 128, 255]);
+        const step = new Uint8Array([0, 164, 255]);
         const gradientMap = new THREE.DataTexture(step, step.length, 1, THREE.RedFormat);
         gradientMap.needsUpdate = true;
     
@@ -65,7 +65,7 @@ export class CharacterController {
                 child.material = new THREE.MeshToonMaterial({color: 0xFFFFFF, map: child.material.map, gradientMap: gradientMap});
                 child.castShadow = true;
                 child.receiveShadow = false;
-                child.material.side = THREE.FrontSide;
+                child.material.side = THREE.DoubleSide;
                 child.material.shadowSide = THREE.FrontSide;
                 // this.csm.setupMaterial(child.material);
             }
@@ -74,15 +74,13 @@ export class CharacterController {
         this.mixer = new THREE.AnimationMixer(model);
     
         //after animations are all loaded up the animations mixer is initialized with all the animation clips
-        this.actions[0] = this.mixer.clipAction(gltf.animations[1]); //idle
-        this.actions[1] = this.mixer.clipAction(gltf.animations[2]); //running
-        this.actions[2] = this.mixer.clipAction(gltf.animations[3]); //walking
-        this.actions[3] = this.mixer.clipAction(gltf.animations[4]); //waking up
+        this.actions[0] = this.mixer.clipAction(gltf.animations[0]); //idle
+        this.actions[1] = this.mixer.clipAction(gltf.animations[1]); //running
 
         this.model.scale.set(10, 10, 10);
         this.model.rotation.y = CharacterController.toRadian(-90);
         this.scene.add(this.model);
-        // this.onLoad();
+        this.onLoad();
     }
 
     //start off animation
@@ -127,7 +125,7 @@ export class CharacterController {
             if((Math.abs(this.moveInput) > 0) && insideBound) {
                 if(!this.runAnimation) {
                     this.runAnimation = true;
-                    this.playAction(2, 0.2);
+                    this.playAction(1, 0.2);
                 }
             } else {
                 if(this.runAnimation) {
@@ -139,7 +137,7 @@ export class CharacterController {
             if(Math.abs(this.moveInput) > 0) {
                 if(!this.runAnimation) {
                     this.runAnimation = true;
-                    this.playAction(2, 0.2);
+                    this.playAction(1, 0.2);
                 }
             } else {
                 if(this.runAnimation) {
