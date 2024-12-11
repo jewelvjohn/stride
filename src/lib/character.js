@@ -11,6 +11,7 @@ export class CharacterController {
         this.lastInputStartTime = 0;
         this.inputPersistance = 0.25;
         this.onLoad = onLoad;
+        this.transition = 0.25;
 
         // this.csm = csm;
 
@@ -26,8 +27,8 @@ export class CharacterController {
 
         //constants
         this.runSpeed = 38;
-        this.rotationLerp = 10;
-        this.positionLerp = 20;
+        this.rotationLerp = 8;
+        this.positionLerp = 16;
         this.minBound = minBound;
         this.maxBound = maxBound;
         this.loop = loop;
@@ -76,6 +77,9 @@ export class CharacterController {
         //after animations are all loaded up the animations mixer is initialized with all the animation clips
         this.actions[0] = this.mixer.clipAction(gltf.animations[1]); //idle
         this.actions[1] = this.mixer.clipAction(gltf.animations[2]); //running
+        this.actions[2] = this.mixer.clipAction(gltf.animations[3]); //greet
+        this.actions[3] = this.mixer.clipAction(gltf.animations[4]); //choice
+        this.actions[4] = this.mixer.clipAction(gltf.animations[5]); //show
 
         console.log(gltf.animations);
 
@@ -93,15 +97,21 @@ export class CharacterController {
 
     startWakeUp() {
         this.takeInputs = false;
-        this.actions[3].clampWhenFinished = true;
-        this.actions[3].loop = THREE.LoopOnce;
-        this.actions[3].getMixer().addEventListener('finished', () => {
-            this.playAction(0, 0.4);
-            this.takeInputs = true;
+        this.actions[2].clampWhenFinished = true;
+        this.actions[2].loop = THREE.LoopOnce;
+        this.actions[4].clampWhenFinished = true;
+        this.actions[4].loop = THREE.LoopOnce;
+
+        this.mixer.addEventListener('finished', () => {
+            if(this.activeAction == this.actions[2]) {
+                this.playAction(4, 0.2);
+            } else if(this.activeAction == this.actions[4]) {
+                this.playAction(3, 0.2);
+                this.takeInputs = true;
+            }
         });
 
-        this.activeAction = this.actions[3];
-        this.activeAction.play();
+        this.playAction(2, 0);
     }
 
     //transition to another character animation
@@ -127,24 +137,24 @@ export class CharacterController {
             if((Math.abs(this.moveInput) > 0) && insideBound) {
                 if(!this.runAnimation) {
                     this.runAnimation = true;
-                    this.playAction(1, 0.2);
+                    this.playAction(1, this.transition);
                 }
             } else {
                 if(this.runAnimation) {
                     this.runAnimation = false;
-                    this.playAction(0, 0.2);
+                    this.playAction(0, this.transition);
                 }
             }
         } else {
             if(Math.abs(this.moveInput) > 0) {
                 if(!this.runAnimation) {
                     this.runAnimation = true;
-                    this.playAction(1, 0.2);
+                    this.playAction(1, this.transition);
                 }
             } else {
                 if(this.runAnimation) {
                     this.runAnimation = false;
-                    this.playAction(0, 0.2);
+                    this.playAction(0, this.transition);
                 }
             }
         }

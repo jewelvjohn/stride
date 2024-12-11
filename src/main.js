@@ -889,7 +889,10 @@ function updateStages(delta) {
     } else {
         selectStage('light_house');
     }
-    if(started && stages[currentStage].mixer) stages[currentStage].mixer.update(delta);
+    if(started && stages[currentStage].mixer) {
+        if(!stages[currentStage].playing) stages[currentStage].playAnimation();
+        stages[currentStage].mixer.update(delta);
+    }
 }
 
 //move camera with player
@@ -898,6 +901,14 @@ function cameraMovement() {
     cameraPosition = player.model.position.clone().add(cameraPositionOffset);
     camera.lookAt(cameraLookAt);
     camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+
+    //intro reel
+    // if(started && camera.fov < 40) {
+    //     console.log("fov");
+    //     camera.fov = THREE.MathUtils.lerp(camera.fov, 44, 0.005);
+    //     camera.updateProjectionMatrix();
+    //     csm.updateFrustums();
+    // }
 }
 
 function loopPlayer() {
@@ -942,6 +953,7 @@ function init() {
         initializeLottie();
         initializeGallery();
         initializePortfolio();
+        player.startWakeUp();
     }
 
     sky = document.querySelector('#sky img');

@@ -7,6 +7,7 @@ export class Stage {
         this.scene = scene;
         this.mixer = null;
         this.action = null;
+        this.playing = false;
     }
 
     initializeAnimations(mixer, action) {
@@ -24,12 +25,22 @@ export class Stage {
     showStage() {
         this.objects.forEach(object => { object.visible = true; });
         this.isActive = true;
-        if(this.mixer) this.action.play();
+        if(this.mixer) this.playAnimation;
     }
     
     hideStage() {
         this.objects.forEach(object => { object.visible = false; });
         this.isActive = false;
-        // if(this.mixer) this.action.stop();
+        if(this.mixer) this.stopAnimation;
+    }
+
+    playAnimation() {
+        this.playing = true;
+        this.action.play();
+    }
+
+    stopAnimation() {
+        this.playing = false;
+        this.action.stop();
     }
 }
