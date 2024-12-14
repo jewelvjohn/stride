@@ -6,9 +6,9 @@
         <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
         <link rel="icon" type="image/svg+xml" href="/stride/pedestrian.svg" />
         <title>Stride</title>
-      <script type="module" crossorigin src="/stride/assets/main-BJIoqFNX.js"></script>
-      <link rel="modulepreload" crossorigin href="/stride/assets/main-DyyCVMje.js">
-      <link rel="stylesheet" crossorigin href="/stride/assets/main-B__VJXuf.css">
+      <script type="module" crossorigin src="/stride/assets/main-BKfiypx5.js"></script>
+      <link rel="modulepreload" crossorigin href="/stride/assets/main-DcIVVM7K.js">
+      <link rel="stylesheet" crossorigin href="/stride/assets/main-DaLOdVXy.css">
       <link rel="stylesheet" crossorigin href="/stride/assets/main-Ct2i7qBE.css">
     </head>
 
@@ -30,7 +30,7 @@
                 <button id="start-button">START</button>
             </div>
         </div>
-        <div class="hud">
+        <div id="hud">
             <canvas id="map-canvas"></canvas>
             <div class="button-container">
                 <div class="button-flex">
@@ -107,9 +107,17 @@
                     <div class="talkbubble-badge">
                         <lottie-player loop autoplay src="./resources/animations/dna.json"></lottie-player>
                     </div>
-                    <p>
+                    <p class="intro-message" id="intro-1">
+                        Hey, how's it goin'?!
+                    </p>
+                    <p class="intro-message" id="intro-2">
+                        Take a look at my <span class="highlight">portfolio.</span>
+                    </p>
+                    <p class="intro-message" id="intro-3">
+                        Use keyboard or touch buttons to move <span class="highlight">left</span> & <span class="highlight">right</span>.
+                    </p>
+                    <p class="intro-message" id="intro-4">
                         I’m Jewel John, a Game Developer who builds same ol’ games a little different. Go ahead and check out my protfolio.
-                        <span class="highlight">This website is under development.</span>
                     </p>
                 </div>
                 <div class="talkbubble-message" id="project-section">
