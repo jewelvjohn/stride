@@ -26,7 +26,7 @@
                 <button id="start-button">START</button>
             </div>
         </div>
-        <div class="hud">
+        <div id="hud">
             <canvas id="map-canvas"></canvas>
             <div class="button-container">
                 <div class="button-flex">
@@ -103,9 +103,17 @@
                     <div class="talkbubble-badge">
                         <lottie-player loop autoplay src="./resources/animations/dna.json"></lottie-player>
                     </div>
-                    <p>
+                    <p class="intro-message" id="intro-1">
+                        Hey, how's it goin'?!
+                    </p>
+                    <p class="intro-message" id="intro-2">
+                        Take a look at my <span class="highlight">portfolio.</span>
+                    </p>
+                    <p class="intro-message" id="intro-3">
+                        Use keyboard or touch buttons to move <span class="highlight">left</span> & <span class="highlight">right</span>.
+                    </p>
+                    <p class="intro-message" id="intro-4">
                         I’m Jewel John, a Game Developer who builds same ol’ games a little different. Go ahead and check out my protfolio.
-                        <span class="highlight">This website is under development.</span>
                     </p>
                 </div>
                 <div class="talkbubble-message" id="project-section">

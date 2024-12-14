@@ -99,6 +99,7 @@ var isTextBubbleVisible = false;
 var sceneLoaded = false;
 var mapLoaded = false;
 var messages = [];
+var introMessages = [];
 
 //Camera Variables
 const cameraLookAtOffset = new THREE.Vector3(0, 30, 0);
@@ -212,6 +213,24 @@ function initializeLottie() {
         mode:"cursor",
         actions: [{type: "click", forceFlag: true}]
     });
+}
+
+function initializeIntro() {
+    for(let i=0; i<4; i++) {
+        introMessages[i] = document.querySelector("#intro-" + (i+1));
+    }
+    selectIntro(0);
+}
+
+function selectIntro(index) {
+    if(index === 2) {
+        document.querySelector("#hud").style.display = "flex";
+        if(map !== null) map.resizeDrawingSurfaceToCanvas();
+    }
+    for(let i=0; i<4; i++) {
+        if(i!==index) introMessages[i].style.display = "none";
+        else introMessages[i].style.display = "block"
+    }
 }
 
 function initializeGallery() {
@@ -901,14 +920,6 @@ function cameraMovement() {
     cameraPosition = player.model.position.clone().add(cameraPositionOffset);
     camera.lookAt(cameraLookAt);
     camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
-
-    //intro reel
-    // if(started && camera.fov < 40) {
-    //     console.log("fov");
-    //     camera.fov = THREE.MathUtils.lerp(camera.fov, 44, 0.005);
-    //     camera.updateProjectionMatrix();
-    //     csm.updateFrustums();
-    // }
 }
 
 function loopPlayer() {
@@ -950,6 +961,7 @@ function init() {
     startButton.onclick = () => {
         started = true;
         loadingScreen.style.display = 'none';
+        initializeIntro();
         initializeLottie();
         initializeGallery();
         initializePortfolio();
@@ -1004,7 +1016,7 @@ function init() {
     document.body.appendChild(stats.dom);
     window.addEventListener('resize', onWindowResize);
     
-    player = new CharacterController('./resources/3d/character.glb', playerOnLoad, scene, loadingManager, -200, 200, true, blinderPositions, blinderWidth);
+    player = new CharacterController('./resources/3d/character.glb', playerOnLoad, selectIntro, scene, loadingManager, -200, 200, true, blinderPositions, blinderWidth);
     inputSystem = new InputSystem();
 
     loadingManager.onProgress = function(url, loaded, total) {

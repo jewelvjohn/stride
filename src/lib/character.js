@@ -2,18 +2,18 @@ import * as THREE from 'three'
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 
 export class CharacterController {
-    constructor(filename, onLoad, scene, manager, minBound, maxBound, loop = false, autoPositions = null, autoLength = null) {
+    constructor(filename, onLoad, introCall, scene, manager, minBound, maxBound, loop = false, autoPositions = null, autoLength = null) {
         this.scene = scene;
         this.model = null;
         this.pause = false;
         this.takeInputs = true;
         this.inputStarted = false;
+        this.introFinished = false;
         this.lastInputStartTime = 0;
         this.inputPersistance = 0.25;
         this.onLoad = onLoad;
+        this.introCall = introCall;
         this.transition = 0.25;
-
-        // this.csm = csm;
 
         this.mixer = null;
         this.actions = {};
@@ -81,8 +81,6 @@ export class CharacterController {
         this.actions[3] = this.mixer.clipAction(gltf.animations[4]); //choice
         this.actions[4] = this.mixer.clipAction(gltf.animations[5]); //show
 
-        console.log(gltf.animations);
-
         this.model.scale.set(10, 10, 10);
         this.model.rotation.y = CharacterController.toRadian(-90);
         this.scene.add(this.model);
@@ -105,8 +103,10 @@ export class CharacterController {
         this.mixer.addEventListener('finished', () => {
             if(this.activeAction == this.actions[2]) {
                 this.playAction(4, 0.2);
+                this.introCall(1);
             } else if(this.activeAction == this.actions[4]) {
                 this.playAction(3, 0.2);
+                this.introCall(2);
                 this.takeInputs = true;
             }
         });
@@ -167,7 +167,7 @@ export class CharacterController {
             this.positionRef = THREE.MathUtils.clamp(this.positionRef, this.minBound, this.maxBound);
             this.model.position.z = THREE.MathUtils.lerp(this.model.position.z, this.positionRef, this.positionLerp * delta);
             if(this.interactionMode) this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, -((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
-            else if(this.moveInput != 0)this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, -((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
+            else if(this.moveInput != 0) this.model.rotation.y = THREE.MathUtils.lerp(this.model.rotation.y, -((1 - this.moveInput) / 2) * Math.PI, this.rotationLerp * delta);
         }
     }
 
@@ -188,6 +188,10 @@ export class CharacterController {
     controller(input, time) {
         if(this.takeInputs) {
             if(input !== 0) {
+                if(!this.introFinished) {
+                    this.introFinished = true;
+                    this.introCall(3);
+                }
                 if(!this.inputStarted) {
                     this.inputStarted = true;
                     this.lastInputStartTime = time;
