@@ -1,13 +1,11 @@
 //UI Dependancies
-import './styles/main.css';
-import './styles/loading.css';
 import {Rive} from "@rive-app/canvas";
 import "@lottiefiles/lottie-player";
 import {create} from '@lottiefiles/lottie-interactivity';
 
 //THREE.js Dependancies
 import * as THREE from 'three';
-import Stats from 'three/addons/libs/stats.module.js'; 
+import Stats from 'three/addons/libs/stats.module.js';
 import {CSM} from 'three/addons/csm/CSM.js';
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
@@ -40,7 +38,7 @@ import sky_green from './resources/images/sky/green.png';
 import sky_noon from './resources/images/sky/noon.png';
 import sky_sunset from './resources/images/sky/sunset.png';
 
-/* 
+/*
     Current Bugs :-
     --null--
     Solved Bugs  :-
@@ -51,7 +49,7 @@ import sky_sunset from './resources/images/sky/sunset.png';
     5. Input system freezes when modifier keys are held
     6. Mobile button buzz when held pressed
     7. Sub-pages have problem accessing js files after deployment
- */
+*/
 
 //Shader Variables
 const noise = new THREE.TextureLoader().load("./resources/textures/noise.png");
@@ -226,6 +224,10 @@ function selectIntro(index) {
     if(index === 2) {
         document.querySelector("#hud").style.display = "flex";
         if(map !== null) map.resizeDrawingSurfaceToCanvas();
+    } else if(index === 3) {
+        document.querySelectorAll(".button-focus").forEach((element) => {
+            element.style.display = "none";
+        });
     }
     for(let i=0; i<4; i++) {
         if(i!==index) introMessages[i].style.display = "none";
