@@ -4,11 +4,11 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
-        <link rel="icon" type="image/svg+xml" href="/stride/pedestrian.svg" />
+        <link rel="icon" type="image/svg+xml" href="/stride/pedestrian.svg" />
         <title>Stride</title>
-      <script type="module" crossorigin src="/stride/assets/main-BKfiypx5.js"></script>
-      <link rel="modulepreload" crossorigin href="/stride/assets/main-DcIVVM7K.js">
-      <link rel="stylesheet" crossorigin href="/stride/assets/main-DaLOdVXy.css">
+      <script type="module" crossorigin src="/stride/assets/main-DZtdsyJu.js"></script>
+      <link rel="modulepreload" crossorigin href="/stride/assets/main-C8eofivH.js">
+      <link rel="stylesheet" crossorigin href="/stride/assets/main-DNU7qw4s.css">
       <link rel="stylesheet" crossorigin href="/stride/assets/main-Ct2i7qBE.css">
     </head>
 
@@ -22,7 +22,7 @@
                     <img src="/purple.svg" alt="website icon">
                 </div> -->
                 <h2>‘STRIDE,</h2>
-                <p>is the theme of this website. Inspired from side scroller games. Press start when loading is finished.</p>
+                <p>is a mobile-optimized 3D web portfolio developed using HTML, CSS, and JavaScript, inspired by side-scrolling video games.</p>
                 <div class="loadingbar-container">
                     <progress id="loading-bar" value="0" max="100"> 0% </progress>
                     <p id="loading-text">Loading assets 0 out of 32</p>
@@ -34,9 +34,11 @@
             <canvas id="map-canvas"></canvas>
             <div class="button-container">
                 <div class="button-flex">
+                    <lottie-player class="button-focus" loop autoplay src="./resources/animations/focus.json"></lottie-player>
                     <div id="leftButton" class="control-button"></div>
                 </div>
                 <div class="button-flex">
+                    <lottie-player class="button-focus" loop autoplay src="./resources/animations/focus.json"></lottie-player>
                     <div id="rightButton" class="control-button"></div>
                 </div>
             </div>
@@ -58,9 +60,10 @@
                             <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
                             <a class="highlight" href="https://rive.app/" target="_blank">Rive</a> 
                             <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
-                            <a class="highlight" href="https://useanimations.com/" target="_blank">GLSL</a>
-                            <a class="highlight" href="https://useanimations.com/" target="_blank">Krita</a>
-                            <a class="highlight" href="https://useanimations.com/" target="_blank">Inkscape</a>
+                            <a class="highlight" href="https://www.opengl.org/" target="_blank">GLSL</a>
+                            <a class="highlight" href="https://krita.org/" target="_blank">Krita</a>
+                            <a class="highlight" href="https://inkscape.org/" target="_blank">Inkscape</a>
+                            <a class="highlight" href="https://www.mixamo.com/" target="_blank">Mixamo</a>
                         </div>
                         <div class="tools">
                             <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a> 
@@ -68,9 +71,10 @@
                             <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
                             <a class="highlight" href="https://rive.app/" target="_blank">Rive</a> 
                             <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
-                            <a class="highlight" href="https://useanimations.com/" target="_blank">GLSL</a>
-                            <a class="highlight" href="https://useanimations.com/" target="_blank">Krita</a>
-                            <a class="highlight" href="https://useanimations.com/" target="_blank">Inkscape</a>
+                            <a class="highlight" href="https://www.opengl.org/" target="_blank">GLSL</a>
+                            <a class="highlight" href="https://krita.org/" target="_blank">Krita</a>
+                            <a class="highlight" href="https://inkscape.org/" target="_blank">Inkscape</a>
+                            <a class="highlight" href="https://www.mixamo.com/" target="_blank">Mixamo</a>
                         </div>
                     </div>
                     <p>
@@ -114,10 +118,11 @@
                         Take a look at my <span class="highlight">portfolio.</span>
                     </p>
                     <p class="intro-message" id="intro-3">
-                        Use keyboard or touch buttons to move <span class="highlight">left</span> & <span class="highlight">right</span>.
+                        Explore using keyboard buttons <span class="highlight">A</span> & <span class="highlight">D</span>, 
+                        <span class="highlight">←</span> & <span class="highlight">→</span> or touch buttons.
                     </p>
                     <p class="intro-message" id="intro-4">
-                        I’m Jewel John, a Game Developer who builds same ol’ games a little different. Go ahead and check out my protfolio.
+                        I’m Jewel John, Gameplay & Graphics Engineer.
                     </p>
                 </div>
                 <div class="talkbubble-message" id="project-section">
