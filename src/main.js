@@ -65,7 +65,7 @@ const loader = new GLTFLoader(loadingManager);
 let scene, camera, stats, canvas, csm, sky, map, effect = null;
 let player, inputSystem, interactionContainer;
 let renderer, interfaceRenderer;
-let loadingScreen, loadingBar, loadingText, startButton;
+let loadingScreen, loadingElements, loadingBar, loadingText;
 
 //Lighting Variables
 const lightIntensity = 3;
@@ -454,7 +454,7 @@ function loadMap() {
             mapLoaded = true;
 
             if(sceneLoaded) {
-                startButton.disabled = false;
+                startScene();
                 loadingText.innerText = `Finished Loading`;
             }
         },
@@ -952,23 +952,44 @@ function playerOnLoad() {
     });
 }
 
+function startScene() {
+    initializeIntro();
+    initializeLottie();
+    initializeGallery();
+    initializePortfolio();
+
+    const elementAnimation = loadingElements.animate([
+        { opacity: 1 }, { opacity: 0 }
+    ], {
+        duration: 500,
+        fill: "forwards",
+        easing: "ease-in"
+    });
+
+    elementAnimation.addEventListener("finish", () => {
+        started = true;
+        player.startWakeUp();
+
+        const screenAnimation = loadingScreen.animate([
+            { transform: "translateX(0)" }, { transform: "translateX(100%)" }
+        ], {
+            duration: 750,
+            fill: "forwards",
+            easing: "ease-out"
+        });
+
+        screenAnimation.addEventListener("finish", () => {
+            loadingScreen.style.display = 'none';
+        }, {once: true});
+    }, {once: true});
+}
+
 //initializes the whole scene
 function init() {
     loadingScreen = document.querySelector('#loading-screen');
+    loadingElements = document.querySelector('.loading-container');
     loadingBar = document.querySelector('#loading-bar');
     loadingText = document.querySelector('#loading-text');
-    
-    startButton = document.querySelector('#start-button');
-    startButton.disabled = true;
-    startButton.onclick = () => {
-        started = true;
-        loadingScreen.style.display = 'none';
-        initializeIntro();
-        initializeLottie();
-        initializeGallery();
-        initializePortfolio();
-        player.startWakeUp();
-    }
 
     sky = document.querySelector('#sky img');
     canvas = document.querySelector('canvas.webgl');
@@ -1028,7 +1049,7 @@ function init() {
     }
     loadingManager.onLoad = function() {
         if(mapLoaded) {
-            startButton.disabled = false;
+            startScene();
             loadingText.innerText = `Finished Loading`;
         } else {
             sceneLoaded = true;
