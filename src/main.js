@@ -5,7 +5,6 @@ import {create} from '@lottiefiles/lottie-interactivity';
 
 //THREE.js Dependancies
 import * as THREE from 'three';
-import Stats from 'three/addons/libs/stats.module.js';
 import {CSM} from 'three/addons/csm/CSM.js';
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/examples/jsm/Addons.js';
@@ -62,7 +61,7 @@ const clock = new THREE.Clock();
 const loadingManager = new THREE.LoadingManager();
 const loader = new GLTFLoader(loadingManager);
 
-let scene, camera, stats, canvas, csm, sky, map, effect = null;
+let scene, camera, canvas, csm, sky, map, effect = null;
 let player, inputSystem, interactionContainer;
 let renderer, interfaceRenderer;
 let loadingScreen, loadingElements, loadingBar, loadingText;
@@ -1034,9 +1033,7 @@ function init() {
         csm.lights[i].intensity = lightIntensity;
         csm.lights[i].shadow.normalBias = highEndGraphics ? 0.05 : 0.2;
     }
-    
-    stats = new Stats();
-    document.body.appendChild(stats.dom);
+
     window.addEventListener('resize', onWindowResize);
     
     player = new CharacterController('./resources/3d/character.glb', playerOnLoad, selectIntro, scene, loadingManager, -200, 200, true, blinderPositions, blinderWidth);
@@ -1140,7 +1137,6 @@ function update() {
     }
     updateMaterials(delta);
     csm.update();
-    stats.update();
 
     if(effect === null) renderer.render(scene, camera);
     else effect.render(scene, camera);

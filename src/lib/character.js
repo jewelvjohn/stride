@@ -102,9 +102,6 @@ export class CharacterController {
 
         this.mixer.addEventListener('finished', () => {
             if(this.activeAction == this.actions[2]) {
-                this.playAction(4, 0.2);
-                this.introCall(1);
-            } else if(this.activeAction == this.actions[4]) {
                 this.playAction(3, 0.2);
                 this.introCall(2);
                 this.takeInputs = true;
