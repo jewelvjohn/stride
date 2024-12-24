@@ -10,7 +10,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: black;
+    background: black url(/resources/images/loading.gif) no-repeat center center;
+    background-size: 25%;
+    background-size: 25vmin;
     z-index: 20;
     box-sizing: border-box;
     padding: 20px;

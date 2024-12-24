@@ -134,12 +134,12 @@ body {
 }
 
 #leftButton {
-    background-image: url('/resources/images/left.svg');
+    background-image: url(/resources/images/left.svg);
     background-size: cover;
 }
 
 #rightButton {
-    background-image: url('/resources/images/right.svg');
+    background-image: url(/resources/images/right.svg);
     background-size: cover;
 }
 
@@ -209,6 +209,32 @@ body {
 
 .intro-message {
     animation: fade-in 1.0s forwards;
+}
+
+.expertise {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fade-in 1.0s forwards;
+}
+
+.expertise table {
+    margin-block: 4px;
+    border-block: 2px white solid;
+}
+
+.expertise table th {
+    font-size: clamp(0.8rem, 3vw, 1.2rem);
+    font-weight: 700;
+    text-align: left;
+    padding-inline: 4px;
+}
+
+.expertise table td {
+    font-size: clamp(0.6rem, 2vw, 0.8rem);
+    text-align: left;
+    padding-inline: 4px;
 }
 
 .talkbubble-social {
