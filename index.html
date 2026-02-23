@@ -1,237 +1,229 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
-        <link rel="icon" type="image/svg+xml" href="/stride/pedestrian.svg" />
-        <link rel="preload" fetchpriority="high" as="image" href="/stride/assets/loading-CnSG7mJO.gif">
-        <title>Stride</title>
-      <script type="module" crossorigin src="/stride/assets/main-Cah0KL-R.js"></script>
-      <link rel="modulepreload" crossorigin href="/stride/assets/main-CfzRFu8n.js">
-      <link rel="stylesheet" crossorigin href="/stride/assets/main-B5sMWCJL.css">
-      <link rel="stylesheet" crossorigin href="/stride/assets/main-khR0lJzB.css">
-    </head>
 
-    <body>
-        <div id="sky">
-            <img src="data:image/png;base64,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OBeAJAMAMAAAUgPYCYAkAwAwAABSA7gWgCQDAKgOYD8AkgwAwAAASA3gFgCSDACgOoB3AEgaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJPwNwoTqDjf3jCNAAAAAElFTkSuQmCC" alt="sky">
-        </div>
-        <div id="loading-screen">
-            <div class="loading-container">
-                <!-- <div class="loading-icon">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
+    <link rel="icon" type="image/svg+xml" href="/stride/pedestrian.svg" />
+    <link rel="preload" fetchpriority="high" as="image" href="/stride/assets/loading-CnSG7mJO.gif">
+    <title>Stride</title>
+  <script type="module" crossorigin src="/stride/assets/main-Sx5EmPKF.js"></script>
+  <link rel="modulepreload" crossorigin href="/stride/assets/main-C6RwhbM6.js">
+  <link rel="stylesheet" crossorigin href="/stride/assets/main-DtLawjoc.css">
+  <link rel="stylesheet" crossorigin href="/stride/assets/main-khR0lJzB.css">
+</head>
+
+<body>
+    <div id="sky">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABgAAAAQACAMAAAAQr2JwAAAACXBIWXMAAB2HAAAdhwGP5fFlAAACRlBMVEXC599SoMxRn8xQnsxVo8xUosxTocxCkctEk8tDkstir81hrs1GlctFlMtXpcxPncxgrc1frM1HlstYpsxWpMxOnMxNm8xMmsxeq81dqs1jsM1JmMtIl8tZp8xLmcxcqc1KmMtIlstaqMxap8xZpsx2u9Fbqc2o2Npmss6y3txKmct1utB0utByudBJl8tbqMyMyNVNnMxMm8x4vNF3vNFLmsy+5d5dq81cqs2TzNZnss6z3tyUzNaRy9Z/wNJ9v9JqtM5os87A5t+v3Nut29us2tua0NeZz9eXzteEw9OCwtNvt89tts9stc+039yx3dyf09ie0tic0diJxtSHxdSGxNRxuNC54t244d224N2k1tmj1dmh1NmOydWLx9V6vdFlsc295N67496n19qSy9ZzudBHlctGlMtYpcxXpMxWo8xOncxKmcxfrc1erM1bqM2NyNV5vdG/5d6QytaAwdJ+wNJ8vtJ7vtJps87B5t+u29ur2tuYz9eWzdeFxNODw9OBwdNuts9rtc+w3dyd0tib0NiKx9SIxdS64t234d2i1dmg09mPytWPydVksc285N6q2dqp2dqm19ql1tqVzdZFk8tEkstVosxUocxRoMxQn8xPnsxhr81grs1+v9J8v9JrtM5ptM7B59+u3Nuq2duYzteWzteVzdeDwtOBwtOAwdNwuM9wt89ut8+139yw3Nyd0dib0diKxtSIxtSFxNRwuNC34N214N21392l1tmi1Nmg1NmQytV7vtFksM284966496p2NpbqkOsAAAK3UlEQVR42u3V0xpAZQJA0T+7ycZkc7Jt23ZNtm2bkyfbrjfrMfrO2Ws9wr7ZYzEAkoYEAAYAgAEAYAAAGAAABgCAAQBgAAAYAAAGAIABAGAAABgAAP/AAJYAIMkAAAwAAAMAwAAAMAAADAAAAwBgmgN4EYCksTgASQYAYAAAGAAABgCAAQBgAAAYAADTHMALACSNZQBIMgAAAwDAAAAwAAAMAAADAGDyA7gYgCQDAKgOYGkAkgwAwAAAMAAADAAAAwDAAACY/AAuAiDJAACqA1gBgCQDADAAAAwAAAMAwAAAmNMA1gMgyQAADAAAAwBg/gNYC4AkAwAwAAAMAAADAGCmA9gagCQDADAAAFIDWBOAJAMAMAAADAAAAwBgpgP4NwBJBgBgAAAYAADzH8DmACQZAIABAJAawBUAJBkAQHUA6wCQZAAABgCAAQBgAADMdAA7ApBkAAAGAEBqAKsCkGQAAAYAgAEAYAAAGAAAcxrA9gAkGQCAAQCQGsAqACQZAIABAGAAABgAAAYAwJwGsB0ASQYAYAAApAawMgBJBgBgAAAYAAAGAIABADCnAVwOQJIBAFQH8C8AkgwAwAAAMAAADAAAAwDAAACY/ABeAyBpLARAkgEAGAAABgCAAQBgAAAYAAAGAMA0B/AqAEljQQCSDADAAAAwAAAMAAADAMAAADAAAKY5gFcASBoLAJBkAAAGAIABAGAAABgAAAYAgAEAMM0BLApAkgEAGAAABgCAAQBgAAAYAAAGAMA0B/AyAEljEQCSDADAAAAwAAAMAAADAMAAADAAAKY5gJcASBoLA5BkAAAGAIABAGAAABgAAAYAgAEAMM0BXAZAkgEAVAewEgBJBgBgAAAYAAAGAIABADCnAVwKQJIBAFQHsCwASQYAYAAAGAAABgCAAQBgAABMfgCXAJBkAADVAawIQJIBABgAAAYAgAEAYAAAzGkAGwKQZAAABgCAAQAw/wGsDUCSAQAYAAAGAIABADDTAWwAQJIBABgAAAYAwPwHsD4ASQYAYAAAGAAA8x/ANgAkGQCAAQCQGsBVACQZAEB1ABsDkGQAAAYAgAEAMP8BrAtAkgEAGAAABgCAAQAw0wHsAkCSAQAYAACpAawOQJIBABgAAAYAgAEAYAAAzGkAOwOQZAAABgBAagCrAZBkAAAGAIABAGAAABgAAHMawJUAJBkAQHUAywOQZAAABgCAAQBgAAAYAAAGAMDkB/BfAJIMAKA6gOUASDIAAAMAwAAAMAAADAAAAwBg8gN4A4CksRQASQYAYAAAGAAABgCAAQBgAAAYAADTHMDrACSNJQFIMgAAAwDAAAAwAAAMAAADAMAAAJjmANYAIMkAAAwAAAMAwAAAMAAA5jSA3wFIGk8CkGQAANUBnANAkgEAGAAAqQFsCkCSAQAYAACpAewGQJIBABgAAKkB7AtAkgEAGAAAqQHcDECSAQBUB/A2AEljHwCSDADAAABIDeAtAJLGvQAkGQBAdQBHApBkAAAGAEBqAEcAkGQAAAYAQGoA9wCQZAAA1QF8BkDSOByAJAMAMAAAUgP4FICk8QkASeM7AJLGSQAkGQCAAQCQGsBWACQZAIABAJAawIUAJBkAQHUAWwKQZAAABgBAagBbAJBkAAAGAEBqABsBkGQAAAYAgAEAMP8B7ABAkgEAGAAAqQH8B4AkAwAwAABSA7gGgCQDAKgO4GwAkgwAwAAASA3gNwCSxk0AJBkAQHUANwKQZAAA1QG8CUDS2BuAJAMAMAAAUgP4HwBJ4wYAkgwAoDqAvQBIMgAAAwAgNYDrAUgyAIDqAD4GIGncDUCSAQBUB/ARAEnjMACSDADAAABIDeBDAJLGXQAkGQBAdQCHApBkAAAGAEBqAHcCkGQAANUBfAtA0jgRgCQDADAAAFIDOAGAJAMAMAAAUgN4CIAkAwCoDuAbAJLG8QAkGQCAAQCQGsDXACSNBwFIMgCA6gDOAiDJAAAMAIDUALYFIMkAAAwAgNQArgYgyQAAqgM4E4AkAwAwAABSA3gCgCQDAKgO4HEAkgwAoDqAXwFIGtcBkGQAANUB7AlAkgEAGAAAqQFcAECSAQBUB7ArAEkGAGAAAKQGsAcASQYAYAAApAbwPABJBgBQHcAHACSNOwBIMgCA6gD+D0DSOASAJAMAMAAAUgN4H4CkcTsASQYAUB3AwQAkGQCAAQCQGsBBACQZAIABAJAawAMAJBkAQHUAXwGQNI4DIMkAAAwAgNQAvgQgadwPQJIBAFQHcCwASQYAYAAApAZwDABJBgBgAACkBvAYAEkGAFAdwC8AJI0zAEgyAAADACA1gJ8BSBqPApBkAADVAZwOQJIBABgAAKkBnAZAkgEAGAAAqQH8BEDSeA6AJAMAqA7gWQCSDACgOoDzAUgyAAADACA1gE0ASDIAAAMAwAAAmP8A/gIgaTwDQJIBAFQH8DQASQYAUB3AewAkjdsASDIAgOoADgQgyQAADACA1AAOACDJAAAMAIDUAG4FIMkAAKoDeBeApLE/AEkGAGAAAKQG8AUASeM+AJIMAKA6gKMBSDIAAAMAIDWAzQBIMgAAAwAgNYDdAUgyAAADACA1gKMASDIAAAMAIDWAzwFIGj8CkDR+ACBpnApAkgEAGAAAqQF8D0DSeASAJAMAqA7gFACSDADAAABIDeBkAJIMAMAAAEgN4GEAkgwAoDqAPwFIGucBkGQAAAYAQGoAfwCQNJ4CIMkAAKoDOBeAJAMAMAAAUgPYCYAkAwAwAABSA7gWgCQDAKgOYD8AkgwAwAAASA3gFgCSDACgOoB3AEgaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJPwNwoTqDjf3jCNAAAAAElFTkSuQmCC" alt="sky">
+    </div>
+    <div id="loading-screen">
+        <div class="loading-container">
+            <!-- <div class="loading-icon">
                     <img src="/purple.svg" alt="website icon">
                 </div> -->
-                <h2>‘STRIDE,</h2>
-                <p>is a mobile-optimized 3D web portfolio developed using HTML, CSS, and JavaScript, inspired by side-scrolling video games.</p>
-                <div class="loadingbar-container">
-                    <progress id="loading-bar" value="0" max="100"> 0% </progress>
-                    <p id="loading-text">Loading assets 0 out of 32</p>
-                </div>
+            <h2>‘STRIDE,</h2>
+            <p>is a mobile-optimized 3D web portfolio developed using HTML, CSS, and JavaScript, inspired by
+                side-scrolling video games.</p>
+            <div class="loadingbar-container">
+                <progress id="loading-bar" value="0" max="100"> 0% </progress>
+                <p id="loading-text">Loading assets 0 out of 32</p>
             </div>
         </div>
-        <div id="hud">
-            <canvas id="map-canvas"></canvas>
-            <div class="button-container">
-                <div class="button-flex">
-                    <lottie-player class="button-focus" loop autoplay src="./resources/animations/focus.json"></lottie-player>
-                    <div id="leftButton" class="control-button"></div>
-                </div>
-                <div class="button-flex">
-                    <lottie-player class="button-focus" loop autoplay src="./resources/animations/focus.json"></lottie-player>
-                    <div id="rightButton" class="control-button"></div>
-                </div>
+    </div>
+    <div id="hud">
+        <canvas id="map-canvas"></canvas>
+        <div class="button-container">
+            <div class="button-flex">
+                <lottie-player class="button-focus" loop autoplay
+                    src="./resources/animations/focus.json"></lottie-player>
+                <div id="leftButton" class="control-button"></div>
+            </div>
+            <div class="button-flex">
+                <lottie-player class="button-focus" loop autoplay
+                    src="./resources/animations/focus.json"></lottie-player>
+                <div id="rightButton" class="control-button"></div>
             </div>
         </div>
-        <div id="talkbubble-container">
-            <div class="talkbubble" id="talkbubble">
-                <div class="talkbubble-message" id="about-section">
-                    <div class="triangle"></div>
-                    <div class="talkbubble-badge">
-                        <lottie-player loop autoplay src="./resources/animations/gear.json"></lottie-player>
-                    </div>
-                    <p>
-                        This website was developed using 
-                    </p>
-                    <div class="auto-scroll">
-                        <div class="tools">
-                            <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a> 
-                            <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>
-                            <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
-                            <a class="highlight" href="https://rive.app/" target="_blank">Rive</a> 
-                            <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
-                            <a class="highlight" href="https://www.opengl.org/" target="_blank">GLSL</a>
-                            <a class="highlight" href="https://krita.org/" target="_blank">Krita</a>
-                            <a class="highlight" href="https://inkscape.org/" target="_blank">Inkscape</a>
-                            <a class="highlight" href="https://www.mixamo.com/" target="_blank">Mixamo</a>
-                        </div>
-                        <div class="tools">
-                            <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a> 
-                            <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>
-                            <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
-                            <a class="highlight" href="https://rive.app/" target="_blank">Rive</a> 
-                            <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
-                            <a class="highlight" href="https://www.opengl.org/" target="_blank">GLSL</a>
-                            <a class="highlight" href="https://krita.org/" target="_blank">Krita</a>
-                            <a class="highlight" href="https://inkscape.org/" target="_blank">Inkscape</a>
-                            <a class="highlight" href="https://www.mixamo.com/" target="_blank">Mixamo</a>
-                        </div>
-                    </div>
-                    <p>
-                        Thanks to,</br>
-                        <a class="highlight" href="https://sketchfab.com/boiko.pavlo4" target="_blank">Pavlo Boiko</a> 
-                        for bus 3D models.
-                    </p>
+    </div>
+    <div id="talkbubble-container">
+        <div class="talkbubble" id="talkbubble">
+            <div class="talkbubble-message" id="about-section">
+                <div class="triangle"></div>
+                <div class="talkbubble-badge">
+                    <lottie-player loop autoplay src="./resources/animations/gear.json"></lottie-player>
                 </div>
-                <div class="talkbubble-message" id="artwork-section">
-                    <div class="triangle"></div>
-                    <div class="talkbubble-badge">
-                        <lottie-player loop autoplay src="./resources/animations/media.json"></lottie-player>
+                <p>
+                    This website was developed using
+                </p>
+                <div class="auto-scroll">
+                    <div class="tools">
+                        <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>
+                        <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>
+                        <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
+                        <a class="highlight" href="https://rive.app/" target="_blank">Rive</a>
+                        <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
+                        <a class="highlight" href="https://www.opengl.org/" target="_blank">GLSL</a>
+                        <a class="highlight" href="https://krita.org/" target="_blank">Krita</a>
+                        <a class="highlight" href="https://inkscape.org/" target="_blank">Inkscape</a>
+                        <a class="highlight" href="https://www.mixamo.com/" target="_blank">Mixamo</a>
                     </div>
-                    <p>
-                        I use 
-                        <a class="highlight" href="https://krita.org/" target="_blank">Krita</a> 
-                        for digital art.
-                    </p> 
-                    <div class="gallery-container">
-                        <lottie-player class="scroll-button left" id="leftButtonGallery" src="./resources/animations/left.json"></lottie-player>
-                        <div class="gallery">
-                            <img type="image/webp" loading="lazy" src="./artwork/alone.webp">
-                            <img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp">
-                            <img type="image/webp" loading="lazy" src="./artwork/ip-girl.webp">
-                            <img type="image/webp" loading="lazy" src="./artwork/for-weirdos.webp">
-                            <img type="image/webp" loading="lazy" src="./artwork/batman.webp">
-                            <img type="image/webp" loading="lazy" src="./artwork/ashutti.webp">
-                        </div>
-                        <lottie-player class="scroll-button right" id="rightButtonGallery" src="./resources/animations/right.json"></lottie-player>
+                    <div class="tools">
+                        <a class="highlight" href="https://threejs.org/" target="_blank">Three.js</a>
+                        <a class="highlight" href="https://vitejs.dev/" target="_blank">Vite</a>
+                        <a class="highlight" href="https://www.blender.org/" target="_blank">Blender</a>
+                        <a class="highlight" href="https://rive.app/" target="_blank">Rive</a>
+                        <a class="highlight" href="https://useanimations.com/" target="_blank">UseAnimations</a>
+                        <a class="highlight" href="https://www.opengl.org/" target="_blank">GLSL</a>
+                        <a class="highlight" href="https://krita.org/" target="_blank">Krita</a>
+                        <a class="highlight" href="https://inkscape.org/" target="_blank">Inkscape</a>
+                        <a class="highlight" href="https://www.mixamo.com/" target="_blank">Mixamo</a>
                     </div>
                 </div>
-                <div class="talkbubble-message" id="intro-section">
-                    <div class="triangle"></div>
-                    <div class="talkbubble-badge">
-                        <lottie-player loop autoplay src="./resources/animations/dna.json"></lottie-player>
-                    </div>
-                    <p class="intro-message" id="intro-1">
-                        Hey, how's it goin'?!
-                    </p>
-                    <p class="intro-message" id="intro-2">
-                        Take a look at my <span class="highlight">portfolio.</span>
-                    </p>
-                    <p class="intro-message" id="intro-3">
-                        Explore using keyboard buttons <span class="highlight">A</span> & <span class="highlight">D</span>, 
-                        <span class="highlight">←</span> & <span class="highlight">→</span> or touch buttons.
-                    </p>
-                    <div id="intro-4">
-                        <p class="intro-message">
-                            I’m Jewel John, Gameplay & Graphics Engineer. These are my game development <span class="highlight">expertise</span>.
-                        </p>
-                        <div class="expertise">
-                            <table>
-                                <tr>
-                                    <th>SCRIPTING</th>
-                                    <th>GRAPHICS</th>
-                                    <th>TOOLS</th>
-                                </tr>
-                                <tr>
-                                    <td>C#</td>
-                                    <td>GLSL</td>
-                                    <td>Unity</td>
-                                </tr>
-                                <tr>
-                                    <td>OOP</td>
-                                    <td>Materials/Shaders</td>
-                                    <td>Blender</td>
-                                </tr>
-                                <tr>
-                                    <td>Mono</td>
-                                    <td>Modeling/Texturing</td>
-                                    <td>Photoshop</td>
-                                </tr>
-                                <tr>
-                                    <td>Editor Script</td>
-                                    <td>Rigging/Animation</td>
-                                    <td>Inkscape</td>
-                                </tr>
-                                <tr>
-                                    <td>Unity Events</td>
-                                    <td>Animation State Machines</td>
-                                    <td>FMOD</td>
-                                </tr>
-                                <tr>
-                                    <td>Scriptable Objects</td>
-                                    <td>SRP (URP/HDRP)</td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Input Systems</td>
-                                    <td>User Interfaces</td>
-                                    <td></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
+                <p>
+                    Thanks to,</br>
+                    <a class="highlight" href="https://sketchfab.com/boiko.pavlo4" target="_blank">Pavlo Boiko</a>
+                    for bus 3D models.
+                </p>
+            </div>
+            <div class="talkbubble-message" id="artwork-section">
+                <div class="triangle"></div>
+                <div class="talkbubble-badge">
+                    <lottie-player loop autoplay src="./resources/animations/media.json"></lottie-player>
                 </div>
-                <div class="talkbubble-message" id="project-section">
-                    <div class="triangle"></div>
-                    <div class="talkbubble-badge">
-                        <lottie-player loop autoplay src="./resources/animations/folder.json"></lottie-player>
+                <p>
+                    I use
+                    <a class="highlight" href="https://krita.org/" target="_blank">Krita</a>
+                    for digital art.
+                </p>
+                <div class="gallery-container">
+                    <lottie-player class="scroll-button left" id="leftButtonGallery"
+                        src="./resources/animations/left.json"></lottie-player>
+                    <div class="gallery">
+                        <img type="image/webp" loading="lazy" src="./artwork/alone.webp">
+                        <img type="image/webp" loading="lazy" src="./artwork/weatherin-with-you.webp">
+                        <img type="image/webp" loading="lazy" src="./artwork/ip-girl.webp">
+                        <img type="image/webp" loading="lazy" src="./artwork/for-weirdos.webp">
+                        <img type="image/webp" loading="lazy" src="./artwork/batman.webp">
+                        <img type="image/webp" loading="lazy" src="./artwork/ashutti.webp">
                     </div>
-                    <lottie-player class="scroll-button left align no-selection" id="leftButtonPortfolio" src="./resources/animations/left.json"></lottie-player>
-                    <div class="portfolio-container">
-                        <div class="portfolio">
-                            <div class="project selected">
-                                <div class="graphic">
-                                    <img type="image/webp" loading="lazy" src="./projects/burny-rush.webp">
+                    <lottie-player class="scroll-button right" id="rightButtonGallery"
+                        src="./resources/animations/right.json"></lottie-player>
+                </div>
+            </div>
+            <div class="talkbubble-message" id="intro-section">
+                <div class="triangle"></div>
+                <div class="talkbubble-badge">
+                    <lottie-player loop autoplay src="./resources/animations/dna.json"></lottie-player>
+                </div>
+                <p class="intro-message" id="intro-1">
+                    Hey, how's it goin'?!
+                </p>
+                <p class="intro-message" id="intro-2">
+                    Take a look at my <span class="highlight">portfolio.</span>
+                </p>
+                <p class="intro-message" id="intro-3">
+                    Explore using keyboard buttons <span class="highlight">A</span> & <span class="highlight">D</span>,
+                    <span class="highlight">←</span> & <span class="highlight">→</span> or touch buttons.
+                </p>
+                <div id="intro-4">
+                    <p class="intro-message">
+                        I’m Jewel John, Gameplay & Graphics Engineer. I work across the stack — from writing the code to
+                        crafting the visuals — on indie, mobile, and PC projects.
+                    </p>
+                </div>
+            </div>
+            <div class="talkbubble-message" id="project-section">
+                <div class="triangle"></div>
+                <div class="talkbubble-badge">
+                    <lottie-player loop autoplay src="./resources/animations/folder.json"></lottie-player>
+                </div>
+                <lottie-player class="scroll-button left align no-selection" id="leftButtonPortfolio"
+                    src="./resources/animations/left.json"></lottie-player>
+
+                <div class="portfolio-container">
+                    <div class="portfolio">
+
+                        <div class="project selected">
+                            <div class="project-body">
+                                <div class="project-header">
+                                    <img class="project-title-img" src="./projects/burny-rush.png" alt="Burny Rush">
                                 </div>
-                                <div class="content">
-                                    <h2>Burny Rush</h2>
-                                    <p>High-fidelity racing game for desktop. <span class="highlight">current project.</span></p>
-                                    <a href="https://jewelvjohn.github.io/burny-rush/" target="_blank"><span>VIEW PROJECT</span></a>
+                                <div class="project-info">
+                                    <p>High-fidelity desktop racing game concept with sophisticated vehicle controller
+                                        with a mix of arcade and realistic physics.</p>
+                                    <a href="https://jewelvjohn.github.io/burny-rush/" target="_blank"><span>VIEW
+                                            PROJECT</span></a>
                                 </div>
                             </div>
-                            <div class="project">
-                                <div class="graphic">
-                                    <img type="image/webp" loading="lazy" src="./projects/stratosphere.webp">
+                            <div class="project-art" style="background-image: url(./projects/burny-rush-showcase.webp);"></div>
+                        </div>
+
+                        <div class="project">
+                            <div class="project-body">
+                                <div class="project-header">
+                                    <img class="project-title-img" src="./projects/stratosphere.png" alt="Stratosphere">
                                 </div>
-                                <div class="content">
-                                    <h2>Stratosphere</h2>
-                                    <p>Third-person open-world game demo project.</p>
-                                    <a href="https://jewelvjohn.github.io/stratosphere/" target="_blank"><span>VIEW PROJECT</span></a>
+                                <div class="project-info">
+                                    <p>Third-person open-world game demo project prioritizing root-motion animation
+                                        state machines and character controllers.</p>
+                                    <a href="https://jewelvjohn.github.io/stratosphere/" target="_blank"><span>VIEW
+                                            PROJECT</span></a>
                                 </div>
                             </div>
+                            <div class="project-art" style="background-image: url(./projects/stratosphere-showcase.webp);"></div>
                         </div>
+
+                        <div class="project">
+                            <div class="project-body">
+                                <div class="project-header">
+                                    <img class="project-title-img" src="./projects/dark-descent.png" alt="Dark Descent">
+                                </div>
+                                <div class="project-info">
+                                    <p>A short, atmospheric exploration action horror game. Focused on mood, tension,
+                                        and the feeling of walking into a place that should've stayed sealed.</p>
+                                    <a href="https://jeweljohn.itch.io/dark-descent"
+                                        target="_blank"><span>EXPLORE</span></a>
+                                </div>
+                            </div>
+                            <div class="project-art" style="background-image: url(./projects/dark-descent-showcase.webp);"></div>
+                        </div>
+
                     </div>
-                    <lottie-player class="scroll-button right align no-selection" id="rightButtonPortfolio" src="./resources/animations/right.json"></lottie-player>
-                    <div class="dot-nav">
-                        <button class="dot-button selected no-selection" ></button>
-                        <button class="dot-button no-selection" ></button>
-                    </div>    
                 </div>
-                <div class="talkbubble-message" id="social-section">
-                    <div class="triangle"></div>
-                    <div class="talkbubble-badge">
-                        <lottie-player loop autoplay src="./resources/animations/messages.json"></lottie-player>
-                    </div>
-                    <p>
-                        Connect with me through my socials.
-                    </p> 
-                    <div class="talkbubble-social"> 
-                        <a href="https://www.linkedin.com/in/jewelvjohn/" target="_blank">
-                            <lottie-player loop hover src="./resources/animations/linkedin.json"></lottie-player>
-                        </a> 
-                        <a href="https://github.com/jewelvjohn" target="_blank">
-                            <lottie-player loop hover src="./resources/animations/github.json"></lottie-player>
-                        </a> 
-                        <a href="https://www.instagram.com/jewelvjohn/" target="_blank">
-                            <lottie-player id="instagram-camera" src="./resources/animations/instagram.json"></lottie-player>
-                        </a> 
-                        <a href="https://dribbble.com/jeweljohn" target="_blank">
-                            <lottie-player loop hover id="instagram-camera" src="./resources/animations/dribbble.json"></lottie-player>
-                        </a> 
-                    </div>
+                <lottie-player class="scroll-button right align no-selection" id="rightButtonPortfolio"
+                    src="./resources/animations/right.json"></lottie-player>
+                <div class="dot-nav">
+                    <button class="dot-button selected no-selection"></button>
+                    <button class="dot-button no-selection"></button>
+                    <button class="dot-button no-selection"></button>
+                </div>
+            </div>
+            <div class="talkbubble-message" id="social-section">
+                <div class="triangle"></div>
+                <div class="talkbubble-badge">
+                    <lottie-player loop autoplay src="./resources/animations/messages.json"></lottie-player>
+                </div>
+                <p>
+                    Connect with me through my socials.
+                </p>
+                <div class="talkbubble-social">
+                    <a href="https://www.linkedin.com/in/jewelvjohn/" target="_blank">
+                        <lottie-player loop hover src="./resources/animations/linkedin.json"></lottie-player>
+                    </a>
+                    <a href="https://github.com/jewelvjohn" target="_blank">
+                        <lottie-player loop hover src="./resources/animations/github.json"></lottie-player>
+                    </a>
+                    <a href="https://www.instagram.com/jewelvjohn/" target="_blank">
+                        <lottie-player id="instagram-camera"
+                            src="./resources/animations/instagram.json"></lottie-player>
+                    </a>
                 </div>
             </div>
         </div>
-        <canvas class="webgl">
-    </body>
+    </div>
+    <canvas class="webgl">
+</body>
+
 </html>
